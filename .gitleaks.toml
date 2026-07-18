@@ -1,0 +1,7 @@
+title = "eshtry-mny gitleaks config"
+
+[allowlist]
+description = "Allow documented placeholder values"
+regexes = [
+  '''CHANGE_ME''',
+]

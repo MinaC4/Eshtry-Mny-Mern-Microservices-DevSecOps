@@ -1,0 +1,26 @@
+# Copy to values.yaml (or override with --set / -f) and fill in real values.
+# Never commit real values.
+
+replicaCount: 3
+imagePullPolicy: IfNotPresent
+
+# Images from Docker Hub (override with --set images.user=...)
+images:
+  user: minac4/eshtry-mny-user:latest
+  product: minac4/eshtry-mny-product:latest
+  cart: minac4/eshtry-mny-cart:latest
+  frontend: minac4/eshtry-mny-frontend:latest
+
+# ConfigMap values
+mongoCluster: "CHANGE_ME"
+mongoDbname: "eshtry_mny"
+frontendOrigin: "https://eshtry-mny.local"
+
+# ====================== Ingress ======================
+ingress:
+  enabled: true
+  className: nginx
+  host: eshtry-mny.local
+  tls:
+    enabled: true
+    secretName: eshtry-mny-tls

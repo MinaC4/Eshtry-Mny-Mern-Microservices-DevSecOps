@@ -1,0 +1,39 @@
+replicaCount: 3
+imagePullPolicy: IfNotPresent
+
+# Images from Docker Hub (override with --set images.user=...)
+images:
+  user: minac4/eshtry-mny-user:latest
+  product: minac4/eshtry-mny-product:latest
+  cart: minac4/eshtry-mny-cart:latest
+  frontend: minac4/eshtry-mny-frontend:latest
+
+# ConfigMap values
+mongoCluster: "CHANGE_ME"
+mongoDbname: "eshtry_mny"
+frontendOrigin: "https://eshtry-mny.local"
+
+# Service-specific values
+services:
+  user:
+    name: user-service
+    image: "{{ .Values.images.user }}"
+    port: 9001
+  product:
+    name: product-service
+    image: "{{ .Values.images.product }}"
+    port: 9000
+  cart:
+    name: cart-service
+    image: "{{ .Values.images.cart }}"
+    port: 9003
+  frontend:
+    name: frontend
+    image: "{{ .Values.images.frontend }}"
+    port: 8080
+
+# ====================== Ingress ======================
+ingress:
+  enabled: true
+  className: nginx
+  host: eshtry-mny.local   # 

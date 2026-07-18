@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: eshtry-mny
+data:
+  NODE_ENV: {{ .Values.nodeEnv | default "production" | quote }}
+  MONGO_CLUSTER: {{ .Values.mongoCluster | quote }}
+  MONGO_DBNAME: {{ .Values.mongoDbname | quote }}
+  PRODUCT_SERVICE_URL: "http://product-service:9000"
+  FRONTEND_ORIGIN: {{ .Values.frontendOrigin | quote }}

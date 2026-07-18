@@ -1,0 +1,48 @@
+services:
+  user:
+    build: ./User
+    container_name: user-service
+    ports:
+      - "9001:9001"
+    env_file:
+      - .env
+    volumes:
+      - ./User:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  product:
+    build: ./Product
+    container_name: product-service
+    ports:
+      - "9000:9000"
+    env_file:
+      - .env
+    volumes:
+      - ./Product:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  cart:
+    build: ./Cart
+    container_name: cart-service
+    ports:
+      - "9003:9003"
+    environment:
+      PRODUCT_SERVICE_URL: http://product:9000
+    env_file:
+      - .env
+    volumes:
+      - ./Cart:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  frontend:
+    build: ./front-end
+    container_name: frontend
+    ports:
+      - "5173:8080"
+    volumes:
+      - ./front-end:/app
+      - /app/node_modules
+    restart: unless-stopped

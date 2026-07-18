@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: eshtry-mny
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/MinaC4/Eshtry-Mny-Mern-Microservices-DevSecOps.git
+    targetRevision: main
+    path: eshtry-mny
+    helm:
+      valueFiles:
+      - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: eshtry-mny
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
