@@ -20,7 +20,7 @@ spec:
               number: 8080
 
       # APIs only (optional improvement)
-      - path: /api/users
+      - path: /api/v1/users
         pathType: Prefix
         backend:
           service:
@@ -28,7 +28,7 @@ spec:
             port:
               number: 9001
 
-      - path: /api/products
+      - path: /api/v1/products
         pathType: Prefix
         backend:
           service:
@@ -36,7 +36,7 @@ spec:
             port:
               number: 9000
 
-      - path: /api/cart
+      - path: /api/v1/cart
         pathType: Prefix
         backend:
           service:
