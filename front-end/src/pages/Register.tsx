@@ -1,5 +1,7 @@
 import "../Style/Register.css";
 import { useState } from "react";
+import { API_BASE } from "../config/api";
+
 function Register() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -13,8 +15,13 @@ function Register() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    if (password !== confpassword) {
+      alert("passwords doesn't match");
+      return;
+    }
+
     try {
-      const response = await fetch("/users", {
+      const response = await fetch(`${API_BASE}/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -23,36 +30,19 @@ function Register() {
       });
   
       if (response.ok) {
-        console.log("Registered successful");
-        window.location.href = "/";
+        window.location.href = "/login";
       } else {
-        console.log("Registered failed");
+        alert("Registration failed");
       }
     } catch (error) {
       console.error("Error:", error);
-    }
-
-    if (password === confpassword) {
-      const data = {
-        email,
-        password,
-        firstName,
-        lastName,
-        age,
-        phone,
-        gender
-      };
-      const dataString = JSON.stringify(data);
-      window.location.href = "/login";
-    } else {
-      alert("passwords doesn't match");
     }
   }
   return (
     <div className="bg-img">
       <div className="registerContent">
         <header>Register Form</header>
-        <form action="/users" method="post" onSubmit={handleSubmit}>
+        <form action={`${API_BASE}/users`} method="post" onSubmit={handleSubmit}>
           <div className="row">
             <div className="col">
               <h6>First name</h6>
@@ -180,15 +170,9 @@ function Register() {
               <div className="row">
                 <div className="col inline">
                   <label className="radio-inline">
-                    <input type="text" name="gender"></input>
+                    <input type="text" name="gender" onChange={(event) => setGender(event.target.value)}></input>
                   </label>
                 </div>
-                {/* <div className="col inline">
-                  <label className="radio-inline">
-                    <input type="radio" name="gender" value="female"/>
-                    Female
-                  </label>
-                </div> */}
               </div>
             </div>
           </div>
@@ -198,7 +182,7 @@ function Register() {
         </form>
         <div className="signup space">
           Already have an account?
-          <a href="/">Login</a>
+          <a href="/login">Login</a>
         </div>
       </div>
     </div>

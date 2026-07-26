@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const logger = require('./config/logger');
 const app = express();
@@ -8,13 +9,14 @@ require('dotenv').config();
 require('./config/db_conn');
 const port = process.env.PORT || 9001;
 
+app.use(helmet());
 app.use(cors({
     origin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rate limiting
+// General rate limit
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -24,13 +26,7 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  message: { error: 'TooManyRequests', message: 'Too many login attempts, please try again later' }
-});
-app.use('/api/v1/users/login', authLimiter);
-app.use('/api/v1/users', authLimiter);
+// Auth-specific rate limiter is applied per-route in userRouter.js
 
 // Routes
 app.use("/api/v1/users", require("./routes/userRouter"));
@@ -61,3 +57,5 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   logger.info(`User service running on port ${port}`);
 });
+
+module.exports = app;

@@ -41,6 +41,20 @@ pipeline {
             }
         }
 
+        // Run unit/smoke tests for all backend services
+        stage('Test') {
+            steps {
+                sh 'cd User && npm ci && npm test'
+                sh 'cd Product && npm ci && npm test'
+                sh 'cd Cart && npm ci && npm test'
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/test-results/*.xml'
+                }
+            }
+        }
+
         // Build Docker images for all microservices
         stage('Build Docker Images') {
             steps {
@@ -84,7 +98,7 @@ pipeline {
             }
         }
 
-        // Update GitOps manifest for Argo CD to apply
+        // Update GitOps manifest — Jenkins tags values.yaml and pushes for Argo CD to apply
         stage('Update GitOps Manifest') {
             steps {
                 sh """

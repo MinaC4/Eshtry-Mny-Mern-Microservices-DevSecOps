@@ -2,6 +2,7 @@ import React, { Fragment, useEffect, useState } from "react";
 import "../Style/home.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Card from "../component/card";
+import { API_BASE } from "../config/api";
 
 function Home() {
   const [data, setData] = useState([]);
@@ -15,7 +16,7 @@ function Home() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("/products", {
+      const response = await fetch(`${API_BASE}/products`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -24,8 +25,6 @@ function Home() {
       if (response.ok) {
         const jsonData = await response.json();
         setData(jsonData);
-      } else {
-        console.log("Failed to fetch products");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -43,7 +42,7 @@ function Home() {
     if (selectedCategory === "idle") {
       fetchData();
     } else {
-      fetch(`/products/filter/category/${selectedCategory}`, {
+      fetch(`${API_BASE}/filter/category/${selectedCategory}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

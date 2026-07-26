@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const logger = require('./config/logger');
 const app = express();
@@ -8,6 +9,7 @@ require('dotenv').config();
 require('./config/db_conn');
 const port = process.env.PORT || 9000;
 
+app.use(helmet());
 app.use(cors({
     origin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
 }));
@@ -54,3 +56,5 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   logger.info(`Product service running on port ${port}`);
 });
+
+module.exports = app;

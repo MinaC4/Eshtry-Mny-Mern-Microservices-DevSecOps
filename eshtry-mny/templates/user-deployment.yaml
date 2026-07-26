@@ -4,7 +4,7 @@ metadata:
   name: user-service
   namespace: eshtry-mny
 spec:
-  replicas: {{ .Values.replicaCount }}
+  # replicas intentionally omitted — owned by user-service-hpa
   strategy:
     type: RollingUpdate
     rollingUpdate:

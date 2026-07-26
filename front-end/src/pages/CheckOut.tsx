@@ -1,37 +1,27 @@
 import { Fragment } from "react";
 import "../Style/CheckOut.css";
+import { API_BASE } from "../config/api";
+
 function CheckOut() {
+  function submitHandler() {
+    const token = localStorage.getItem("token");
 
-  
-function submitHandler(){
-  alert("Your order has been placed!");
-}
-
-
-  const token = localStorage.getItem("token");
-
-  if (token) { 
-    fetch("/cart/checkout", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
-      },
-    }).then((response) => {
-      if (response.ok) {
-        response.json().then((data) => {
-          console.log(data);
-        });
-      } else {
-        console.log("Error");
-      }
-    });
-  } else {
-    window.location.href = "/login";
+    if (token) {
+      fetch(`${API_BASE}/cart/checkout`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+      }).then((response) => {
+        if (response.ok) {
+          alert("Your order has been placed!");
+        }
+      });
+    } else {
+      window.location.href = "/login";
+    }
   }
-  
-  
-
 
   return (
     <Fragment>
@@ -93,7 +83,7 @@ function submitHandler(){
               </div>
             </div>
 
-            <div className="bat"  onClick={submitHandler} >proceed</div>
+            <div className="bat" onClick={submitHandler}>proceed</div>
           </div>
         </div>
       </div>

@@ -22,10 +22,20 @@ spec:
         - protocol: TCP
           port: 9000
   egress:
+    # DNS resolution (UDP + TCP port 53 to kube-system)
     - to:
-        - podSelector:
+        - namespaceSelector:
             matchLabels:
-              app: mongodb
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # MongoDB Atlas (external SaaS — allow to any IP on 27017)
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
       ports:
         - protocol: TCP
           port: 27017

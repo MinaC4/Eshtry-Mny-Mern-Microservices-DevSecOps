@@ -8,7 +8,7 @@ const mongo_cluster = process.env.MONGO_CLUSTER;
 const mongo_database = process.env.MONGO_DBNAME;
 
 
-mongoose.connect(`mongodb+srv://${mongo_username}:***@${mongo_cluster}/${mongo_database}?retryWrites=true&w=majority`
+mongoose.connect(`mongodb+srv://${mongo_username}:${mongo_password}@${mongo_cluster}/${mongo_database}?retryWrites=true&w=majority`
 , { useNewUrlParser: true, useUnifiedTopology: true })
 .then(() => logger.info(`Connected to: ${mongoose.connection.name}`))
 .catch(err => logger.error({ err }, 'MongoDB connection failed'));

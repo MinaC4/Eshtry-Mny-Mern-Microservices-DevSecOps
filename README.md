@@ -73,7 +73,7 @@ Jenkins builds, scans, and publishes the images, then records the new image tags
 - Uses **automated sync** with:
   - **prune**: removes deleted manifests
   - **selfHeal**: reconciles drift automatically
-- **Argo CD Image Updater** annotations on the Application (see `argocd-application.yaml`) automatically update image tags in `values.yaml` and commit back to git — Jenkins only builds and pushes images.
+- Jenkins builds images, tags `eshtry-mny/values.yaml` with `yq`, and pushes the commit. Argo CD detects the committed Helm values change and syncs it automatically — there are **no Argo CD Image Updater annotations** in `argocd-application.yaml`.
 
 Argo CD is the only component that applies Kubernetes changes to the cluster. After Jenkins pushes updated image tags, Argo CD detects the committed Helm values change and syncs it automatically.
 
@@ -101,7 +101,7 @@ The Helm chart in `eshtry-mny/` templates:
   - `/api/cart` → cart service
 - **TLS termination** via cert-manager + Let's Encrypt (annotation on Ingress)
 
-`k8s/base/configmap.yaml`, `k8s/base/secret.yaml` and `eshtry-mny/values.yaml` ship with `CHANGE_ME` placeholders only. For Helm, pass real values with `--set` or configure **External Secrets Operator** (see `eshtry-mny/templates/externalsecret.yaml` + `clustersecretstore.yaml`). `NOTE.md` keeps the reminder to rotate any credentials that were previously committed before making the repo public.
+`k8s/base/configmap.yaml`, `k8s/base/secret.yaml` and `eshtry-mny/values.yaml` ship with `CHANGE_ME` placeholders only. For Helm, pass real values with `--set secrets.mongoUsername=... --set secrets.mongoPassword=... --set secrets.accessToken=...` or supply a private `-f override.yaml` file. Rotate any credentials that were previously committed before making the repo public.
 
 Backends restrict CORS to `FRONTEND_ORIGIN` from the environment, which defaults to `http://localhost:5173` as shown in `.env.example`.
 

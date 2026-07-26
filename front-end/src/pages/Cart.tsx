@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import "../Style/Cart.css";
 import NavBar from "../component/NavBar";
+import { API_BASE } from "../config/api";
 
 declare global {
   interface Window {
@@ -16,47 +17,37 @@ function Cart() {
   const fetchCartData = async () => {
     try {
       const token = localStorage.getItem("token");
-      console.log("🔑 Cart - Token from localStorage:", token ? "✅ موجود" : "❌ مش موجود");
 
       if (!token) {
-        console.log("🚨 No token → redirect to login");
         window.location.href = "/login";
         return;
       }
 
-      const response = await fetch("/cart", {   // ← مهم: استخدم /cart مش localhost
+      const response = await fetch(`${API_BASE}/cart`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
 
-      console.log("📡 Cart fetch status:", response.status);
-
       if (response.ok) {
         const data = await response.json();
-        console.log("✅ Cart data received:", data);
         setCartData(data);
       } else if (response.status === 401) {
-        console.log("❌ Unauthorized → redirect to login");
         localStorage.removeItem("token");
         window.location.href = "/login";
-      } else {
-        console.log("❌ Failed to fetch cart");
       }
     } catch (error) {
-      console.error("❌ Error fetching cart:", error);
+      console.error("Error fetching cart:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Load cart on page open
   useEffect(() => {
     fetchCartData();
   }, []);
 
-  // Make it refreshable from ProductInfo
   useEffect(() => {
     window.refreshCart = fetchCartData;
     return () => { delete window.refreshCart; };
@@ -110,17 +101,10 @@ function Cart() {
                 </table>
               </div>
 
-              <div className="cart-table-bill">
-                <div className="bill-total bold-text">
-                  Total: ${cartData.total || 0}
-                </div>
-              </div>
-
-              <div className="cart-header-footer">
-                <a href="/Checkout">
-                  <button className="cart-header-cta red-bg" type="button">
-                    Proceed to Checkout
-                  </button>
+              <div className="total-section">
+                <p>Total: <strong>${cartData.total}</strong></p>
+                <a href="/checkout">
+                  <button className="searchButton">Proceed to Checkout</button>
                 </a>
               </div>
             </div>

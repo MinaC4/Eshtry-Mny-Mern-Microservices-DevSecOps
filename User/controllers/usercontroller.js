@@ -59,7 +59,8 @@ const loginUser = async (req, res, next) => {
                         lastName: user.lastName,
                         age: user.age,
                         phone: user.phone,
-                        gender: user.gender
+                        gender: user.gender,
+                        role: user.role
                     }
                 },
                 process.env.ACCESS_TOKEN,

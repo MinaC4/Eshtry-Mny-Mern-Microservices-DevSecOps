@@ -1,6 +1,7 @@
 import "../Style/profile.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Fragment, useState, useEffect } from "react";
+import { API_BASE } from "../config/api";
 
 type ProductDetail = {
   image?: string;
@@ -17,13 +18,12 @@ function ProductInfo() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/products/${productID}`, {
+        const response = await fetch(`${API_BASE}/products/${productID}`, {
           headers: {
             "Content-Type": "application/json",
           },
         });
         const data = await response.json();
-        console.log(data);
         setInputValue(data);
       } catch (error) {
         console.error("Error:", error);
@@ -36,8 +36,7 @@ function ProductInfo() {
   const onSubmithandler = () => {
     const token = localStorage.getItem("token");
     if (token) {
-      console.log("Add to cart");
-      fetch(`/cart/${productID}`, {
+      fetch(`${API_BASE}/cart/${productID}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -46,10 +45,8 @@ function ProductInfo() {
       })
         .then((response) => {
           if (response.ok) {
-            console.log("Added to cart");
             alert("Added to cart");
           } else {
-            console.log("Failed to add to cart");
             window.location.href = "/login";
           }
         })
@@ -57,9 +54,6 @@ function ProductInfo() {
           console.error("Error:", error);
         });
     }
-
-  
-
   };
 
   return (

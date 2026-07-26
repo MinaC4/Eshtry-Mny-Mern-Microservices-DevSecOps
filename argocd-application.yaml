@@ -21,3 +21,25 @@ spec:
       selfHeal: true
     syncOptions:
     - CreateNamespace=true
+  # Prevent ArgoCD selfHeal from reverting replica counts that HPAs manage
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: user-service
+      jsonPointers:
+        - /spec/replicas
+    - group: apps
+      kind: Deployment
+      name: product-service
+      jsonPointers:
+        - /spec/replicas
+    - group: apps
+      kind: Deployment
+      name: cart-service
+      jsonPointers:
+        - /spec/replicas
+    - group: apps
+      kind: Deployment
+      name: frontend
+      jsonPointers:
+        - /spec/replicas

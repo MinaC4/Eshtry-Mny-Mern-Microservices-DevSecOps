@@ -1,8 +1,19 @@
 const CartModel = require('../models/cartModel');
 const axios = require('axios');
+const axiosRetry = require('axios-retry').default;
 const logger = require('../config/logger');
 
 const PRODUCT_SERVICE_URL = process.env.PRODUCT_SERVICE_URL || 'http://product-service:9000';
+
+// Configure axios-retry: 2 retries with exponential backoff, 3 s timeout per request
+const axiosInstance = axios.create({ timeout: 3000 });
+axiosRetry(axiosInstance, {
+    retries: 2,
+    retryDelay: axiosRetry.exponentialDelay,
+    retryCondition: (err) =>
+        axiosRetry.isNetworkOrIdempotentRequestError(err) ||
+        (err.response && err.response.status >= 500),
+});
 
 const getCartProducts = async (req, res, next) => {
     try {
@@ -15,10 +26,12 @@ const getCartProducts = async (req, res, next) => {
         if (cartProductIds.length > 0) {
             const results = await Promise.all(
                 cartProductIds.map(id =>
-                    axios.get(`${PRODUCT_SERVICE_URL}/api/v1/products/${id}`).then(r => r.data).catch((err) => {
-                        logger.error({ err, productId: id }, 'Failed to fetch product from Product service');
-                        return null;
-                    })
+                    axiosInstance.get(`${PRODUCT_SERVICE_URL}/api/v1/products/${id}`)
+                        .then(r => r.data)
+                        .catch((err) => {
+                            logger.error({ err, productId: id }, 'Failed to fetch product from Product service');
+                            return null;
+                        })
                 )
             );
             Products = results.filter(p => p !== null);
@@ -38,9 +51,9 @@ const addCartProduct = async (req, res, next) => {
     const productId = req.params.productid;
 
     try {
-        // Verify product exists
+        // Verify product exists (with timeout + retry)
         try {
-            await axios.get(`${PRODUCT_SERVICE_URL}/api/v1/products/${productId}`);
+            await axiosInstance.get(`${PRODUCT_SERVICE_URL}/api/v1/products/${productId}`);
         } catch (err) {
             if (err.response?.status === 404) {
                 return res.status(404).json({ error: 'NotFound', message: 'Product not found' });

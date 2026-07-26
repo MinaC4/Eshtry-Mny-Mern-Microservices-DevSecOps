@@ -2,6 +2,7 @@ import "../Style/profile.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import NavBar from "../component/NavBar";
 import { useState, useEffect, Fragment } from "react";
+import { API_BASE } from "../config/api";
 
 type UserProfile = {
   firstName?: string;
@@ -17,15 +18,13 @@ function Profile() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    console.log("🔑 Profile - Token from localStorage:", token ? "✅ موجود" : "❌ مش موجود");
 
     if (!token) {
-      console.log("🚨 No token in Profile → redirect to login");
       window.location.href = "/login";
       return;
     }
 
-    fetch("/users", {   // ← بدون / في النهاية
+    fetch(`${API_BASE}/users`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -33,7 +32,6 @@ function Profile() {
       },
     })
       .then((response) => {
-        console.log("📡 Profile fetch status:", response.status);
         if (response.ok) {
           return response.json();
         } else {
@@ -41,11 +39,10 @@ function Profile() {
         }
       })
       .then((data) => {
-        console.log("✅ Profile data received:", data);
         setUser(data);
       })
       .catch((error) => {
-        console.error("❌ Profile error:", error);
+        console.error("Profile error:", error);
         window.location.href = "/login";
       });
   }, []);
