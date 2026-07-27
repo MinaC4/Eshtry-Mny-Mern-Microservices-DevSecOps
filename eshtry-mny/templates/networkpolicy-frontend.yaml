@@ -1,12 +1,12 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: user-service-allow
+  name: frontend-allow
   namespace: eshtry-mny
 spec:
   podSelector:
     matchLabels:
-      app: user-service
+      app: frontend
   policyTypes:
     - Ingress
     - Egress
@@ -17,14 +17,7 @@ spec:
               kubernetes.io/metadata.name: ingress-nginx
       ports:
         - protocol: TCP
-          port: 9001
-    - from:
-        - podSelector:
-            matchLabels:
-              app: frontend
-      ports:
-        - protocol: TCP
-          port: 9001
+          port: 8080
   egress:
     - to:
         - namespaceSelector:
@@ -36,8 +29,23 @@ spec:
         - protocol: TCP
           port: 53
     - to:
-        - ipBlock:
-            cidr: 0.0.0.0/0
+        - podSelector:
+            matchLabels:
+              app: user-service
       ports:
         - protocol: TCP
-          port: 27017
+          port: 9001
+    - to:
+        - podSelector:
+            matchLabels:
+              app: product-service
+      ports:
+        - protocol: TCP
+          port: 9000
+    - to:
+        - podSelector:
+            matchLabels:
+              app: cart-service
+      ports:
+        - protocol: TCP
+          port: 9003

@@ -10,95 +10,54 @@ pipeline {
     }
 
     stages {
-        // Checkout source code from Git repository
-        stage('Checkout Code') {
-            steps {
-                checkout scm
-            }
-        }
+        stage('Checkout Code') { steps { checkout scm } }
 
-        // Scan for leaked secrets
-        stage('Security: Secret Scan (gitleaks)') {
-            steps {
-                sh 'docker run --rm -v $(pwd):/repo zricethezav/gitleaks:latest detect --source=/repo --config=/repo/.gitleaks.toml --no-git -v --exit-code=1'
-            }
-        }
-
-        // Run SonarQube static code analysis
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('sonarqube') {
-                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                        sh """
-                            ${SONAR_SCANNER} \\
-                            -Dsonar.projectKey=eshtry-mny \\
-                            -Dsonar.sources=. \\
-                            -Dsonar.host.url=http://localhost:9000 \\
-                            -Dsonar.login=${SONAR_TOKEN}
-                        """
-                    }
+        stage('Quality & Tests') {
+            parallel {
+                stage('Security: Secret Scan') {
+                    steps { sh 'docker run --rm -v $(pwd):/repo zricethezav/gitleaks:latest detect --source=/repo --config=/repo/.gitleaks.toml --no-git -v --exit-code=1' }
                 }
+                // SonarQube DISABLED — server not reachable
+                stage('Test: User') { steps { sh 'cd User && npm ci && npm test' } }
+                stage('Test: Product') { steps { sh 'cd Product && npm ci && npm test' } }
+                stage('Test: Cart') { steps { sh 'cd Cart && npm ci && npm test' } }
+            }
+            post { always { junit allowEmptyResults: true, testResults: '**/test-results/*.xml' } }
+        }
+
+        stage('Build & Dependency Audit') {
+            parallel {
+                stage('Build: User') { steps { sh "docker build -t ${DOCKERHUB_ORG}/eshtry-mny-user:${IMAGE_TAG} ./User" } }
+                stage('Build: Product') { steps { sh "docker build -t ${DOCKERHUB_ORG}/eshtry-mny-product:${IMAGE_TAG} ./Product" } }
+                stage('Build: Cart') { steps { sh "docker build -t ${DOCKERHUB_ORG}/eshtry-mny-cart:${IMAGE_TAG} ./Cart" } }
+                stage('Build: Frontend') { steps { sh "docker build -t ${DOCKERHUB_ORG}/eshtry-mny-frontend:${IMAGE_TAG} ./front-end" } }
+                stage('Audit: User') { steps { sh 'cd User && npm audit --audit-level=high' } }
+                stage('Audit: Product') { steps { sh 'cd Product && npm audit --audit-level=high' } }
+                stage('Audit: Cart') { steps { sh 'cd Cart && npm audit --audit-level=high' } }
+                stage('Audit: Frontend') { steps { sh 'cd front-end && npm audit --audit-level=high' } }
             }
         }
 
-        // Run unit/smoke tests for all backend services
-        stage('Test') {
-            steps {
-                sh 'cd User && npm ci && npm test'
-                sh 'cd Product && npm ci && npm test'
-                sh 'cd Cart && npm ci && npm test'
-            }
-            post {
-                always {
-                    junit allowEmptyResults: true, testResults: '**/test-results/*.xml'
-                }
-            }
-        }
-
-        // Build Docker images for all microservices
-        stage('Build Docker Images') {
-            steps {
-                sh "docker build -t ${DOCKERHUB_ORG}/eshtry-mny-user:${IMAGE_TAG} ./User"
-                sh "docker build -t ${DOCKERHUB_ORG}/eshtry-mny-product:${IMAGE_TAG} ./Product"
-                sh "docker build -t ${DOCKERHUB_ORG}/eshtry-mny-cart:${IMAGE_TAG} ./Cart"
-                sh "docker build -t ${DOCKERHUB_ORG}/eshtry-mny-frontend:${IMAGE_TAG} ./front-end"
-            }
-        }
-
-        // Run security checks for Node.js dependencies
-        stage('Security: Dependency Audit') {
-            steps {
-                sh 'cd User && npm audit --audit-level=high'
-                sh 'cd Product && npm audit --audit-level=high'
-                sh 'cd Cart && npm audit --audit-level=high'
-                sh 'cd front-end && npm audit --audit-level=high'
-            }
-        }
-
-        // Scan Docker images for vulnerabilities using Trivy
         stage('Security: Docker Scan (Trivy)') {
-            steps {
-                sh """
-                    docker run --rm aquasec/trivy image ${DOCKERHUB_ORG}/eshtry-mny-user:${IMAGE_TAG} --severity HIGH,CRITICAL --exit-code 1
-                    docker run --rm aquasec/trivy image ${DOCKERHUB_ORG}/eshtry-mny-product:${IMAGE_TAG} --severity HIGH,CRITICAL --exit-code 1
-                    docker run --rm aquasec/trivy image ${DOCKERHUB_ORG}/eshtry-mny-cart:${IMAGE_TAG} --severity HIGH,CRITICAL --exit-code 1
-                    docker run --rm aquasec/trivy image ${DOCKERHUB_ORG}/eshtry-mny-frontend:${IMAGE_TAG} --severity HIGH,CRITICAL --exit-code 1
-                """
+            parallel {
+                stage('Trivy: User') { steps { sh "docker run --rm aquasec/trivy image ${DOCKERHUB_ORG}/eshtry-mny-user:${IMAGE_TAG} --severity HIGH,CRITICAL --exit-code 1" } }
+                stage('Trivy: Product') { steps { sh "docker run --rm aquasec/trivy image ${DOCKERHUB_ORG}/eshtry-mny-product:${IMAGE_TAG} --severity HIGH,CRITICAL --exit-code 1" } }
+                stage('Trivy: Cart') { steps { sh "docker run --rm aquasec/trivy image ${DOCKERHUB_ORG}/eshtry-mny-cart:${IMAGE_TAG} --severity HIGH,CRITICAL --exit-code 1" } }
+                stage('Trivy: Frontend') { steps { sh "docker run --rm aquasec/trivy image ${DOCKERHUB_ORG}/eshtry-mny-frontend:${IMAGE_TAG} --severity HIGH,CRITICAL --exit-code 1" } }
             }
         }
 
-        // Push Docker images to Docker Hub registry
-        stage('Push Images to Docker Hub') {
-            steps {
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                sh "docker push ${DOCKERHUB_ORG}/eshtry-mny-user:${IMAGE_TAG}"
-                sh "docker push ${DOCKERHUB_ORG}/eshtry-mny-product:${IMAGE_TAG}"
-                sh "docker push ${DOCKERHUB_ORG}/eshtry-mny-cart:${IMAGE_TAG}"
-                sh "docker push ${DOCKERHUB_ORG}/eshtry-mny-frontend:${IMAGE_TAG}"
+        stage('Docker Login') { steps { sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin' } }
+
+        stage('Push Images') {
+            parallel {
+                stage('Push: User') { steps { sh "docker push ${DOCKERHUB_ORG}/eshtry-mny-user:${IMAGE_TAG}" } }
+                stage('Push: Product') { steps { sh "docker push ${DOCKERHUB_ORG}/eshtry-mny-product:${IMAGE_TAG}" } }
+                stage('Push: Cart') { steps { sh "docker push ${DOCKERHUB_ORG}/eshtry-mny-cart:${IMAGE_TAG}" } }
+                stage('Push: Frontend') { steps { sh "docker push ${DOCKERHUB_ORG}/eshtry-mny-frontend:${IMAGE_TAG}" } }
             }
         }
 
-        // Update GitOps manifest — Jenkins tags values.yaml and pushes for Argo CD to apply
         stage('Update GitOps Manifest') {
             steps {
                 sh """
@@ -110,18 +69,14 @@ pipeline {
                     git config user.name "Jenkins CI"
                     git add eshtry-mny/values.yaml
                     git commit -m "ci: update image tags to ${IMAGE_TAG}" || echo "No changes to commit"
+                    git pull --rebase origin main
                     git push origin HEAD:main
                 """
             }
         }
     }
-
     post {
-        success {
-            echo 'Pipeline Success'
-        }
-        failure {
-            echo 'Pipeline Failed'
-        }
+        success { echo 'Pipeline Success' }
+        failure { echo 'Pipeline Failed' }
     }
 }

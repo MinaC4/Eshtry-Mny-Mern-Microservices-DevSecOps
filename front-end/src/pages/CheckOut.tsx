@@ -1,26 +1,18 @@
 import { Fragment } from "react";
 import "../Style/CheckOut.css";
 import { API_BASE } from "../config/api";
+import axios from "axios";
 
 function CheckOut() {
   function submitHandler() {
-    const token = localStorage.getItem("token");
-
-    if (token) {
-      fetch(`${API_BASE}/cart/checkout`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
-        },
-      }).then((response) => {
-        if (response.ok) {
-          alert("Your order has been placed!");
-        }
+    axios.delete(`${API_BASE}/cart/checkout`)
+      .then((response) => {
+        if (response.status === 200) { alert("Your order has been placed!"); }
+      })
+      .catch((error) => {
+        console.error("Checkout error:", error);
+        if (error.response?.status === 401) { window.location.href = "/login"; }
       });
-    } else {
-      window.location.href = "/login";
-    }
   }
 
   return (

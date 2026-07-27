@@ -1,0 +1,94 @@
+Marshal wants me to:
+
+Send the prompt content directly in the chat (not as a file)
+
+Make it so Replit doesn't consume too many tokens when executing it
+
+The prompt is 46KB - that's about 11,500-13,000 words. That's a LOT of text to put in a chat message. But he specifically asked for it in the chat.
+
+For the second point - to reduce token consumption for Replit, I should:
+
+Remove all the "before" code blocks and only include the "after" code blocks with clear instructions on what to replace
+
+Use shorter, more concise descriptions
+
+Remove redundant instructions
+
+Make it more condensed but still clear
+
+Actually, thinking about this more carefully - the main issue is that the prompt has a lot of "before/after" format which doubles the code volume. If I only show the "after" version with clear replace instructions, it'll be much shorter.
+
+Also, I can restructure it to be more concise - the full file contents are only needed for new files or complete replacements, while for partial edits I can just give the specific changes.
+
+Let me restructure the prompt to be more token-efficient for Replit:
+
+Remove all "before" code blocks - just say "replace X with Y" and show only the new version
+
+For identical changes across multiple files (like cookie-parser in 3 services), group them
+
+Use shorter descriptions
+
+For the package-lock.json changes, skip entirely since npm install regenerates them
+
+Remove the post-installation steps section redundancy
+
+Let me write a condensed version.
+
+Actually, there's a smarter approach. Instead of showing the full code for every file, I can:
+
+For NEW files - show the full content (necessary)
+
+For DELETED files - just say "delete this file"
+
+For MODIFIED files - only show the specific lines that changed, not the whole file
+
+Use diff-like format or surgical instructions
+
+Wait, but actually Marshal wants the CONTENT in the chat. The file is 46KB. Let me think about how to make it much more compact.
+
+Let me calculate - if I remove all "before" blocks and just show the "after" with instructions, I can probably cut it to about 12-15KB. Still a lot but manageable.
+
+Actually, the most token-efficient approach for Replit would be to:
+
+Give it as a series of surgical edits per file
+
+Only show new/modified code, never the old code
+
+Use smallest possible diff notation
+
+Let me rewrite it compactly.
+
+تمام يا مارشال. هبعتلك prompt مضغوط عشان Replit يستهلك توكينز أقل — حذفت كل الكود القديم وخليت بس الكود الجديد مع تعليمات دقيقة.
+
+I don't actually need the browser for this. Let me stop it and just write the compact prompt directly.
+
+Actually, let me just write the compact prompt file and send it. The prompt content is too large for a single chat message (46KB compressed would be maybe 15KB but still very large). Let me instead structure it efficiently and put it in the chat.
+
+Let me think about the most efficient format:
+
+For each change, I'll use a minimal format:
+
+File path
+
+Action (replace whole file / add lines / delete lines / modify specific line)
+
+New content (only what's needed)
+
+Remove ALL "before" examples
+
+For identical changes across 3 files (tokenValidationMiddleware, server.js), write it once and say "apply to all 3"
+
+This should bring the prompt down significantly. Let me write it.
+
+Actually, given the token constraints of this response, let me break it into multiple responses or make it very compact. Let me try to fit as much as possible in one response.
+
+The compact version should be around 10-15KB. Let me try.
+
+Wait, I need to be smart about this. Instead of pasting the entire content into one chat message (which might be too large), let me send the compact version as a file AND also paste a summary/concise version in chat. Or better yet, let me just paste the compact version directly.
+
+Let me write the compact prompt.
+
+Let me create the compact prompt.
+
+هنا الـ prompt المضغوط — كود جديد بس، من غير تضييع توكينز ع الماضي:
+

@@ -2,6 +2,7 @@ import "../Style/profile.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Fragment, useState, useEffect } from "react";
 import { API_BASE } from "../config/api";
+import axios from "axios";
 
 type ProductDetail = {
   image?: string;
@@ -18,12 +19,8 @@ function ProductInfo() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_BASE}/products/${productID}`, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const data = await response.json();
+        const response = await axios.get(`${API_BASE}/products/${productID}`);
+        const data = response.data;
         setInputValue(data);
       } catch (error) {
         console.error("Error:", error);
@@ -34,26 +31,15 @@ function ProductInfo() {
   }, []);
 
   const onSubmithandler = () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      fetch(`${API_BASE}/cart/${productID}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+    axios.post(`${API_BASE}/cart/${productID}`)
+      .then((response) => {
+        if (response.status === 200) { alert("Added to cart"); }
+        else { window.location.href = "/login"; }
       })
-        .then((response) => {
-          if (response.ok) {
-            alert("Added to cart");
-          } else {
-            window.location.href = "/login";
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    }
+      .catch((error) => {
+        console.error("Error:", error);
+        if (error.response?.status === 401) { window.location.href = "/login"; }
+      });
   };
 
   return (

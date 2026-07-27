@@ -1,0 +1,5 @@
+title = "eshtry-mny gitleaks config"
+
+# No allowlist entries — every finding should be reviewed.
+# If a false positive is confirmed after review, add a narrow regex here
+# with a comment explaining why it's safe to ignore.

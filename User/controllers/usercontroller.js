@@ -51,34 +51,20 @@ const loginUser = async (req, res, next) => {
 
         if (user && (await bcrypt.compare(password, user.password))) {
             const accessToken = jwt.sign(
-                {
-                    user: {
-                        id: user._id,
-                        email: user.email,
-                        firstName: user.firstName,
-                        lastName: user.lastName,
-                        age: user.age,
-                        phone: user.phone,
-                        gender: user.gender,
-                        role: user.role
-                    }
-                },
+                { user: { id: user._id, role: user.role } },
                 process.env.ACCESS_TOKEN,
                 { expiresIn: "1h" }
             );
 
             logger.info({ userId: user._id, email }, 'User logged in successfully');
+            res.cookie('token', accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 3600000
+            });
             return res.status(200).json({
-                token: accessToken,
-                user: {
-                    id: user._id,
-                    email: user.email,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    age: user.age,
-                    phone: user.phone,
-                    gender: user.gender
-                }
+                user: { id: user._id, email: user.email, firstName: user.firstName, lastName: user.lastName }
             });
         } else {
             return res.status(401).json({

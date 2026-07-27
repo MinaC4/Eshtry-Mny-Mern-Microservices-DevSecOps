@@ -32,16 +32,15 @@ services:
     image: "{{ .Values.images.frontend }}"
     port: 8080
 
-# ====================== Ingress ======================
-# Secrets — pass real values with --set secrets.* or a -f override file.
-# Never commit real credentials here.
-secrets:
-  mongoUsername: "CHANGE_ME"
-  mongoPassword: "CHANGE_ME"
-  accessToken: "CHANGE_ME"
+# Secrets are now managed by External Secrets Operator (AWS Secrets Manager).
+# See eshtry-mny/templates/externalsecret.yaml for the mapping.
+# Do NOT set secrets via --set secrets.* anymore.
 
 # ====================== Ingress ======================
 ingress:
   enabled: true
   className: nginx
-  host: eshtry-mny.local   # 
+  host: eshtry-mny.local
+  tls:
+    enabled: true
+    secretName: eshtry-mny-tls

@@ -3,6 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import NavBar from "../component/NavBar";
 import { useState, useEffect, Fragment } from "react";
 import { API_BASE } from "../config/api";
+import axios from "axios";
 
 type UserProfile = {
   firstName?: string;
@@ -17,30 +18,8 @@ function Profile() {
   const [user, setUser] = useState<UserProfile>({});
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      window.location.href = "/login";
-      return;
-    }
-
-    fetch(`${API_BASE}/users`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error("Unauthorized");
-        }
-      })
-      .then((data) => {
-        setUser(data);
-      })
+    axios.get(`${API_BASE}/users`)
+      .then((response) => { setUser(response.data); })
       .catch((error) => {
         console.error("Profile error:", error);
         window.location.href = "/login";

@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import "../Style/Cart.css";
 import NavBar from "../component/NavBar";
 import { API_BASE } from "../config/api";
+import axios from "axios";
 
 declare global {
   interface Window {
@@ -16,32 +17,12 @@ function Cart() {
 
   const fetchCartData = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        window.location.href = "/login";
-        return;
-      }
-
-      const response = await fetch(`${API_BASE}/cart`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setCartData(data);
-      } else if (response.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/login";
-      }
-    } catch (error) {
+      const response = await axios.get(`${API_BASE}/cart`);
+      if (response.status === 200) { setCartData(response.data); }
+    } catch (error: any) {
       console.error("Error fetching cart:", error);
-    } finally {
-      setLoading(false);
-    }
+      if (error.response?.status === 401) { window.location.href = "/login"; }
+    } finally { setLoading(false); }
   };
 
   useEffect(() => {

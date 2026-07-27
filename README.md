@@ -85,7 +85,7 @@ The Helm chart in `eshtry-mny/` templates:
 
 - Deployments + Services for **user**, **product**, **cart**, and **frontend**
 - A shared `ConfigMap` (`app-config`) for non-secret settings
-- A shared `Secret` (`app-secrets`) for sensitive settings (populated via **External Secrets Operator** from AWS Secrets Manager)
+- A shared `Secret` (`app-secrets`) for sensitive settings (populated via **External Secrets Operator** from AWS Secrets Manager — see `eshtry-mny/templates/externalsecret.yaml` for the key mapping)
 - A dedicated `eshtry-mny` namespace
 - Health probes and resource requests/limits on all backend deployments
 - Container `securityContext` settings with `runAsNonRoot: true`, `readOnlyRootFilesystem: true`, and `allowPrivilegeEscalation: false`
@@ -101,7 +101,7 @@ The Helm chart in `eshtry-mny/` templates:
   - `/api/cart` → cart service
 - **TLS termination** via cert-manager + Let's Encrypt (annotation on Ingress)
 
-`k8s/base/configmap.yaml`, `k8s/base/secret.yaml` and `eshtry-mny/values.yaml` ship with `CHANGE_ME` placeholders only. For Helm, pass real values with `--set secrets.mongoUsername=... --set secrets.mongoPassword=... --set secrets.accessToken=...` or supply a private `-f override.yaml` file. Rotate any credentials that were previously committed before making the repo public.
+`k8s/base/configmap.yaml` and `eshtry-mny/values.yaml` ship with `CHANGE_ME` placeholders only. Secrets (`app-secrets`) are managed by **External Secrets Operator** from AWS Secrets Manager — see `eshtry-mny/templates/externalsecret.yaml`. For local Docker Compose development, create a `.env` file from `.env.example`. Rotate any credentials that were previously committed before making the repo public.
 
 Backends restrict CORS to `FRONTEND_ORIGIN` from the environment, which defaults to `http://localhost:5173` as shown in `.env.example`.
 

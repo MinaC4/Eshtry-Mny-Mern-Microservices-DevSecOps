@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
 const logger = require('./config/logger');
 const app = express();
 
@@ -12,9 +13,11 @@ const port = process.env.PORT || 9000;
 app.use(helmet());
 app.use(cors({
     origin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
+    credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Rate limiting
 const limiter = rateLimit({
@@ -44,17 +47,24 @@ app.get('/health', (req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-  logger.error({ err, path: req.path, method: req.method }, 'Unhandled error');
   const status = err.status || 500;
-  res.status(status).json({
-    error: err.name || 'InternalError',
-    message: err.message || 'Something went wrong',
-    details: err.details || {}
-  });
+  logger.error({ err, path: req.path, method: req.method, status }, 'Unhandled error');
+  res.status(status).json(
+    status >= 500
+      ? { error: 'InternalServerError', message: 'Something went wrong. Please try again later.' }
+      : { error: err.name || 'Error', message: err.message || 'Something went wrong',
+          ...(err.details && { details: err.details }) }
+  );
 });
 
-app.listen(port, () => {
-  logger.info(`Product service running on port ${port}`);
+const server = app.listen(port, () => {
+  logger.info(`[Product] service running on port ${port}`);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error({ err: reason, promise }, 'Unhandled Rejection');
+  server.close(() => process.exit(1));
+  setTimeout(() => process.exit(1), 10000);
 });
 
 module.exports = app;

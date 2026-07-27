@@ -1,6 +1,7 @@
 import { Fragment, useState } from "react";
 import "../Style/Login.css";
 import { API_BASE } from "../config/api";
+import axios from "axios";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -8,19 +9,9 @@ function Login() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-   
     try {
-      const response = await fetch(`${API_BASE}/users/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.token) {
-        localStorage.setItem("token", data.token);
-        if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
+      const response = await axios.post(`${API_BASE}/users/login`, { email, password });
+      if (response.status === 200) {
         window.location.href = "/";
       } else {
         alert("Password or email not correct");

@@ -1,0 +1,1361 @@
+
+
+
+
+# Replit Prompt — Eshtry-Mny Fix (Compact)
+
+
+
+> نفذ بالترتيب من 1 إلى 7. بعد ما تخلص كل مجموعة، اشتغل اللي بعدها.
+
+> الكود تحت هو الكود الجديد — استبدل بيه الملفات أو التغييرات بالظبط.
+
+
+
+---
+
+
+
+## 1. 🔴 Blockers (13 ملف)
+
+
+
+### 1.1 Product/controllers/filterController.js — استبدل الملف كله
+
+
+
+```javascript
+
+const productModel = require('../models/productModel');
+
+
+
+const categoryFilter  = async (req, res, next) =>{
+
+    try { const filteredProducts = await productModel.find({category: req.params.category})
+
+        res.json({filteredProducts})
+
+    } catch (error) { next(error) }
+
+}
+
+
+
+const priceFilter = async (req, res, next) =>{
+
+    try { const filteredProducts = await productModel.find({price: {$lte: req.params.price}})
+
+        res.json(filteredProducts)
+
+    } catch (error) { next(error) }
+
+}
+
+
+
+const categorypriceFilter = async (req, res, next) =>{
+
+    try { const filteredProducts = await productModel.find({category: req.params.category, price: {$lte: req.params.price}})
+
+        res.json(filteredProducts)
+
+    } catch (error) { next(error) }
+
+}
+
+
+
+module.exports = { categoryFilter, priceFilter, categorypriceFilter }
+
+```
+
+
+
+### 1.2 User + Product + Cart — server.js (نفذ في الـ 3)
+
+
+
+**حرفياً اعمل الـ 7 تغييرات دي في كل ملف من User/server.js و Product/server.js و Cart/server.js:**
+
+
+
+**(أ)** بعد `const rateLimit = require('express-rate-limit');` أضف:
+
+```javascript
+
+const cookieParser = require('cookie-parser');
+
+```
+
+
+
+**(ب)** في `app.use(cors({...}))` غيّرها لـ:
+
+```javascript
+
+app.use(cors({
+
+    origin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
+
+    credentials: true
+
+}));
+
+```
+
+
+
+**(ج)** بعد `app.use(express.urlencoded({ extended: true }));` أضف:
+
+```javascript
+
+app.use(cookieParser());
+
+```
+
+
+
+**(د)** استبدل global error handler بالكود ده:
+
+```javascript
+
+app.use((err, req, res, next) => {
+
+  const status = err.status || 500;
+
+  logger.error({ err, path: req.path, method: req.method, status }, 'Unhandled error');
+
+  res.status(status).json(
+
+    status >= 500
+
+      ? { error: 'InternalServerError', message: 'Something went wrong. Please try again later.' }
+
+      : { error: err.name || 'Error', message: err.message || 'Something went wrong',
+
+          ...(err.details && { details: err.details }) }
+
+  );
+
+});
+
+```
+
+
+
+**(هـ)** استبدل `app.listen(...)` بـ:
+
+```javascript
+
+const server = app.listen(port, () => {
+
+  logger.info(`[SERVICE] service running on port ${port}`);
+
+});
+
+// بدّل [SERVICE] بـ User / Product / Cart حسب الملف
+
+
+
+process.on('unhandledRejection', (reason, promise) => {
+
+  logger.error({ err: reason, promise }, 'Unhandled Rejection');
+
+  server.close(() => process.exit(1));
+
+  setTimeout(() => process.exit(1), 10000);
+
+});
+
+```
+
+
+
+**(و)** تأكد إن في `module.exports = app;` في آخر الملف
+
+
+
+### 1.3 User + Product + Cart — tokenValidationMiddleware (نفذ في الـ 3)
+
+
+
+استبدل **الدالة كلها** (من `const validateToken =` لآخرها) بـ:
+
+
+
+```javascript
+
+const validateToken = asyncHandler(async (req, res, next) => {
+
+    let token;
+
+    if (req.cookies && req.cookies.token) {
+
+        token = req.cookies.token;
+
+    } else {
+
+        let authHeader = req.headers.Authorization || req.headers.authorization;
+
+        if (authHeader && authHeader.startsWith("Bearer")) {
+
+            token = authHeader.split(" ")[1];
+
+        }
+
+    }
+
+    if (token) {
+
+        jwt.verify(token, process.env.ACCESS_TOKEN, { algorithms: ['HS256'] }, (err, decoded) => {
+
+            if (err) {
+
+                logger.warn({ err: err.message }, 'JWT verification failed');
+
+                return res.status(401).json({ error: 'Unauthorized', message: "User is not authorized" });
+
+            }
+
+            req.user = decoded.user;
+
+            next();
+
+        });
+
+    } else {
+
+        logger.warn('No token provided in request');
+
+        return res.status(401).json({ error: 'Unauthorized', message: "No token provided" });
+
+    }
+
+});
+
+```
+
+
+
+### 1.4 User/controllers/usercontroller.js — JWT payload + login response
+
+
+
+**(أ)** استبدل `jwt.sign` بهذا:
+
+```javascript
+
+const accessToken = jwt.sign(
+
+    { user: { id: user._id, role: user.role } },
+
+    process.env.ACCESS_TOKEN,
+
+    { expiresIn: "1h" }
+
+);
+
+```
+
+
+
+**(ب)** استبدل `return res.status(200).json({...})` بهذا:
+
+```javascript
+
+res.cookie('token', accessToken, {
+
+    httpOnly: true,
+
+    secure: process.env.NODE_ENV === 'production',
+
+    sameSite: 'strict',
+
+    maxAge: 3600000
+
+});
+
+return res.status(200).json({
+
+    user: { id: user._id, email: user.email, firstName: user.firstName, lastName: user.lastName }
+
+});
+
+```
+
+
+
+### 1.5 User/models/userModel.js — غيّر حقل email
+
+
+
+```
+
+email: {
+
+    type: String,
+
+    required: [true, "Please enter your email"],
+
+    unique: true
+
+},
+
+```
+
+
+
+### 1.6 Product/models/productModel.js — غيّر حقل name
+
+
+
+```
+
+name: {
+
+    type: String,
+
+    required: true,
+
+    unique: true
+
+},
+
+```
+
+
+
+### 1.7 package.json — أضف "cookie-parser": "^1.4.7" في dependencies في User و Product و Cart
+
+
+
+---
+
+
+
+## 2. 🔵 NetworkPolicies (5 ملفات)
+
+
+
+### 2.1 networkpolicy-user.yaml — استبدل الملف كله
+
+
+
+```yaml
+
+apiVersion: networking.k8s.io/v1
+
+kind: NetworkPolicy
+
+metadata:
+
+  name: user-service-allow
+
+  namespace: eshtry-mny
+
+spec:
+
+  podSelector:
+
+    matchLabels:
+
+      app: user-service
+
+  policyTypes:
+
+    - Ingress
+
+    - Egress
+
+  ingress:
+
+    - from:
+
+        - namespaceSelector:
+
+            matchLabels:
+
+              kubernetes.io/metadata.name: ingress-nginx
+
+      ports:
+
+        - protocol: TCP
+
+          port: 9001
+
+    - from:
+
+        - podSelector:
+
+            matchLabels:
+
+              app: frontend
+
+      ports:
+
+        - protocol: TCP
+
+          port: 9001
+
+  egress:
+
+    - to:
+
+        - namespaceSelector:
+
+            matchLabels:
+
+              kubernetes.io/metadata.name: kube-system
+
+      ports:
+
+        - protocol: UDP
+
+          port: 53
+
+        - protocol: TCP
+
+          port: 53
+
+    - to:
+
+        - ipBlock:
+
+            cidr: 0.0.0.0/0
+
+      ports:
+
+        - protocol: TCP
+
+          port: 27017
+
+```
+
+
+
+### 2.2 networkpolicy-product.yaml — استبدل الملف كله
+
+
+
+```yaml
+
+apiVersion: networking.k8s.io/v1
+
+kind: NetworkPolicy
+
+metadata:
+
+  name: product-service-allow
+
+  namespace: eshtry-mny
+
+spec:
+
+  podSelector:
+
+    matchLabels:
+
+      app: product-service
+
+  policyTypes:
+
+    - Ingress
+
+    - Egress
+
+  ingress:
+
+    - from:
+
+        - namespaceSelector:
+
+            matchLabels:
+
+              kubernetes.io/metadata.name: ingress-nginx
+
+        - podSelector:
+
+            matchLabels:
+
+              app: frontend
+
+        - podSelector:
+
+            matchLabels:
+
+              app: cart-service
+
+      ports:
+
+        - protocol: TCP
+
+          port: 9000
+
+  egress:
+
+    - to:
+
+        - namespaceSelector:
+
+            matchLabels:
+
+              kubernetes.io/metadata.name: kube-system
+
+      ports:
+
+        - protocol: UDP
+
+          port: 53
+
+        - protocol: TCP
+
+          port: 53
+
+    - to:
+
+        - ipBlock:
+
+            cidr: 0.0.0.0/0
+
+      ports:
+
+        - protocol: TCP
+
+          port: 27017
+
+```
+
+
+
+### 2.3 networkpolicy-cart.yaml — غيّر سطر واحد
+
+
+
+في `namespaceSelector` غيّر `name: ingress-nginx` → `kubernetes.io/metadata.name: ingress-nginx`
+
+
+
+### 2.4 networkpolicy-frontend.yaml — أنشئ ملف جديد
+
+
+
+```yaml
+
+apiVersion: networking.k8s.io/v1
+
+kind: NetworkPolicy
+
+metadata:
+
+  name: frontend-allow
+
+  namespace: eshtry-mny
+
+spec:
+
+  podSelector:
+
+    matchLabels:
+
+      app: frontend
+
+  policyTypes:
+
+    - Ingress
+
+    - Egress
+
+  ingress:
+
+    - from:
+
+        - namespaceSelector:
+
+            matchLabels:
+
+              kubernetes.io/metadata.name: ingress-nginx
+
+      ports:
+
+        - protocol: TCP
+
+          port: 8080
+
+  egress:
+
+    - to:
+
+        - namespaceSelector:
+
+            matchLabels:
+
+              kubernetes.io/metadata.name: kube-system
+
+      ports:
+
+        - protocol: UDP
+
+          port: 53
+
+        - protocol: TCP
+
+          port: 53
+
+    - to:
+
+        - podSelector:
+
+            matchLabels:
+
+              app: user-service
+
+      ports:
+
+        - protocol: TCP
+
+          port: 9001
+
+    - to:
+
+        - podSelector:
+
+            matchLabels:
+
+              app: product-service
+
+      ports:
+
+        - protocol: TCP
+
+          port: 9000
+
+    - to:
+
+        - podSelector:
+
+            matchLabels:
+
+              app: cart-service
+
+      ports:
+
+        - protocol: TCP
+
+          port: 9003
+
+```
+
+
+
+---
+
+
+
+## 3. 🟢 Helm/K8s (8 تغييرات)
+
+
+
+### 3.1 أنشئ eshtry-mny/templates/externalsecret.yaml
+
+
+
+```yaml
+
+apiVersion: external-secrets.io/v1beta1
+
+kind: ExternalSecret
+
+metadata:
+
+  name: app-secrets
+
+  namespace: eshtry-mny
+
+spec:
+
+  secretStoreRef:
+
+    name: aws-secretsmanager
+
+    kind: ClusterSecretStore
+
+  target:
+
+    name: app-secrets
+
+    creationPolicy: Owner
+
+  data:
+
+    - secretKey: MONGO_USERNAME
+
+      remoteRef:
+
+        key: eshtry-mny/app-secrets
+
+        property: MONGO_USERNAME
+
+    - secretKey: MONGO_PASSWORD
+
+      remoteRef:
+
+        key: eshtry-mny/app-secrets
+
+        property: MONGO_PASSWORD
+
+    - secretKey: ACCESS_TOKEN
+
+      remoteRef:
+
+        key: eshtry-mny/app-secrets
+
+        property: ACCESS_TOKEN
+
+```
+
+
+
+### 3.2 احذف eshtry-mny/templates/secret.yaml
+
+
+
+### 3.3 frontend-deployment.yaml — أضف probes بعد ports
+
+
+
+```yaml
+
+          livenessProbe:
+
+            httpGet: { path: /, port: 8080 }
+
+            initialDelaySeconds: 10
+
+            periodSeconds: 10
+
+          readinessProbe:
+
+            httpGet: { path: /, port: 8080 }
+
+            initialDelaySeconds: 5
+
+            periodSeconds: 5
+
+```
+
+
+
+### 3.4 frontend-service.yaml — غيّر type
+
+
+
+```
+
+type: ClusterIP  # كان NodePort
+
+```
+
+
+
+### 3.5 ingress.yaml — أضف TLS block بعد ingressClassName
+
+
+
+```yaml
+
+  {{- if .Values.ingress.tls.enabled }}
+
+  tls:
+
+    - hosts:
+
+        - {{ .Values.ingress.host }}
+
+      secretName: {{ .Values.ingress.tls.secretName }}
+
+  {{- end }}
+
+```
+
+
+
+### 3.6 values.yaml — 3 تغييرات
+
+
+
+**(أ)** استبدل الـ secrets block:
+
+```yaml
+
+# Secrets are now managed by External Secrets Operator (AWS Secrets Manager).
+
+# See eshtry-mny/templates/externalsecret.yaml for the mapping.
+
+# Do NOT set secrets via --set secrets.* anymore.
+
+```
+
+
+
+**(ب)** أضف tls تحت ingress:
+
+```yaml
+
+ingress:
+
+  enabled: true
+
+  className: nginx
+
+  host: eshtry-mny.local
+
+  tls:
+
+    enabled: true
+
+    secretName: eshtry-mny-tls
+
+```
+
+
+
+### 3.7 user-pdb.yaml — استبدل المحتوى كله
+
+
+
+```yaml
+
+{{- if false }}
+
+  DEPRECATED — All PDBs (user, product, cart, frontend) are defined in pdb.yaml.
+
+  This file is kept only to avoid git-delete conflicts. Remove after next cleanup.
+
+{{- end }}
+
+```
+
+
+
+---
+
+
+
+## 4. 🟡 Jenkinsfile — استبدل الملف كله
+
+
+
+ضع هذا الـ pipeline (أبرز التغييرات: parallel stages، SonarQube معطل، `git pull --rebase` قبل push):
+
+
+
+```groovy
+
+pipeline {
+
+    agent any
+
+
+
+    environment {
+
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+
+        IMAGE_TAG = "${BUILD_NUMBER}"
+
+        KUBECONFIG = "/var/lib/jenkins/.kube/config"
+
+        SONAR_SCANNER = "/opt/sonar-scanner/bin/sonar-scanner"
+
+        DOCKERHUB_ORG = "minac4"
+
+    }
+
+
+
+    stages {
+
+        stage('Checkout Code') { steps { checkout scm } }
+
+
+
+        stage('Quality & Tests') {
+
+            parallel {
+
+                stage('Security: Secret Scan') {
+
+                    steps { sh 'docker run --rm -v $(pwd):/repo zricethezav/gitleaks:latest detect --source=/repo --config=/repo/.gitleaks.toml --no-git -v --exit-code=1' }
+
+                }
+
+                // SonarQube DISABLED — server not reachable
+
+                stage('Test: User') { steps { sh 'cd User && npm ci && npm test' } }
+
+                stage('Test: Product') { steps { sh 'cd Product && npm ci && npm test' } }
+
+                stage('Test: Cart') { steps { sh 'cd Cart && npm ci && npm test' } }
+
+            }
+
+            post { always { junit allowEmptyResults: true, testResults: '**/test-results/*.xml' } }
+
+        }
+
+
+
+        stage('Build & Dependency Audit') {
+
+            parallel {
+
+                stage('Build: User') { steps { sh "docker build -t ${DOCKERHUB_ORG}/eshtry-mny-user:${IMAGE_TAG} ./User" } }
+
+                stage('Build: Product') { steps { sh "docker build -t ${DOCKERHUB_ORG}/eshtry-mny-product:${IMAGE_TAG} ./Product" } }
+
+                stage('Build: Cart') { steps { sh "docker build -t ${DOCKERHUB_ORG}/eshtry-mny-cart:${IMAGE_TAG} ./Cart" } }
+
+                stage('Build: Frontend') { steps { sh "docker build -t ${DOCKERHUB_ORG}/eshtry-mny-frontend:${IMAGE_TAG} ./front-end" } }
+
+                stage('Audit: User') { steps { sh 'cd User && npm audit --audit-level=high' } }
+
+                stage('Audit: Product') { steps { sh 'cd Product && npm audit --audit-level=high' } }
+
+                stage('Audit: Cart') { steps { sh 'cd Cart && npm audit --audit-level=high' } }
+
+                stage('Audit: Frontend') { steps { sh 'cd front-end && npm audit --audit-level=high' } }
+
+            }
+
+        }
+
+
+
+        stage('Security: Docker Scan (Trivy)') {
+
+            parallel {
+
+                stage('Trivy: User') { steps { sh "docker run --rm aquasec/trivy image ${DOCKERHUB_ORG}/eshtry-mny-user:${IMAGE_TAG} --severity HIGH,CRITICAL --exit-code 1" } }
+
+                stage('Trivy: Product') { steps { sh "docker run --rm aquasec/trivy image ${DOCKERHUB_ORG}/eshtry-mny-product:${IMAGE_TAG} --severity HIGH,CRITICAL --exit-code 1" } }
+
+                stage('Trivy: Cart') { steps { sh "docker run --rm aquasec/trivy image ${DOCKERHUB_ORG}/eshtry-mny-cart:${IMAGE_TAG} --severity HIGH,CRITICAL --exit-code 1" } }
+
+                stage('Trivy: Frontend') { steps { sh "docker run --rm aquasec/trivy image ${DOCKERHUB_ORG}/eshtry-mny-frontend:${IMAGE_TAG} --severity HIGH,CRITICAL --exit-code 1" } }
+
+            }
+
+        }
+
+
+
+        stage('Docker Login') { steps { sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin' } }
+
+
+
+        stage('Push Images') {
+
+            parallel {
+
+                stage('Push: User') { steps { sh "docker push ${DOCKERHUB_ORG}/eshtry-mny-user:${IMAGE_TAG}" } }
+
+                stage('Push: Product') { steps { sh "docker push ${DOCKERHUB_ORG}/eshtry-mny-product:${IMAGE_TAG}" } }
+
+                stage('Push: Cart') { steps { sh "docker push ${DOCKERHUB_ORG}/eshtry-mny-cart:${IMAGE_TAG}" } }
+
+                stage('Push: Frontend') { steps { sh "docker push ${DOCKERHUB_ORG}/eshtry-mny-frontend:${IMAGE_TAG}" } }
+
+            }
+
+        }
+
+
+
+        stage('Update GitOps Manifest') {
+
+            steps {
+
+                sh """
+
+                    yq eval '.images.user = "${DOCKERHUB_ORG}/eshtry-mny-user:${IMAGE_TAG}"' -i eshtry-mny/values.yaml
+
+                    yq eval '.images.product = "${DOCKERHUB_ORG}/eshtry-mny-product:${IMAGE_TAG}"' -i eshtry-mny/values.yaml
+
+                    yq eval '.images.cart = "${DOCKERHUB_ORG}/eshtry-mny-cart:${IMAGE_TAG}"' -i eshtry-mny/values.yaml
+
+                    yq eval '.images.frontend = "${DOCKERHUB_ORG}/eshtry-mny-frontend:${IMAGE_TAG}"' -i eshtry-mny/values.yaml
+
+                    git config user.email "jenkins@eshtry-mny.local"
+
+                    git config user.name "Jenkins CI"
+
+                    git add eshtry-mny/values.yaml
+
+                    git commit -m "ci: update image tags to ${IMAGE_TAG}" || echo "No changes to commit"
+
+                    git pull --rebase origin main
+
+                    git push origin HEAD:main
+
+                """
+
+            }
+
+        }
+
+    }
+
+    post {
+
+        success { echo 'Pipeline Success' }
+
+        failure { echo 'Pipeline Failed' }
+
+    }
+
+}
+
+```
+
+
+
+---
+
+
+
+## 5. 🔴 Frontend Auth (7 ملفات)
+
+
+
+### 5.1 front-end/src/config/api.ts — استبدل الملف كله
+
+
+
+```typescript
+
+export const API_BASE = '/api/v1';
+
+import axios from 'axios';
+
+axios.defaults.withCredentials = true;
+
+```
+
+
+
+### 5.2 Login.tsx — استبدل الـ handleSubmit
+
+
+
+```typescript
+
+async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+
+    event.preventDefault();
+
+    try {
+
+      const response = await axios.post(`${API_BASE}/users/login`, { email, password });
+
+      if (response.status === 200) {
+
+        window.location.href = "/";
+
+      } else {
+
+        alert("Password or email not correct");
+
+      }
+
+    } catch (error) {
+
+      console.error("Login error:", error);
+
+      alert("Something went wrong");
+
+    }
+
+}
+
+```
+
+
+
+**كمان:** أضف `import axios from "axios";` في بداية الملف (تحت import API_BASE)
+
+
+
+### 5.3 Cart.tsx — استبدل fetchCartData
+
+
+
+```typescript
+
+const fetchCartData = async () => {
+
+    try {
+
+      const response = await axios.get(`${API_BASE}/cart`);
+
+      if (response.status === 200) { setCartData(response.data); }
+
+    } catch (error: any) {
+
+      console.error("Error fetching cart:", error);
+
+      if (error.response?.status === 401) { window.location.href = "/login"; }
+
+    } finally { setLoading(false); }
+
+};
+
+```
+
+
+
+**كمان:** أضف `import axios from "axios";` في البداية
+
+
+
+### 5.4 CheckOut.tsx — استبدل submitHandler
+
+
+
+```typescript
+
+function submitHandler() {
+
+    axios.delete(`${API_BASE}/cart/checkout`)
+
+      .then((response) => {
+
+        if (response.status === 200) { alert("Your order has been placed!"); }
+
+      })
+
+      .catch((error) => {
+
+        console.error("Checkout error:", error);
+
+        if (error.response?.status === 401) { window.location.href = "/login"; }
+
+      });
+
+}
+
+```
+
+
+
+**كمان:** أضف `import axios from "axios";` في البداية
+
+
+
+### 5.5 ProductInfo.tsx
+
+
+
+**(أ)** في useEffect: استبدل الـ fetch بـ:
+
+```typescript
+
+const response = await axios.get(`${API_BASE}/products/${productID}`);
+
+const data = response.data;
+
+setInputValue(data);
+
+```
+
+
+
+**(ب)** استبدل onSubmithandler:
+
+```typescript
+
+const onSubmithandler = () => {
+
+    axios.post(`${API_BASE}/cart/${productID}`)
+
+      .then((response) => {
+
+        if (response.status === 200) { alert("Added to cart"); }
+
+        else { window.location.href = "/login"; }
+
+      })
+
+      .catch((error) => {
+
+        console.error("Error:", error);
+
+        if (error.response?.status === 401) { window.location.href = "/login"; }
+
+      });
+
+};
+
+```
+
+
+
+### 5.6 Profile.tsx — استبدل useEffect
+
+
+
+```typescript
+
+useEffect(() => {
+
+    axios.get(`${API_BASE}/users`)
+
+      .then((response) => { setUser(response.data); })
+
+      .catch((error) => {
+
+        console.error("Profile error:", error);
+
+        window.location.href = "/login";
+
+      });
+
+}, []);
+
+```
+
+
+
+**كمان:** أضف `import axios from "axios";` في البداية
+
+
+
+### 5.7 front-end/package.json — أضف "axios": "^1.18.1" في dependencies
+
+
+
+---
+
+
+
+## 6. 🔴 Docker — أنشئ 4 ملفات .dockerignore
+
+
+
+### 6.1 User/.dockerignore
+
+### 6.2 Product/.dockerignore
+
+### 6.3 Cart/.dockerignore
+
+### 6.4 front-end/.dockerignore
+
+
+
+كلهم نفس المحتوى:
+
+```
+
+node_modules
+
+.env
+
+.git
+
+.gitignore
+
+*.md
+
+```
+
+
+
+---
+
+
+
+## 7. 🟤 Config & Cleanup
+
+
+
+### 7.1 .gitleaks.toml — استبدل كله
+
+
+
+```toml
+
+title = "eshtry-mny gitleaks config"
+
+
+
+# No allowlist entries — every finding should be reviewed.
+
+# If a false positive is confirmed after review, add a narrow regex here
+
+# with a comment explaining why it's safe to ignore.
+
+```
+
+
+
+### 7.2 README.md — تغييرين
+
+
+
+**(أ)** استبدل سطر الـ Secret:
+
+```
+
+- A shared `Secret` (`app-secrets`) for sensitive settings (populated via **External Secrets Operator** from AWS Secrets Manager — see `eshtry-mny/templates/externalsecret.yaml` for the key mapping)
+
+```
+
+
+
+**(ب)** استبدل فقرة CHANGE_ME:
+
+```
+
+`k8s/base/configmap.yaml` and `eshtry-mny/values.yaml` ship with `CHANGE_ME` placeholders only. Secrets (`app-secrets`) are managed by **External Secrets Operator** from AWS Secrets Manager — see `eshtry-mny/templates/externalsecret.yaml`. For local Docker Compose development, create a `.env` file from `.env.example`. Rotate any credentials that were previously committed before making the repo public.
+
+```
+
+
+
+---
+
+
+
+## ✅ بعد التنفيذ
+
+
+
+```bash
+
+# 1. ركّب الـ dependencies
+
+cd User && npm install && cd ..
+
+cd Product && npm install && cd ..
+
+cd Cart && npm install && cd ..
+
+cd front-end && npm install && cd ..
+
+
+
+# 2. تأكد من الـ changes
+
+git status
+
+git diff --stat
+
+
+
+# 3. commit
+
+git add -A
+
+git commit -m "fix: full security overhaul - 6 Blockers, NetworkPolicies, Helm/K8s, Frontend auth refactor"
+
+```

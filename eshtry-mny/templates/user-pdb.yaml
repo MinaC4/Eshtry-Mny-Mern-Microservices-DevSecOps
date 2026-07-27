@@ -1,10 +1,4 @@
-apiVersion: policy/v1
-kind: PodDisruptionBudget
-metadata:
-  name: user-service-pdb
-  namespace: eshtry-mny
-spec:
-  minAvailable: 1
-  selector:
-    matchLabels:
-      app: user-service
+{{- if false }}
+  DEPRECATED — All PDBs (user, product, cart, frontend) are defined in pdb.yaml.
+  This file is kept only to avoid git-delete conflicts. Remove after next cleanup.
+{{- end }}
