@@ -9,15 +9,19 @@ export default defineConfig({
     strictPort: true,
     watch: { usePolling: true },
     proxy: {
-      '/users': {
+      '/api/v1/users': {
         target: 'http://user-service:9001',
         changeOrigin: true,
       },
-      '/products': {
+      '/api/v1/products': {
         target: 'http://product-service:9000',
         changeOrigin: true,
       },
-      '/cart': {
+      '/api/v1/filter': {
+        target: 'http://product-service:9000',
+        changeOrigin: true,
+      },
+      '/api/v1/cart': {
         target: 'http://cart-service:9003',
         changeOrigin: true,
         bypass(req) {
@@ -29,12 +33,12 @@ export default defineConfig({
       }
     }
   },
-  // مهم للـ production build
   preview: {
     proxy: {
-      '/users': { target: 'http://user-service:9001', changeOrigin: true },
-      '/products': { target: 'http://product-service:9000', changeOrigin: true },
-      '/cart': { target: 'http://cart-service:9003', changeOrigin: true }
+      '/api/v1/users': { target: 'http://user-service:9001', changeOrigin: true },
+      '/api/v1/products': { target: 'http://product-service:9000', changeOrigin: true },
+      '/api/v1/filter': { target: 'http://product-service:9000', changeOrigin: true },
+      '/api/v1/cart': { target: 'http://cart-service:9003', changeOrigin: true }
     }
   }
 })
