@@ -2,17 +2,17 @@
 
 ## Architecture diagram
 
-![Eshtry-Mny architecture diagram] (docs/Generated%20image%201.png)
+![Eshtry-Mny architecture diagram](<docs/Generated image 1.png>)
 
 
-An e-commerce demo built as **MERN microservices** (Node.js/Express + MongoDB + React) and deployed to **Kubernetes** using **Helm**, with a **DevSecOps CI/CD pipeline** in **Jenkins** and **GitOps continuous delivery** via **Argo CD**.
+An e-commerce demo built as **MERN microservices** (Node.js/Express + MongoDB + React) and deployed to **Kubernetes** using **Helm**, with a **DevSecOps CI/CD pipeline** in **Jenkins** and **GitOps[...] 
 
 
 ## What's in this repo
 
 ### Application services
 
-- **Frontend**: React (Vite) in `front-end/`, built into a static bundle and served by nginx (uses `nginxinc/nginx-unprivileged:1.27-alpine` running on container port `8080` with `emptyDir` volumes for `/var/cache/nginx` and `/tmp` so it works under Kubernetes' `readOnlyRootFilesystem: true` and `runAsNonRoot: true`). The frontend also proxies API calls to the three backend services via nginx, resolving upstream hostnames lazily per-request so it doesn't fail on startup if a backend isn't ready yet.
+- **Frontend**: React (Vite) in `front-end/`, built into a static bundle and served by nginx (uses `nginxinc/nginx-unprivileged:1.27-alpine` running on container port `8080` with `emptyDir` volume[...]
 - **User service**: Node.js/Express in `User/` (API on `9001`)
 - **Product service**: Node.js/Express in `Product/` (API on `9000`)
 - **Cart service**: Node.js/Express in `Cart/` (API on `9003`)
@@ -58,7 +58,7 @@ The Jenkins pipeline in `Jenkinsfile` implements these stages:
 - **Security: Dependency Audit**: runs `npm audit --audit-level=high` for each Node project (fails on HIGH/CRITICAL)
 - **Security: Docker Scan (Trivy)**: scans each built image for **HIGH/CRITICAL** vulnerabilities with `--exit-code 1` (fails on findings)
 - **Push Images to Docker Hub**: authenticates using Jenkins credentials and pushes versioned images (tag = Jenkins `BUILD_NUMBER`)
-- **Update GitOps Manifest**: updates the `images.user`, `images.product`, `images.cart`, and `images.frontend` entries in `eshtry-mny/values.yaml` using `yq`, commits the build tag, and pushes `HEAD:main` for Argo CD to apply
+- **Update GitOps Manifest**: updates the `images.user`, `images.product`, `images.cart`, and `images.frontend` entries in `eshtry-mny/values.yaml` using `yq`, commits the build tag, and pushes `H[...]
 
 Jenkins builds, scans, and publishes the images, then records the new image tags in git. It does not run `helm upgrade --install` against the live cluster.
 
@@ -71,7 +71,7 @@ Jenkins builds, scans, and publishes the images, then records the new image tags
 - Uses **automated sync** with:
   - **prune**: removes deleted manifests
   - **selfHeal**: reconciles drift automatically
-- Jenkins builds images, tags `eshtry-mny/values.yaml` with `yq`, and pushes the commit. Argo CD detects the committed Helm values change and syncs it automatically — there are **no Argo CD Image Updater annotations** in `argocd-application.yaml`.
+- Jenkins builds images, tags `eshtry-mny/values.yaml` with `yq`, and pushes the commit. Argo CD detects the committed Helm values change and syncs it automatically — there are **no Argo CD Imag[...]
 
 Argo CD is the only component that applies Kubernetes changes to the cluster. After Jenkins pushes updated image tags, Argo CD detects the committed Helm values change and syncs it automatically.
 
@@ -81,9 +81,9 @@ Argo CD is the only component that applies Kubernetes changes to the cluster. Af
 
 The Helm chart in `eshtry-mny/` templates:
 
-- Deployments + Services for **user**, **product**, **cart**, and **frontend**
+- Deployments + Services for **user**, **product**, **cart**, and **frontend`
 - A shared `ConfigMap` (`app-config`) for non-secret settings
-- A shared `Secret` (`app-secrets`) for sensitive settings (populated via **External Secrets Operator** from AWS Secrets Manager — see `eshtry-mny/templates/externalsecret.yaml` for the key mapping)
+- A shared `Secret` (`app-secrets`) for sensitive settings (populated via **External Secrets Operator** from AWS Secrets Manager — see `eshtry-mny/templates/externalsecret.yaml` for the key mapp[...]
 - A dedicated `eshtry-mny` namespace
 - Health probes and resource requests/limits on all backend deployments
 - Container `securityContext` settings with `runAsNonRoot: true`, `readOnlyRootFilesystem: true`, and `allowPrivilegeEscalation: false`
@@ -99,7 +99,7 @@ The Helm chart in `eshtry-mny/` templates:
   - `/api/v1/cart` → cart service
 - **TLS**: not currently configured. The Ingress serves HTTP only. To add TLS, install cert-manager, create a ClusterIssuer, and add the appropriate annotation to the Ingress.
 
-`k8s/base/configmap.yaml` and `eshtry-mny/values.yaml` ship with `CHANGE_ME` placeholders only. Secrets (`app-secrets`) are managed by **External Secrets Operator** from AWS Secrets Manager — see `eshtry-mny/templates/externalsecret.yaml`. For local Docker Compose development, create a `.env` file from `.env.example`. Rotate any credentials that were previously committed before making the repo public.
+`k8s/base/configmap.yaml` and `eshtry-mny/values.yaml` ship with `CHANGE_ME` placeholders only. Secrets (`app-secrets`) are managed by **External Secrets Operator** from AWS Secrets Manager — s[...]
 
 Backends restrict CORS to `FRONTEND_ORIGIN` from the environment, which defaults to `http://localhost:5173` as shown in `.env.example`.
 
@@ -125,8 +125,8 @@ helm upgrade --install eshtry-mny . -n eshtry-mny --create-namespace
 
 Before deploying with Helm/ArgoCD, ensure the following are in place:
 
-1. **External Secrets Operator (ESO)**: Must be pre-installed cluster-wide. An IRSA-authorized ServiceAccount named `external-secrets-sa` must exist in the target namespace. The chart's `ExternalSecret` and `ClusterSecretStore` resources depend on this.
-2. **Ingress Controller**: The NetworkPolicies expect the ingress controller to run in a namespace named exactly `ingress-nginx` (the default for the ingress-nginx Helm chart). If your ingress controller uses a different namespace, update the `namespaceSelector` in the NetworkPolicy templates.
+1. **External Secrets Operator (ESO)**: Must be pre-installed cluster-wide. An IRSA-authorized ServiceAccount named `external-secrets-sa` must exist in the target namespace. The chart's `External[...]
+2. **Ingress Controller**: The NetworkPolicies expect the ingress controller to run in a namespace named exactly `ingress-nginx` (the default for the ingress-nginx Helm chart). If your ingress co[...]
 3. **MongoDB Atlas**: Backends connect to MongoDB Atlas. The NetworkPolicy egress rule allows `0.0.0.0/0:27017` because Atlas does not provide a fixed IP range — this is an accepted tradeoff.
 
 ## Quickstart (one command)
@@ -140,7 +140,7 @@ Clone the repo and run the setup script for your platform:
 
 **Windows (PowerShell):**
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts\setup-windows.ps1
+powershell -ExecutionPolicy Bypass -File scripts\\setup-windows.ps1
 ```
 
 The script will:
@@ -169,7 +169,7 @@ Ports:
 - `9000` → product service
 - `9003` → cart service
 
-All four services build from multi-stage Dockerfiles. The backend images run in production mode as non-root users with `node server.js`; the frontend image also runs as a non-root user and serves the built static bundle with nginx.
+All four services build from multi-stage Dockerfiles. The backend images run in production mode as non-root users with `node server.js`; the frontend image also runs as a non-root user and serves[...]
 
 ## Tooling screenshots
 
