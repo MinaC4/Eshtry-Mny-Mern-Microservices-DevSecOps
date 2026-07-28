@@ -2,7 +2,8 @@
 
 ## Architecture diagram
 
-![Eshtry-Mny architecture diagram](docs/Generated image 1.png)
+![Eshtry-Mny architecture diagram](<img width="1570" height="1002" alt="image" src="https://github.com/user-attachments/assets/6142b760-8e00-4ab6-b529-927c17b63394" />
+)
 
 
 An e-commerce demo built as **MERN microservices** (Node.js/Express + MongoDB + React) and deployed to **Kubernetes** using **Helm**, with a **DevSecOps CI/CD pipeline** in **Jenkins** and **GitOps continuous delivery** via **Argo CD**.
