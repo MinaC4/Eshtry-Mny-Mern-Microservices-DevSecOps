@@ -41,6 +41,8 @@ spec:
         - protocol: TCP
           port: 9000
     # MongoDB Atlas (external SaaS — allow to any IP on 27017)
+        # MongoDB Atlas egress: intentionally broad (0.0.0.0/0) because Atlas
+        # does not provide a fixed IP range. Accepted tradeoff per security review.
     - to:
         - ipBlock:
             cidr: 0.0.0.0/0

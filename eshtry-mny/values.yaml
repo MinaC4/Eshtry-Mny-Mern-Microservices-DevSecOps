@@ -41,6 +41,3 @@ ingress:
   enabled: true
   className: nginx
   host: eshtry-mny.local
-  tls:
-    enabled: true
-    secretName: eshtry-mny-tls

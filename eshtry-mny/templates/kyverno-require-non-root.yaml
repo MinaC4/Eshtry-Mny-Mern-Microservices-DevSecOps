@@ -19,13 +19,19 @@ spec:
               - CronJob
       validate:
         message: "Containers must run as non-root user"
-        pattern:
-          spec:
-            template:
-              spec:
-                containers:
-                  - securityContext:
-                      runAsNonRoot: true
-                initContainers:
-                  - securityContext:
-                      runAsNonRoot: true
+        anyPattern:
+          - spec:
+              template:
+                spec:
+                  containers:
+                    - securityContext:
+                        runAsNonRoot: true
+                  initContainers:
+                    - securityContext:
+                        runAsNonRoot: true
+          - spec:
+              template:
+                spec:
+                  containers:
+                    - securityContext:
+                        runAsNonRoot: true

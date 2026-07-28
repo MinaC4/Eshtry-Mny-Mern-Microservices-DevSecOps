@@ -6,7 +6,7 @@ const registerSchema = z.object({
     password: z.string().min(8),
     firstName: z.string().min(1).max(50),
     lastName: z.string().min(1).max(50),
-    age: z.number().int().min(13).max(120),
+    age: z.coerce.number().int().min(13).max(120),
     phone: z.string().regex(/^\+?[1-9]\d{1,14}$/),
     gender: z.enum(['male', 'female', 'other']).optional()
   })

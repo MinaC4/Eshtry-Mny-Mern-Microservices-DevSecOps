@@ -20,13 +20,19 @@ function Register() {
       return;
     }
 
+    const ageNum = Number(age);
+    if (!Number.isInteger(ageNum) || ageNum < 13 || ageNum > 120) {
+      alert("Age must be a whole number between 13 and 120");
+      return;
+    }
+
     try {
       const response = await fetch(`${API_BASE}/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ email, password, firstName, lastName, age, phone, gender })
+        body: JSON.stringify({ email, password, firstName, lastName, age: Number(age), phone, gender })
       });
   
       if (response.ok) {
@@ -157,7 +163,9 @@ function Register() {
             <div className="col">
               <div className="field">
                 <input
-                  type="text"
+                  type="number"
+                  min="13"
+                  max="120"
                   className="form-control"
                   required
                   placeholder="Age"

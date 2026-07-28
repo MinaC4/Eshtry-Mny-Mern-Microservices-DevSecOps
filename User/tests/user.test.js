@@ -38,4 +38,21 @@ describe('User service — register', () => {
       .send({ email: 'test@example.com' });
     expect(res.status).toBeGreaterThanOrEqual(400);
   });
+
+  it('POST /api/v1/users with age as numeric string passes validation', async () => {
+    // age sent as string "25" should be coerced to number by z.coerce.number()
+    const res = await request(app)
+      .post('/api/v1/users')
+      .send({
+        email: 'valid@example.com',
+        password: 'securePass123',
+        firstName: 'Test',
+        lastName: 'User',
+        age: '25',
+        phone: '+1234567890',
+        gender: 'male'
+      });
+    // Should pass validation (may fail at DB layer since mocked, but not 400)
+    expect(res.status).not.toBe(400);
+  });
 });

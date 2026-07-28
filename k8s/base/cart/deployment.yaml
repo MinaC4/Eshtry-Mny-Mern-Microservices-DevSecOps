@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: cart-service
-        image: minac4/eshtry-mny-cart:latest
+        image: minac4/eshtry-mny-cart:0.1.0-dev
         imagePullPolicy: Always
         ports:
         - containerPort: 9003

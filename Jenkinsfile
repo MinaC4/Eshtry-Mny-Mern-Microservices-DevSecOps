@@ -15,7 +15,7 @@ pipeline {
         stage('Quality & Tests') {
             parallel {
                 stage('Security: Secret Scan') {
-                    steps { sh 'docker run --rm -v $(pwd):/repo zricethezav/gitleaks:latest detect --source=/repo --config=/repo/.gitleaks.toml --no-git -v --exit-code=1' }
+                    steps { sh 'docker run --rm -v $(pwd):/repo zricethezav/gitleaks:latest detect --source=/repo --config=/repo/.gitleaks.toml -v --exit-code=1' }
                 }
                 // SonarQube DISABLED — server not reachable
                 stage('Test: User') { steps { sh 'cd User && npm ci && npm test' } }
@@ -55,6 +55,13 @@ pipeline {
                 stage('Push: Product') { steps { sh "docker push ${DOCKERHUB_ORG}/eshtry-mny-product:${IMAGE_TAG}" } }
                 stage('Push: Cart') { steps { sh "docker push ${DOCKERHUB_ORG}/eshtry-mny-cart:${IMAGE_TAG}" } }
                 stage('Push: Frontend') { steps { sh "docker push ${DOCKERHUB_ORG}/eshtry-mny-frontend:${IMAGE_TAG}" } }
+            }
+        }
+
+        stage('Helm Lint & Template') {
+            steps {
+                sh 'helm lint eshtry-mny'
+                sh 'helm template eshtry-mny eshtry-mny'
             }
         }
 

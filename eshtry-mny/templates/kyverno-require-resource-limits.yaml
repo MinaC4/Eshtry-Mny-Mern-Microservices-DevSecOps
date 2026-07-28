@@ -19,23 +19,34 @@ spec:
               - CronJob
       validate:
         message: "Containers must have resource limits and requests"
-        pattern:
-          spec:
-            template:
-              spec:
-                containers:
-                  - resources:
-                      limits:
-                        cpu: "?*"
-                        memory: "?*"
-                      requests:
-                        cpu: "?*"
-                        memory: "?*"
-                initContainers:
-                  - resources:
-                      limits:
-                        cpu: "?*"
-                        memory: "?*"
-                      requests:
-                        cpu: "?*"
-                        memory: "?*"
+        anyPattern:
+          - spec:
+              template:
+                spec:
+                  containers:
+                    - resources:
+                        limits:
+                          cpu: "?*"
+                          memory: "?*"
+                        requests:
+                          cpu: "?*"
+                          memory: "?*"
+                  initContainers:
+                    - resources:
+                        limits:
+                          cpu: "?*"
+                          memory: "?*"
+                        requests:
+                          cpu: "?*"
+                          memory: "?*"
+          - spec:
+              template:
+                spec:
+                  containers:
+                    - resources:
+                        limits:
+                          cpu: "?*"
+                          memory: "?*"
+                        requests:
+                          cpu: "?*"
+                          memory: "?*"

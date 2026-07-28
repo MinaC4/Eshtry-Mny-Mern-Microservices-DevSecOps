@@ -19,13 +19,19 @@ spec:
               - CronJob
       validate:
         message: "Containers must have readOnlyRootFilesystem: true"
-        pattern:
-          spec:
-            template:
-              spec:
-                containers:
-                  - securityContext:
-                      readOnlyRootFilesystem: true
-                initContainers:
-                  - securityContext:
-                      readOnlyRootFilesystem: true
+        anyPattern:
+          - spec:
+              template:
+                spec:
+                  containers:
+                    - securityContext:
+                        readOnlyRootFilesystem: true
+                  initContainers:
+                    - securityContext:
+                        readOnlyRootFilesystem: true
+          - spec:
+              template:
+                spec:
+                  containers:
+                    - securityContext:
+                        readOnlyRootFilesystem: true

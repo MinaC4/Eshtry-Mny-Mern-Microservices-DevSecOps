@@ -1,4 +1,5 @@
 const productModel = require('../models/productModel');
+const mongoose = require('mongoose');
 
 const getProducts = async (req, res, next) => {
     try {
@@ -29,9 +30,15 @@ const getProductById = async (req, res, next) => {
 
 const findProduct = async (req, res, next) => {
     try {
-        const product = await productModel.findOne({
-            $or: [{ name: req.params.idOrName }, { _id: req.params.idOrName }]
-        });
+        const idOrName = req.params.idOrName;
+        const filters = [{ name: idOrName }];
+        if (mongoose.Types.ObjectId.isValid(idOrName)) {
+            filters.push({ _id: idOrName });
+        }
+        const product = await productModel.findOne({ $or: filters });
+        if (!product) {
+            return res.status(404).json({ error: 'NotFound', message: 'Product not found' });
+        }
         res.status(200).json(product);
     } catch (error) {
         next(error);

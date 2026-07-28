@@ -1,4 +1,4 @@
-# Eshtry-Mny — MERN Microservices + DevSecOps + GitOps (Jenkins, SonarQube, Trivy, Helm, Argo CD)
+# Eshtry-Mny — MERN Microservices + DevSecOps + GitOps (Jenkins, Trivy, Helm, Argo CD)
 
 ## Architecture diagram
 
@@ -23,7 +23,6 @@ An e-commerce demo built as **MERN microservices** (Node.js/Express + MongoDB + 
 ### DevSecOps & GitOps
 
 - **CI/CD**: `Jenkinsfile`
-  - Static code analysis with **SonarQube**
   - Secret scanning with **gitleaks**
   - Dependency checks with **npm audit**
   - Container image scanning with **Trivy**, including a HIGH/CRITICAL-severity gate using `--exit-code 1`
@@ -55,7 +54,6 @@ The Jenkins pipeline in `Jenkinsfile` implements these stages:
 
 - **Checkout Code**: fetch repository source
 - **Security: Secret Scan (gitleaks)**: scans for leaked secrets with `--exit-code=1` (fails on any finding)
-- **SonarQube Analysis**: runs `sonar-scanner` against the codebase (project key: `eshtry-mny`)
 - **Build Docker Images**: builds images for `User`, `Product`, `Cart`, and `front-end`
 - **Security: Dependency Audit**: runs `npm audit --audit-level=high` for each Node project (fails on HIGH/CRITICAL)
 - **Security: Docker Scan (Trivy)**: scans each built image for **HIGH/CRITICAL** vulnerabilities with `--exit-code 1` (fails on findings)
@@ -96,10 +94,10 @@ The Helm chart in `eshtry-mny/` templates:
 - **NetworkPolicies**: default deny-all, with explicit allow rules per service (Ingress from nginx, service-to-service, egress to MongoDB)
 - An `Ingress` that routes:
   - `/` → frontend
-  - `/api/users` → user service
-  - `/api/products` → product service
-  - `/api/cart` → cart service
-- **TLS termination** via cert-manager + Let's Encrypt (annotation on Ingress)
+  - `/api/v1/users` → user service
+  - `/api/v1/products` → product service
+  - `/api/v1/cart` → cart service
+- **TLS**: not currently configured. The Ingress serves HTTP only. To add TLS, install cert-manager, create a ClusterIssuer, and add the appropriate annotation to the Ingress.
 
 `k8s/base/configmap.yaml` and `eshtry-mny/values.yaml` ship with `CHANGE_ME` placeholders only. Secrets (`app-secrets`) are managed by **External Secrets Operator** from AWS Secrets Manager — see `eshtry-mny/templates/externalsecret.yaml`. For local Docker Compose development, create a `.env` file from `.env.example`. Rotate any credentials that were previously committed before making the repo public.
 
@@ -122,6 +120,14 @@ From the repo folder:
 cd eshtry-mny
 helm upgrade --install eshtry-mny . -n eshtry-mny --create-namespace
 ```
+
+## Cluster Prerequisites
+
+Before deploying with Helm/ArgoCD, ensure the following are in place:
+
+1. **External Secrets Operator (ESO)**: Must be pre-installed cluster-wide. An IRSA-authorized ServiceAccount named `external-secrets-sa` must exist in the target namespace. The chart's `ExternalSecret` and `ClusterSecretStore` resources depend on this.
+2. **Ingress Controller**: The NetworkPolicies expect the ingress controller to run in a namespace named exactly `ingress-nginx` (the default for the ingress-nginx Helm chart). If your ingress controller uses a different namespace, update the `namespaceSelector` in the NetworkPolicy templates.
+3. **MongoDB Atlas**: Backends connect to MongoDB Atlas. The NetworkPolicy egress rule allows `0.0.0.0/0:27017` because Atlas does not provide a fixed IP range — this is an accepted tradeoff.
 
 ## Quickstart (one command)
 
@@ -179,17 +185,6 @@ All four services build from multi-stage Dockerfiles. The backend images run in 
 
 ![Jenkins pipeline stages](docs/screenshots/screenshot-03.png)
 
-### SonarQube project overview 
-
-![SonarQube overview](docs/screenshots/screenshot-04.png)
-
-### SonarQube issues list
-
-![SonarQube issues](docs/screenshots/screenshot-05.png)
-
-### SonarQube security hotspot review
-
-![SonarQube security hotspots](docs/screenshots/screenshot-06.png)
 
 ### Argo CD application tree (synced/healthy)
 

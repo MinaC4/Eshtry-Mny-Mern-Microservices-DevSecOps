@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: minac4/eshtry-mny-frontend:latest
+        image: minac4/eshtry-mny-frontend:0.1.0-dev
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
