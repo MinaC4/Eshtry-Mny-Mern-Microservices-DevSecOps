@@ -11,7 +11,7 @@ const app = express();
 app.set('trust proxy', 1);
 
 require('dotenv').config();
-require('./config/db_conn');
+const mongoose = require('./config/db_conn');
 const port = process.env.PORT || 9000;
 
 app.use(helmet());
@@ -33,6 +33,13 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     uptime: Math.floor((Date.now() - startTime) / 1000)
   });
+});
+
+// Readiness reflects MongoDB connectivity so a pod without a working DB
+// connection is removed from Service endpoints instead of serving 500s.
+app.get('/ready', (req, res) => {
+  const ready = mongoose.connection.readyState === 1;
+  res.status(ready ? 200 : 503).json({ status: ready ? 'ready' : 'not-ready' });
 });
 
 // Rate limiting

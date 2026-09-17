@@ -7,9 +7,9 @@ replicaCount: 1
 imagePullPolicy: IfNotPresent
 # Images from the operator's Harbor registry (override with --set images.user=...)
 images:
-  user: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user:0.1.2
-  product: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product:0.1.0-homelab2
-  cart: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart:0.1.0-homelab2
+  user: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user:0.1.3
+  product: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product:0.1.3
+  cart: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart:0.1.3
   frontend: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend:0.1.1
 # ConfigMap values
 mongoCluster: "" # unused when MONGO_URI is set (in-cluster MongoDB)
