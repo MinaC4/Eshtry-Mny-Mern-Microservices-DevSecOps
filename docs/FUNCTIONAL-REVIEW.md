@@ -24,3 +24,10 @@ Deployed bundle contains: Remove, Receipt, Logout, duplicate-cart message
 ## Known cosmetic limitations (not functional bugs)
 - Product images come from third-party CDNs and one URL in `products.json` (Destiny 2) is malformed; the `onError` fallback hides it rather than showing a broken icon. Fixing seed data is optional.
 - No payment is processed; `checkout` clears the cart by design (there is no payment service).
+
+## Second pass (receipt + profile)
+6. **Receipt layout** — restructured into a clear order document: store header, Order #, date, customer email, payment (Demo/N-A), itemised table (item, category, price), Items count, Total, and a **Print receipt** button plus Continue shopping.
+7. **Profile page** — was sourcing images from `/src/assets/...` (broken after a Vite build) and had a dead "Update" link. Now: assets are imported (bundled), and it shows real data — name, email, age, phone, gender, role, **Member since** (createdAt), **Items in cart**, plus a working **Logout**. Dead "Update" removed.
+8. **NavBar avatar** — same broken-asset path fixed by importing `profile-header.jpg`.
+
+Deployed-bundle evidence: `/assets/index-679000f1.js` contains `Order Receipt`, `Print receipt`, `Member since`, `Items in cart`. Profile API returns `{firstName, gender, age, phone, role, createdAt}`.
