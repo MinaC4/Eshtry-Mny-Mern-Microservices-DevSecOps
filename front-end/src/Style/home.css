@@ -116,5 +116,9 @@ img {
   }
 .wid{
     width: 100%;
-    background: #27292a;
+    min-height: 100vh;
+    /* Dark overlay over the background image keeps the cards readable. */
+    background: linear-gradient(rgba(26, 27, 28, 0.88), rgba(26, 27, 28, 0.88)),
+                url('../assets/background1.jpg') no-repeat center center fixed;
+    background-size: cover;
 }
