@@ -25,6 +25,10 @@ spec:
       verifyImages:
         - imageReferences:
             - "192.168.1.8:30082/eshtry-mny/*"
+          imageRegistryCredentials:
+            allowInsecureRegistry: true
+            secrets:
+              - harbor-creds
           mutateDigest: {{ ternary "true" "false" (eq .Values.kyverno.verifyImages.action "Enforce") }}
           attestors:
             - count: 1
