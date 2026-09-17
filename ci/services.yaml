@@ -1,0 +1,49 @@
+# Machine-readable build/test matrix consumed by ci/scripts/*.sh and the Jenkinsfile.
+# Keep in sync with docs/00-build-matrix.md.
+registry:
+  type: harbor
+  host: "192.168.1.8:30082"
+  project: eshtry-mny
+  insecure: false
+
+services:
+  - name: user-service
+    context: User
+    dockerfile: User/Dockerfile
+    image_repo: "192.168.1.8:30082/eshtry-mny/eshtry-mny-user"
+    container_port: 9001
+    service_port: 9001
+    test_cmd: "cd User && npm ci && npm test"
+    audit_cmd: "cd User && npm audit --audit-level=high"
+    deploy: true
+    depends_on: [mongodb]
+  - name: product-service
+    context: Product
+    dockerfile: Product/Dockerfile
+    image_repo: "192.168.1.8:30082/eshtry-mny/eshtry-mny-product"
+    container_port: 9000
+    service_port: 9000
+    test_cmd: "cd Product && npm ci && npm test"
+    audit_cmd: "cd Product && npm audit --audit-level=high"
+    deploy: true
+    depends_on: [mongodb]
+  - name: cart-service
+    context: Cart
+    dockerfile: Cart/Dockerfile
+    image_repo: "192.168.1.8:30082/eshtry-mny/eshtry-mny-cart"
+    container_port: 9003
+    service_port: 9003
+    test_cmd: "cd Cart && npm ci && npm test"
+    audit_cmd: "cd Cart && npm audit --audit-level=high"
+    deploy: true
+    depends_on: [mongodb, product-service]
+  - name: frontend
+    context: front-end
+    dockerfile: front-end/Dockerfile
+    image_repo: "192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend"
+    container_port: 8080
+    service_port: 80
+    test_cmd: "cd front-end && npm ci && npm run build"
+    audit_cmd: "cd front-end && npm audit --audit-level=high"
+    deploy: true
+    depends_on: [user-service, product-service, cart-service]
