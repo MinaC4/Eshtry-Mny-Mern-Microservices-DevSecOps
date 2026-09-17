@@ -55,11 +55,17 @@ hpa:
 # PodDisruptionBudget: maxUnavailable keeps single-replica rollouts/drains possible.
 pdb:
   maxUnavailable: 1
-# Image signature admission (Phase 5/8). Roll out Audit first, then Enforce.
+ # Image signature admission (Phase 5/8). Roll out Audit first, then Enforce.
 kyverno:
   verifyImages:
     enabled: true
     action: Audit
+
+# PostSync smoke test (Phase 10). Runs in its own namespace via the Ingress.
+smokeTest:
+  enabled: true
+  image: "curlimages/curl:8.10.1"
+  baseUrl: "http://eshtry-mny.192.168.1.8.nip.io"
 # ====================== Ingress ======================
 ingress:
   enabled: true
