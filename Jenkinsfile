@@ -4,7 +4,7 @@ pipeline {
     parameters {
         booleanParam(name: 'SONAR_ENABLED', defaultValue: false, description: 'Run SonarQube analysis (requires the sonar-token credential and a reachable server)')
         booleanParam(name: 'PUSH_GITOPS', defaultValue: true, description: 'Push the digest-pinned values.yaml back to Git for Argo CD')
-        string(name: 'GITOPS_BRANCH', defaultValue: 'devsecops/homelab-engagement', description: 'Branch to push the GitOps digest commit to')
+        string(name: 'GITOPS_BRANCH', defaultValue: 'main', description: 'Branch to push the GitOps digest commit to')
     }
 
     environment {
