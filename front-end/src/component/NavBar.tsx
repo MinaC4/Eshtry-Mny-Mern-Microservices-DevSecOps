@@ -3,6 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect, useState } from "react";
 import { API_BASE } from "../config/api";
 import axios from "axios";
+import profileHeader from "../assets/profile-header.jpg";
 
 function NavBar() {
   const [activeLink, setActiveLink] = useState("home");
@@ -62,7 +63,7 @@ function NavBar() {
                 )}
                 <li>
                   <a href="/profile" onClick={() => handleLinkClick("profile")}>
-                    Profile <img src="src\assets\profile-header.jpg" alt="" />
+                    Profile <img src={profileHeader} alt="" />
                   </a>
                 </li>
               </ul>
