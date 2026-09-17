@@ -33,7 +33,6 @@ pipeline {
                 stage('Test: Product') { steps { sh 'docker run --rm -v "$PWD/Product":/app -w /app node:20-alpine sh -c "npm ci --no-audit --no-fund && npm test && rm -rf node_modules"' } }
                 stage('Test: Cart')    { steps { sh 'docker run --rm -v "$PWD/Cart":/app -w /app node:20-alpine sh -c "npm ci --no-audit --no-fund && npm test && rm -rf node_modules"' } }
             }
-            post { always { junit allowEmptyResults: true, testResults: '**/test-results/*.xml' } }
         }
 
         stage('SonarQube Analysis') {
