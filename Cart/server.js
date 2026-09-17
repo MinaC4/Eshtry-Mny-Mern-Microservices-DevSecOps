@@ -11,7 +11,10 @@ const app = express();
 app.set('trust proxy', 1);
 
 require('dotenv').config();
-const mongoose = require('./config/db_conn');
+const mongoose = require('mongoose');
+// Fail fast instead of buffering DB calls for 10s when Mongo is unreachable.
+mongoose.set('bufferCommands', false);
+require('./config/db_conn');
 const port = process.env.PORT || 9003;
 
 app.use(helmet());
