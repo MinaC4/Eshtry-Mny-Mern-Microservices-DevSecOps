@@ -196,3 +196,28 @@ All four services build from multi-stage Dockerfiles. The backend images run in 
 ### Kubernetes Dashboard (replica sets/services)
 
 ![Kubernetes Dashboard replica sets](docs/screenshots/screenshot-09.png)
+
+---
+
+## Homelab deployment (this cluster) — what actually runs here
+
+The sections above describe the original cloud-reference design. This deployment was adapted to the operator's real k3s homelab; see `docs/COMPARISON.md` for the full list. Key differences:
+
+- **Ingress:** Traefik (class `traefik`, `kube-system`) at `http://eshtry-mny.192.168.1.8.nip.io` — not ingress-nginx.
+- **Database:** dedicated in-cluster MongoDB StatefulSet in `eshtry-mny` (no Atlas); NetworkPolicy egress restricted to the Mongo pods only.
+- **Secrets:** local Kubernetes Secret created out-of-band (`ci/scripts/create-secrets.sh`), never committed; AWS/Vault ESO gated off (the cluster's ESO↔Vault wiring is non-functional).
+- **Registry:** the operator's Harbor (`192.168.1.8:30082/eshtry-mny`), not Docker Hub.
+- **Pipeline:** Jenkins builds → tests → audits → Trivy → SBOM (Syft) → push → **cosign sign by digest** → verify → **pin digests** into `values.yaml`.
+- **Delivery:** Argo CD auto-syncs the digest-pinned chart (manual `helm upgrade` retired); a PostSync smoke Job runs the full user journey.
+- **Admission:** Kyverno policies scoped to `eshtry-mny` (no `:latest`, non-root, read-only rootfs, limits). `verify-images` is in **Audit** (see `docs/08-policy-as-code.md`).
+- **Scale:** HPA min 1 / max 3 for the homelab.
+
+Docs: `docs/` (analysis, threat model, ADR, phase reports, `SECURITY.md`, `EVIDENCE.md`, `COMPARISON.md`, `DEMO.md`), state in `docs/STATE.md`.
+
+### Local run / verification
+```
+kubectl get application eshtry-mny -n argocd          # Synced / Healthy
+kubectl get pods -n eshtry-mny                        # 5/5 Running
+kubectl logs -n eshtry-mny-tests job/smoke-test       # SMOKE OK
+```
+

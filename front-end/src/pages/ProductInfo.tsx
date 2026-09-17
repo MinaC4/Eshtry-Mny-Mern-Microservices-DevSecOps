@@ -34,11 +34,12 @@ function ProductInfo() {
     axios.post(`${API_BASE}/cart/${productID}`)
       .then((response) => {
         if (response.status === 200) { alert("Added to cart"); }
-        else { window.location.href = "/login"; }
       })
       .catch((error) => {
-        console.error("Error:", error);
-        if (error.response?.status === 401) { window.location.href = "/login"; }
+        const status = error.response?.status;
+        if (status === 401) { window.location.href = "/login"; }
+        else if (status === 409) { alert("This game is already in your cart"); }
+        else { alert("Could not add to cart. Please try again."); }
       });
   };
 

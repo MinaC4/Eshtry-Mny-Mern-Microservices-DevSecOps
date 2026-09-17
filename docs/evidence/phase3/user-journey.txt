@@ -1,0 +1,22 @@
+# Phase 3 — End-to-end user journey (real output)
+
+Endpoint: http://eshtry-mny.192.168.1.8.nip.io  (resolved via --resolve to 192.168.1.8)
+Date: 2026-09-17 | Release: eshtry-mny revision 4 (deployed)
+
+```
+1) frontend /         : 200
+2) products           : 26
+3) register           : 201
+4) login              : 200
+   cookie stored      : 1
+5) add to cart        : 200
+6) cart before checkout: {"count":1,"total":34.99}
+7) checkout           : {"message":"Checkout completed","deletedCount":1}
+8) cart after checkout: {"count":0,"total":0}
+9) profile (JWT)      : 200
+10) admin write denied: 403
+11) filter price/100  : 200
+12) filter bad price  : 400   (zod validation — R7 fix working)
+```
+
+All steps are the real curl output captured during Phase 3.

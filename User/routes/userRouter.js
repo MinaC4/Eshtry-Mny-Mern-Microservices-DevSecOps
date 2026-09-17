@@ -4,7 +4,7 @@ const router = express.Router();
 const validateToken = require("../middleware/tokenValidationMiddleware");
 const { validate, registerSchema, loginSchema } = require("../middleware/validateRequest");
 
-const {getUser, userRegister, loginUser} = require("../controllers/usercontroller");
+const {getUser, userRegister, loginUser, logoutUser} = require("../controllers/usercontroller");
 
 // Strict limiter applied only to auth endpoints (login & register)
 const authLimiter = rateLimit({
@@ -18,5 +18,7 @@ router.route("/").post(authLimiter, validate(registerSchema), userRegister);
 router.route("/").get(validateToken, getUser);
 
 router.route("/login").post(authLimiter, validate(loginSchema), loginUser);
+
+router.route("/logout").post(logoutUser);
 
 module.exports = router;

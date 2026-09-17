@@ -20,6 +20,13 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: true
+        runAsUser: {{ .Values.security.backend.runAsUser }}
+        runAsGroup: {{ .Values.security.backend.runAsGroup }}
+        fsGroup: {{ .Values.security.backend.fsGroup }}
+        seccompProfile:
+          type: RuntimeDefault
+      imagePullSecrets:
+        - name: {{ .Values.registry.pullSecretName }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -46,7 +53,7 @@ spec:
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /health
+              path: /ready
               port: 9003
             initialDelaySeconds: 5
             periodSeconds: 5
@@ -61,6 +68,9 @@ spec:
             runAsNonRoot: true
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           envFrom:
             - secretRef:
                 name: app-secrets

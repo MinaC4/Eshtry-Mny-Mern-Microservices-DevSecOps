@@ -20,6 +20,13 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: true
+        runAsUser: {{ .Values.security.frontend.runAsUser }}
+        runAsGroup: {{ .Values.security.frontend.runAsGroup }}
+        fsGroup: {{ .Values.security.frontend.fsGroup }}
+        seccompProfile:
+          type: RuntimeDefault
+      imagePullSecrets:
+        - name: {{ .Values.registry.pullSecretName }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -57,6 +64,9 @@ spec:
             runAsNonRoot: true
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           envFrom:
             - configMapRef:
                 name: app-config

@@ -10,18 +10,18 @@ spec:
       match:
         any:
         - resources:
+            namespaces:
+              - eshtry-mny
             kinds:
-              - Pod
               - Deployment
               - StatefulSet
               - DaemonSet
               - Job
-              - CronJob
       validate:
         message: "Image tag 'latest' is not allowed. Use a specific version tag."
-        deny:
-          conditions:
-            all:
-              - key: "{{ "{{" }} container.image {{ "}}" }}"
-                operator: EndsWith
-                value: ":latest"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - image: "!*latest"

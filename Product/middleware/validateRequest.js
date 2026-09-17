@@ -10,6 +10,25 @@ const createProductSchema = z.object({
   })
 });
 
+const priceFilterSchema = z.object({
+  params: z.object({
+    price: z.coerce.number().nonnegative().max(1000000)
+  })
+});
+
+const categoryFilterSchema = z.object({
+  params: z.object({
+    category: z.string().min(1).max(50)
+  })
+});
+
+const categoryPriceFilterSchema = z.object({
+  params: z.object({
+    category: z.string().min(1).max(50),
+    price: z.coerce.number().nonnegative().max(1000000)
+  })
+});
+
 const validate = (schema) => (req, res, next) => {
   const result = schema.safeParse(req);
   if (!result.success) {
@@ -22,4 +41,10 @@ const validate = (schema) => (req, res, next) => {
   next();
 };
 
-module.exports = { validate, createProductSchema };
+module.exports = {
+  validate,
+  createProductSchema,
+  priceFilterSchema,
+  categoryFilterSchema,
+  categoryPriceFilterSchema
+};

@@ -1,0 +1,42 @@
+{{- if .Values.kyverno.verifyImages.enabled }}
+# Admission verification of image signatures (Phase 5/8). Scoped to
+# eshtry-mny only so no other project is affected. The public key is, by
+# definition, public and is also committed at security/cosign.pub.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: eshtry-verify-images
+  annotations:
+    policies.kyverno.io/title: Verify cosign image signatures
+    policies.kyverno.io/category: Supply Chain
+    policies.kyverno.io/severity: high
+spec:
+  validationFailureAction: {{ .Values.kyverno.verifyImages.action }}
+  background: false
+  rules:
+    - name: verify-cosign-key
+      match:
+        any:
+          - resources:
+              namespaces:
+                - eshtry-mny
+              kinds:
+                - Pod
+      verifyImages:
+        - imageReferences:
+            - "192.168.1.8:30082/eshtry-mny/*"
+          imageRegistryCredentials:
+            allowInsecureRegistry: true
+            secrets:
+              - harbor-creds
+          mutateDigest: {{ ternary "true" "false" (eq .Values.kyverno.verifyImages.action "Enforce") }}
+          attestors:
+            - count: 1
+              entries:
+                - keys:
+                    publicKeys: |-
+                      -----BEGIN PUBLIC KEY-----
+                      MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAErFDZCXTZ0Jm6aMOTbxBWIf573HPu
+                      c7gjiLjuvQQMzyzie5Ar04q/Cx6w5nklEGQ/izyPQKxSp3iuf8WR5o+A1Q==
+                      -----END PUBLIC KEY-----
+{{- end }}

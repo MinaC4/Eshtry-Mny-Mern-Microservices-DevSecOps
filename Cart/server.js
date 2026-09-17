@@ -6,7 +6,14 @@ const cookieParser = require('cookie-parser');
 const logger = require('./config/logger');
 const app = express();
 
+// Behind the Traefik ingress; trust exactly one proxy so rate limiting and
+// logs key on the real client IP rather than the ingress pod IP.
+app.set('trust proxy', 1);
+
 require('dotenv').config();
+const mongoose = require('mongoose');
+// Fail fast instead of buffering DB calls for 10s when Mongo is unreachable.
+mongoose.set('bufferCommands', false);
 require('./config/db_conn');
 const port = process.env.PORT || 9003;
 
@@ -29,6 +36,13 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     uptime: Math.floor((Date.now() - startTime) / 1000)
   });
+});
+
+// Readiness reflects MongoDB connectivity so a pod without a working DB
+// connection is removed from Service endpoints instead of serving 500s.
+app.get('/ready', (req, res) => {
+  const ready = mongoose.connection.readyState === 1;
+  res.status(ready ? 200 : 503).json({ status: ready ? 'ready' : 'not-ready' });
 });
 
 // Rate limiting

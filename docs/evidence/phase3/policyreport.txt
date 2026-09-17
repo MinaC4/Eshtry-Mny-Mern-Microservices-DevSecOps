@@ -1,0 +1,6 @@
+NAME                                   KIND          NAME              PASS   FAIL   WARN   ERROR   SKIP   AGE
+40536daf-1221-43db-bb7c-9c286a35a909   Deployment    frontend          4      0      0      0       0      5m48s
+ab1ad0f1-8ffb-4a9d-ba6d-913a95d12ac4   Deployment    user-service      4      0      0      0       0      5m53s
+c055b532-4176-4b52-8016-0d338ec33121   StatefulSet   mongodb           4      0      0      0       0      8m37s
+f1f6df35-05fd-4265-86d1-62e832e99725   Deployment    product-service   4      0      0      0       0      5m50s
+f3ac15de-53de-4385-a9cd-3f2966ac39ad   Deployment    cart-service      4      0      0      0       0      5m39s

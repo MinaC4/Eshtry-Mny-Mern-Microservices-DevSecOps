@@ -1,5 +1,15 @@
 const { z } = require('zod');
 
+const phoneSchema = z.preprocess(
+  (v) => (typeof v === 'string' ? v.replace(/[\s\-()]/g, '') : v),
+  z.string().regex(/^\+?[0-9]{7,15}$/, 'Invalid phone number')
+);
+
+const genderSchema = z.preprocess(
+  (v) => (v === '' ? undefined : v),
+  z.enum(['male', 'female', 'other']).optional()
+);
+
 const registerSchema = z.object({
   body: z.object({
     email: z.string().email(),
@@ -7,8 +17,8 @@ const registerSchema = z.object({
     firstName: z.string().min(1).max(50),
     lastName: z.string().min(1).max(50),
     age: z.coerce.number().int().min(13).max(120),
-    phone: z.string().regex(/^\+?[1-9]\d{1,14}$/),
-    gender: z.enum(['male', 'female', 'other']).optional()
+    phone: phoneSchema,
+    gender: genderSchema
   })
 });
 

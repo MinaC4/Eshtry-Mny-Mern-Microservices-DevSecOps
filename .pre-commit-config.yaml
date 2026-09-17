@@ -1,0 +1,61 @@
+# Pre-commit gates mirroring the Jenkins pipeline, so the same checks run
+# locally before a commit. Keep in sync with Jenkinsfile and ci/services.yaml.
+#
+# Run once to install:            pre-commit install
+# Run across the whole tree:      pre-commit run --all-files
+#
+# Tools that are not installed locally are executed through their official
+# container images (Docker is already present on the operator's machine), so
+# nothing has to be installed on the host.
+
+default_stages: [pre-commit]
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-json
+      - id: detect-private-key
+      - id: check-added-large-files
+        args: ["--maxkb=4096"]
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+        # Helm templates are not valid YAML before rendering; validated by `helm lint`.
+        exclude: ^(eshtry-mny/templates/|k8s/base/)
+
+  - repo: local
+    hooks:
+      - id: gitleaks
+        name: gitleaks secret scan
+        description: Blocks any commit containing a detected secret.
+        language: system
+        pass_filenames: false
+        entry: bash -c 'docker run --rm -v "$PWD":/repo ghcr.io/gitleaks/gitleaks:latest dir /repo --config /repo/.gitleaks.toml --redact -v --exit-code=1'
+
+      - id: hadolint
+        name: hadolint Dockerfile lint
+        language: system
+        files: (^|/)Dockerfile$
+        entry: bash -c 'for f in "$@"; do docker run --rm -i hadolint/hadolint:latest hadolint --failure-threshold warning - < "$f" || exit 1; done' --
+
+      - id: helm-lint
+        name: helm lint
+        language: system
+        pass_filenames: false
+        files: ^eshtry-mny/
+        entry: helm lint eshtry-mny
+
+      - id: helm-template
+        name: helm template (render check)
+        language: system
+        pass_filenames: false
+        files: ^eshtry-mny/
+        entry: bash -c 'helm template eshtry-mny ./eshtry-mny -n eshtry-mny >/dev/null'
+
+      - id: frontend-typecheck
+        name: frontend typecheck (tsc)
+        language: system
+        pass_filenames: false
+        files: ^front-end/.*\.(ts|tsx)$
+        entry: bash -c 'test -d front-end/node_modules && (cd front-end && npx tsc --noEmit) || echo "front-end/node_modules missing; skipped (run npm ci)"'

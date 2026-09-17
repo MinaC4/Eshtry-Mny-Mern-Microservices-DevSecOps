@@ -1,0 +1,68 @@
+{{- if .Values.smokeTest.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eshtry-mny-tests
+---
+# Smoke test run by Argo CD after every sync. Lives in its own namespace so it
+# is not subject to the app's default-deny NetworkPolicies, and reaches the app
+# through the real Ingress (same path a user takes).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: smoke-test
+  namespace: eshtry-mny-tests
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      labels:
+        app: smoke-test
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: smoke
+          image: {{ .Values.smokeTest.image }}
+          command: ["sh", "-c"]
+          args:
+            - |
+              set -e
+              BASE="{{ .Values.smokeTest.baseUrl }}"
+              CURL="curl -fsS --retry 5 --retry-delay 5 --retry-all-errors"
+              echo "GET / -> $($CURL -o /dev/null -w '%{http_code}' "$BASE/")"
+              test "$($CURL -o /dev/null -w '%{http_code}' "$BASE/api/v1/products")" = "200"
+              test "$($CURL "$BASE/api/v1/products" | grep -o '"name"' | wc -l)" -ge 1
+              EMAIL="smoke-$(date +%s)@example.com"
+              $CURL -o /dev/null -X POST "$BASE/api/v1/users" -H 'Content-Type: application/json' \
+                -d "{\"email\":\"$EMAIL\",\"password\":\"Password123\",\"firstName\":\"Smoke\",\"lastName\":\"Test\",\"age\":25,\"phone\":\"01000000001\",\"gender\":\"\"}"
+              $CURL -c /tmp/cj -o /dev/null -X POST "$BASE/api/v1/users/login" -H 'Content-Type: application/json' \
+                -d "{\"email\":\"$EMAIL\",\"password\":\"Password123\"}"
+              PID=$($CURL "$BASE/api/v1/products" | tr ',' '\n' | grep -m1 '_id' | sed 's/.*"\([a-f0-9]\{24\}\)".*/\1/')
+              $CURL -b /tmp/cj -o /dev/null -X POST "$BASE/api/v1/cart/$PID"
+              $CURL -b /tmp/cj -X DELETE "$BASE/api/v1/cart/checkout" | grep -q "Checkout completed"
+              echo "SMOKE OK"
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+      volumes:
+        - name: tmp
+          emptyDir: {}
+{{- end }}

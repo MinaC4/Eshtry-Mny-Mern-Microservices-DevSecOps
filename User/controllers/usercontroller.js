@@ -33,7 +33,7 @@ const userRegister = async (req, res, next) => {
             lastName: req.body.lastName,
             age: req.body.age,
             phone: req.body.phone,
-            gender: req.body.gender
+            gender: req.body.gender || undefined
         });
 
         logger.info({ userId: user._id, email }, 'User registered successfully');
@@ -57,9 +57,13 @@ const loginUser = async (req, res, next) => {
             );
 
             logger.info({ userId: user._id, email }, 'User logged in successfully');
+            // Secure cookies require HTTPS. Only mark secure when the public
+            // origin is https, so the app still works on an HTTP-only homelab.
+            const secureCookie = process.env.NODE_ENV === 'production'
+                && (process.env.FRONTEND_ORIGIN || '').startsWith('https');
             res.cookie('token', accessToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
+                secure: secureCookie,
                 sameSite: 'strict',
                 maxAge: 3600000
             });
@@ -77,8 +81,20 @@ const loginUser = async (req, res, next) => {
     }
 };
 
+const logoutUser = (req, res) => {
+    const secureCookie = process.env.NODE_ENV === 'production'
+        && (process.env.FRONTEND_ORIGIN || '').startsWith('https');
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: secureCookie,
+        sameSite: 'strict'
+    });
+    return res.status(200).json({ message: 'Logged out' });
+};
+
 module.exports = {
     getUser,
     userRegister,
-    loginUser
+    loginUser,
+    logoutUser
 };

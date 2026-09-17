@@ -25,6 +25,16 @@ function Cart() {
     } finally { setLoading(false); }
   };
 
+  const removeItem = async (productId: string) => {
+    try {
+      await axios.delete(`${API_BASE}/cart/${productId}`);
+      await fetchCartData();
+    } catch (error) {
+      console.error("Error removing item:", error);
+      alert("Could not remove the item. Please try again.");
+    }
+  };
+
   useEffect(() => {
     fetchCartData();
   }, []);
@@ -57,6 +67,7 @@ function Cart() {
                       <th className="cart-table-desktop cart-table-payment">Name</th>
                       <th className="cart-table-desktop cart-table-size">Category</th>
                       <th className="cart-table-size right-text-mobile">Price</th>
+                      <th className="cart-table-size">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -64,16 +75,25 @@ function Cart() {
                       cartData.Products.map((product: any) => (
                         <tr className="cart-table-content" key={product._id}>
                           <td className="cart-table-image-info">
-                            <img src={product.image} alt="Product Image" />
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = "hidden"; }}
+                            />
                           </td>
                           <td className="bold-text">{product.name}</td>
                           <td>{product.category}</td>
                           <td>${product.price}</td>
+                          <td>
+                            <button className="searchButton" type="button" onClick={() => removeItem(product._id)}>
+                              Remove
+                            </button>
+                          </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={4} style={{ textAlign: "center", padding: "40px" }}>
+                        <td colSpan={5} style={{ textAlign: "center", padding: "40px" }}>
                           Your cart is empty. Add some games!
                         </td>
                       </tr>
@@ -85,7 +105,9 @@ function Cart() {
               <div className="total-section">
                 <p>Total: <strong>${cartData.total}</strong></p>
                 <a href="/checkout">
-                  <button className="searchButton">Proceed to Checkout</button>
+                  <button className="searchButton" disabled={!cartData.Products || cartData.Products.length === 0}>
+                    Proceed to Checkout
+                  </button>
                 </a>
               </div>
             </div>

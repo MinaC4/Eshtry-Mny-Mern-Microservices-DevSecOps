@@ -10,13 +10,13 @@ spec:
       match:
         any:
         - resources:
+            namespaces:
+              - eshtry-mny
             kinds:
-              - Pod
               - Deployment
               - StatefulSet
               - DaemonSet
               - Job
-              - CronJob
       validate:
         message: "Containers must run as non-root user"
         anyPattern:

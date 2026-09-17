@@ -1,6 +1,7 @@
 import "../Style/Register.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { API_BASE } from "../config/api";
+import axios from "axios";
 
 function Register() {
   const [firstName, setFirstName] = useState("");
@@ -11,6 +12,13 @@ function Register() {
   const [gender, setGender] = useState("");
   const [password, setPassword] = useState("");
   const [confpassword, setconfPassword] = useState("");
+
+  useEffect(() => {
+    // Already authenticated? Skip the registration form.
+    axios.get(`${API_BASE}/users`)
+      .then(() => { window.location.href = "/"; })
+      .catch(() => {});
+  }, []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -38,10 +46,13 @@ function Register() {
       if (response.ok) {
         window.location.href = "/login";
       } else {
-        alert("Registration failed");
+        const err = await response.json().catch(() => ({}));
+        const detail = err.details && Object.values(err.details).flat().join(", ");
+        alert(detail ? `Registration failed: ${detail}` : (err.message || "Registration failed"));
       }
     } catch (error) {
       console.error("Error:", error);
+      alert("Registration failed: could not reach the server");
     }
   }
   return (
@@ -175,12 +186,18 @@ function Register() {
               </div>
             </div>
             <div className="col">
-              <div className="row">
-                <div className="col inline">
-                  <label className="radio-inline">
-                    <input type="text" name="gender" onChange={(event) => setGender(event.target.value)}></input>
-                  </label>
-                </div>
+              <div className="field">
+                <select
+                  className="form-control"
+                  name="gender"
+                  value={gender}
+                  onChange={(event) => setGender(event.target.value)}
+                >
+                  <option value="">Prefer not to say</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
               </div>
             </div>
           </div>

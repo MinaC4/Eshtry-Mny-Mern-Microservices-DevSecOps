@@ -38,9 +38,9 @@ describe('Product service — list products', () => {
 });
 
 describe('Product service — find product by name', () => {
-  it('GET /api/v1/products/find/nonexistent-name returns 404 not 500', async () => {
-    const res = await request(app).get('/api/v1/products/find/some-product-name');
-    // Should return 404 (not found) or structured error, never 500 crash
+  it('GET /api/v1/products/:name returns structured JSON (not an HTML 404)', async () => {
+    const res = await request(app).get('/api/v1/products/nonexistent-product-name');
+    // Should return 404 (not found) or structured 500, never a plain HTML 404
     expect([404, 500]).toContain(res.status);
     expect(res.headers['content-type']).toMatch(/json/);
   });
