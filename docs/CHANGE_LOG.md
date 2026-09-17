@@ -85,4 +85,13 @@ cosign:
 - keypair generated locally at `~/.config/eshtry-mny/cosign.key` (password in `cosign.key.pass`), public key committed at `security/cosign.pub`.
 - images signed by digest: user/product/cart `0.1.0`, user `0.1.2`, frontend `0.1.1`.
 
+## Phase 4/5/8 additions
+- Jenkins job `eshtry-mny` + credentials `harbor-ci`, `cosign-key`, `cosign-password`, `github-token`.
+- Harbor robot `robot$eshtry-mny+eshtry-mny-ci` (push+pull).
+- ClusterPolicy `eshtry-verify-images` (scoped to `eshtry-mny`), `validationFailureAction: Audit` (see docs/08-policy-as-code.md for why not Enforce).
+- Secret `harbor-creds` in namespace **`kyverno`** (pull-only robot for the `eshtry-mny` project) so verify-images can authenticate. Additive only.
+- App fix: `POST /api/v1/users/logout`; frontend redirects authenticated users away from `/login` & `/register`; NavBar Login/Logout.
+
+Remove (rollback): `kubectl delete secret harbor-creds -n kyverno`; `kubectl delete clusterpolicy eshtry-verify-images`; delete the Jenkins job/credentials via the UI.
+
 

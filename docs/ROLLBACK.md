@@ -19,6 +19,9 @@ kubectl delete application eshtry-mny -n argocd
 kubectl delete policy eshtry-verify-images -n eshtry-mny   # exact name confirmed in Phase 8
 # Jenkins: delete the new job and credentials (UI/CLI, added in Phase 4)
 # Harbor: delete project eshtry-mny (Phase 4)
+# Kyverno verify-images policy + the pull secret added to the kyverno namespace
+kubectl delete clusterpolicy eshtry-verify-images
+kubectl delete secret harbor-creds -n kyverno
 ```
 
 Order matters: remove the Argo CD Application before deleting the namespace, so self-heal does not recreate workloads.

@@ -22,9 +22,12 @@ Jenkins job `eshtry-mny`; credentials `harbor-ci`, `cosign-key`, `cosign-passwor
 GitHub source control (Gitea excluded) · in-cluster MongoDB (no Atlas) · local k8s Secrets (Vault/ESO broken, untouched) · Harbor registry · use operator's installed tools · merge to `main` at the end.
 
 ## Next exact steps
-1. Kyverno `verify-images` (Audit → Enforce) scoped to `eshtry-mny`; prove unsigned rejection; confirm the 4 existing policies unaffected.
-2. Phase 6 (secrets rotation evidence), Phase 8 (policy proofs), Phase 9 (network/runtime), Phase 10 (smoke/DAST/observability), Phase 11 (README/SECURITY/EVIDENCE/COMPARISON/DEMO).
+1. **Kyverno verify-images**: currently **Audit** — Enforce is blocked by a private-realm SSRF guard in Kyverno 1.18.2 (see docs/08-policy-as-code.md). Needs operator approval for one of: Harbor hostname realm + node registries.yaml, or a Kyverno upgrade. CI cosign verify remains the enforced control.
+2. Phase 6 (secrets rotation evidence), Phase 9 (network/runtime proof), Phase 10 (smoke/DAST/observability), Phase 11 (README/SECURITY/EVIDENCE/COMPARISON/DEMO).
 3. Merge branch → `main`; retarget Argo Application to `main`; update Jenkins job branch.
+
+## Auth UX (fixed)
+`POST /api/v1/users/logout` clears the cookie (verified: profile 401 after logout). `/login` and `/register` redirect authenticated users to `/`. NavBar shows Login/Logout.
 
 ## Open operator items
 - SonarQube server pod is down (start it; then run Jenkins with `SONAR_ENABLED=true`).
