@@ -66,11 +66,21 @@ pipeline {
         }
 
         stage('Security: Docker Scan (Trivy)') {
-            parallel {
-                stage('Trivy: User')     { steps { sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image ${REGISTRY}/eshtry-mny-user:${IMAGE_TAG} --severity HIGH,CRITICAL --exit-code 1" } }
-                stage('Trivy: Product')  { steps { sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image ${REGISTRY}/eshtry-mny-product:${IMAGE_TAG} --severity HIGH,CRITICAL --exit-code 1" } }
-                stage('Trivy: Cart')     { steps { sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image ${REGISTRY}/eshtry-mny-cart:${IMAGE_TAG} --severity HIGH,CRITICAL --exit-code 1" } }
-                stage('Trivy: Frontend') { steps { sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image ${REGISTRY}/eshtry-mny-frontend:${IMAGE_TAG} --severity HIGH,CRITICAL --exit-code 1" } }
+            steps {
+                sh '''
+                    set -e
+                    mkdir -p .trivycache
+                    # Download the DB once into a shared cache, then scan offline.
+                    docker run --rm -v "$PWD/.trivycache:/root/.cache/trivy" \
+                      aquasec/trivy image --download-db-only --no-progress
+                    for svc in user product cart frontend; do
+                      echo "== Trivy: ${svc} =="
+                      docker run --rm -v "$PWD/.trivycache:/root/.cache/trivy" \
+                        -v /var/run/docker.sock:/var/run/docker.sock \
+                        aquasec/trivy image --skip-db-update --no-progress --timeout 10m \
+                        --severity HIGH,CRITICAL --exit-code 1 "${REGISTRY}/eshtry-mny-${svc}:${IMAGE_TAG}"
+                    done
+                '''
             }
         }
 

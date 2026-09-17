@@ -23,6 +23,12 @@ pids
 *.seed
 *.pid.lock
 
+# CI workspace artifacts (never committed)
+.trivycache/
+.cosign.key
+.docker/
+security/sbom/
+
 # Docker
 .dockerignore
 k8s/base/secret.local.yaml
