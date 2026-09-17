@@ -168,7 +168,8 @@ pipeline {
                         git config user.name "Jenkins CI"
                         git add eshtry-mny/values.yaml
                         git commit -m "ci: pin ${IMAGE_TAG} image digests [skip ci]" || echo "No changes to commit"
-                        git push "https://x-access-token:${GITHUB_TOKEN}@github.com/MinaC4/Eshtry-Mny-Mern-Microservices-DevSecOps.git" "HEAD:refs/heads/${GITOPS_BRANCH}"
+                        TARGET_BRANCH="${GITOPS_BRANCH:-${GIT_BRANCH#origin/}}"
+                        git push "https://x-access-token:${GITHUB_TOKEN}@github.com/MinaC4/Eshtry-Mny-Mern-Microservices-DevSecOps.git" "HEAD:refs/heads/${TARGET_BRANCH}"
                     '''
                 }
             }
