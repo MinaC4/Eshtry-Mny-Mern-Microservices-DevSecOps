@@ -15,7 +15,7 @@ Date: after merge to `main` (commit `43573f4`/`1a8501f`). Legend: ✅ done · �
 | 7 — GitOps | ✅ | Argo CD registered, auto-sync + self-heal proven, `docs/07-gitops.md`. Rollback via `git revert` documented, not executed. No PHASE-7 report |
 | 8 — policy as code | ⚠️ | 4 chart policies Enforce + verify-images Audit; unsigned rejection transcript; `docs/08-policy-as-code.md`. No PHASE-8 report |
 | 9 — network + runtime | ⚠️ | NetworkPolicy enforcement **proven** (allowed/denied), `docs/09-network-security.md`. **Falco not installed** (not approved) → out of scope. No PHASE-9 report |
-| 10 — dynamic testing + obs | ⚠️ | Smoke Job as Argo PostSync hook ✅ (`SMOKE OK`, caught a real rotation bug). **ZAP not run**; **no app-level `/metrics`** (both documented waivers). No PHASE-10 report |
+| 10 — dynamic testing + obs | ⚠️ | Smoke Job as Argo PostSync hook ✅ (`SMOKE OK`). **Observability DONE** (prom-client `/metrics`, ServiceMonitor, Prometheus 3/3 targets up, Grafana dashboard loaded). **ZAP attempted but blocked** by image pull failure (`ghcr.io` connection reset) — recorded NOT EXECUTED |
 | 11 — docs & evidence | ⚠️ | `SECURITY.md`, `EVIDENCE.md`, `COMPARISON.md`, `DEMO.md`, README section ✅. Missing `PHASE-11-REPORT.md` and `docs/06-secrets-management.md` |
 
 ## Section 5 acceptance criteria
@@ -50,10 +50,10 @@ Date: after merge to `main` (commit `43573f4`/`1a8501f`). Legend: ✅ done · �
 ## Remaining work (prioritised)
 1. **Branch protection** (CR-1, needs repo admin).
 2. Decide **Kyverno Enforce** path (Harbor hostname+node registries.yaml, or Kyverno upgrade).
-3. **SonarQube** server pod down; run Jenkins with `SONAR_ENABLED=true`.
-4. **ZAP** baseline + triage; **app `/metrics`** + Grafana dashboard.
-5. Write the missing **phase reports** and `docs/06`.
-6. Optional: pre-engagement export (cluster state), Falco (if approved), rollback rehearsal.
+3. **SonarQube** server pod down (deferred by operator).
+4. **Falco** (deferred by operator).
+5. **ZAP** baseline once the image can be pulled (network).
+6. Optional: pre-engagement export (post-engagement snapshot taken), rollback rehearsal already done.
 
 ## Bottom line
 The system is **deployed, tool-driven and working** (Jenkins → Harbor → Git → Argo CD, signed digest-pinned images, full app journey, smoke gate, proven NetworkPolicy, proven rotation). The gaps are either **operator decisions** (branch admin, Kyverno path, SonarQube, Falco/ZAP permissions) or **documentation/backup completeness** (phase reports 6–11, `06-secrets-management.md`, pre-engagement export).

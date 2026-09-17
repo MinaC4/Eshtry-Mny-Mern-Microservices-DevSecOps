@@ -15,8 +15,12 @@ Last updated: Phases 9/10/11 + functional/UI work. Branch `devsecops/homelab-eng
 ## Blocked / decisions
 1. Kyverno `verify-images` Enforce blocked by private-realm SSRF guard (Audit now). Options: Harbor hostname + node registries.yaml, or Kyverno upgrade.
 2. Branch protection (CR-1, needs repo admin).
-3. SonarQube server pod down (stage disabled by default).
-4. ZAP DAST not run (waiver); app has no `/metrics` (observability gap).
+3. SonarQube server pod down (deferred).
+4. Falco not installed (deferred).
+5. ZAP baseline blocked by image pull failure (ghcr.io connection reset).
+
+## Observability (DONE)
+Backends expose `/metrics` (prom-client); ServiceMonitor + `allow-prometheus` NetworkPolicy; Prometheus 3/3 targets up; Grafana dashboard `Eshtry-Mny` (5 panels) loaded.
 
 ## Merge plan
 Merge `devsecops/homelab-engagement` → `main`; retarget the Argo Application `targetRevision` to `main`; update the Jenkins job branch. Committed `argocd-application.yaml` already targets `main`.

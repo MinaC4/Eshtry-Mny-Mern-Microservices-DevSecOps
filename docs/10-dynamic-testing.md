@@ -11,8 +11,12 @@ SMOKE OK
 - Result: Job `succeeded=1`, Argo `Synced/Healthy`.
 - It caught a **real bug**: after rotating `ACCESS_TOKEN` only `user-service` had been restarted, so `cart-service` still signed/verified with the old secret and cross-service auth returned 401. Restarting all three backends fixed it. Lesson recorded: rotate the secret, then roll **all** consumers before validating.
 
-## DAST (OWASP ZAP) — NOT RUN (documented waiver)
-ZAP baseline was approved in principle but **not executed**: the homelab resource budget is tight and a ZAP run needs a dedicated pod plus scan time. The endpoints were instead exercised directly (see `FUNCTIONAL-REVIEW.md`) including input validation (`/filter/price/abc` -> 400). Recommended next step: run `zap-baseline.py` against `http://eshtry-mny.192.168.1.8.nip.io` excluding `DELETE /api/v1/cart/checkout`, triage results here.
+## DAST (OWASP ZAP) — ATTEMPTED, BLOCKED by registry pull
+ZAP baseline was attempted as a pod in `eshtry-mny-tests` against the Ingress. The scan never ran because the image could not be pulled (`ghcr.io/zaproxy/zaproxy:stable`: `read tcp ...: read: connection reset by peer`). Recorded as **NOT EXECUTED** (network), not as a silent waiver. Endpoints were exercised directly including input validation (`/filter/price/abc` -> 400). To run later:
+`kubectl run zap -n eshtry-mny-tests --image=zaproxy/zap-stable -- zap-baseline.py -t http://eshtry-mny.192.168.1.8.nip.io -m 3 -J /tmp/report.json`.
 
-## Observability — PARTIAL (documented gap)
-kube-prometheus-stack is present, but the three Node services do **not expose a `/metrics` endpoint**, so there are no application-level (request rate / error rate / latency) metrics to scrape. Adding them requires instrumenting the services (e.g. `prom-client`) — a code change outside the current fix scope. Currently available: pod/container metrics, Kyverno policy reports, and the app's structured pino logs. A Grafana dashboard needs the metrics first; deferred with this note rather than faked.
+## Observability — DONE
+- Backends expose Prometheus metrics via `prom-client` (`/metrics`): default process/node metrics plus `http_requests_total{method,route,status}` and `http_request_duration_seconds` histogram.
+- `ServiceMonitor eshtry-mny-backends` (label `release: prometheus`) scrapes user/product/cart every 30s; a `allow-prometheus` NetworkPolicy admits the `monitoring` namespace.
+- **Verified**: Prometheus `up{namespace="eshtry-mny"}` = **1** for all three; `sum(http_requests_total{namespace="eshtry-mny"})` = 899; p95 latency ≈ 0.0095s.
+- **Grafana dashboard `Eshtry-Mny`** (uid `eshtry-mny`, 5 panels: pods running, request rate, 5xx error rate, p95 latency, pod restarts) loaded by the Grafana sidecar (verified via the Grafana API).
