@@ -7,6 +7,10 @@ node_modules/
 .env.local
 .env.*.local
 
+# Helm secret values (local secrets backend, populated by Jenkins)
+values-secret.yaml
+eshtry-mny/values-secret.yaml
+
 # Logs
 *.log
 npm-debug.log*

@@ -57,9 +57,13 @@ const loginUser = async (req, res, next) => {
             );
 
             logger.info({ userId: user._id, email }, 'User logged in successfully');
+            // Secure cookies require HTTPS. Only mark secure when the public
+            // origin is https, so the app still works on an HTTP-only homelab.
+            const secureCookie = process.env.NODE_ENV === 'production'
+                && (process.env.FRONTEND_ORIGIN || '').startsWith('https');
             res.cookie('token', accessToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
+                secure: secureCookie,
                 sameSite: 'strict',
                 maxAge: 3600000
             });

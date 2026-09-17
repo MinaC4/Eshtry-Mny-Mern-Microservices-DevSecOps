@@ -5,6 +5,12 @@ title = "eshtry-mny gitleaks config"
 [extend]
 useDefault = true
 
-# No allowlist entries — every finding should be reviewed.
-# If a false positive is confirmed after review, add a narrow regex here
-# with a comment explaining why it's safe to ignore.
+# Allowlist is intentionally tiny and path-based only. Both entries are
+# git-ignored local secret files and must never be committed (see .gitignore).
+# Add a narrow regex only after confirming a false positive.
+[allowlist]
+description = "Local-only, git-ignored secret files."
+paths = [
+  '''values-secret\.yaml$''',
+  '''\.env$''',
+]

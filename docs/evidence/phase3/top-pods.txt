@@ -1,0 +1,6 @@
+NAME                               CPU(cores)   MEMORY(bytes)   
+cart-service-756d9c64b8-pps7j      1m           31Mi            
+frontend-674ddd7c6c-qtvkr          1m           4Mi             
+mongodb-0                          7m           88Mi            
+product-service-5ccdbc6d7f-46xxm   1m           29Mi            
+user-service-55cd586757-whqg5      2m           30Mi            

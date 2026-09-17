@@ -1,11 +1,21 @@
 # STATE — Eshtry-Mny Homelab DevSecOps Engagement
 
-Last updated: end of Phase 2. No cluster writes performed. Working branch `devsecops/homelab-engagement`.
+Last updated: end of Phase 3. Release `eshtry-mny` deployed in namespace `eshtry-mny` (revision 4).
 
 ## Current position
-- Phases 0, 1, 2: **DONE** (Phase 2 left one BLOCKED item: branch protection needs repo admin — CR-1).
-- Next: Phase 3 (first cluster writes) — prerequisite fixes identified (ingress class, netpol ns, secrets->local, in-cluster Mongo, HPA 1/3, Kyverno namespace scoping, numeric uid).
-- Resume: read this file, then `docs/01-ADR-0001-homelab-adaptation.md` and the phase reports.
+- Phases 0, 1, 2, 3: **DONE**. Phase 2 has one BLOCKED item (branch protection, CR-1).
+- Phase 3: 5/5 workloads Running, full user journey verified. Images on Harbor `eshtry-mny` (tags `0.1.0-homelab*`).
+- Next: Phase 4 (Jenkins hardening + SBOM/sign in-pipeline), then Phase 5 (cosign + verify-images).
+- Resume: read this file, then `docs/03-baseline-deployment.md`, `docs/01-ADR-0001-homelab-adaptation.md`.
+
+## Cluster objects now existing (all in `eshtry-mny` + 4 scoped ClusterPolicies)
+Deployments user/product/cart/frontend, StatefulSet mongodb (+2Gi PVC), 5 Services, Ingress (traefik), 6 NetworkPolicies, 4 HPAs (min1/max3), 4 PDBs, ConfigMap app-config, Secrets app-secrets + harbor-creds, ClusterPolicies deny-latest-tag/require-non-root/require-readonly-rootfs/require-resource-limits.
+Harbor project `eshtry-mny` + robot `robot$eshtry-mny+eshtry-mny-puller`.
+Local untracked file `values-secret.yaml` holds the secrets.
+
+## Access
+- App: `http://eshtry-mny.192.168.1.8.nip.io`
+- Mongo creds live only in `values-secret.yaml` + Secret `app-secrets`.
 
 ## Locked decisions (operator)
 - Source control: **GitHub** (origin), Gitea excluded. Work on branches, merge when verified.

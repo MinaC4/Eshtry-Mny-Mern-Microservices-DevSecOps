@@ -4,7 +4,7 @@ metadata:
   name: user-service-pdb
   namespace: eshtry-mny
 spec:
-  minAvailable: 1
+  maxUnavailable: {{ .Values.pdb.maxUnavailable }}
   selector:
     matchLabels:
       app: user-service
@@ -15,7 +15,7 @@ metadata:
   name: product-service-pdb
   namespace: eshtry-mny
 spec:
-  minAvailable: 1
+  maxUnavailable: {{ .Values.pdb.maxUnavailable }}
   selector:
     matchLabels:
       app: product-service
@@ -26,7 +26,7 @@ metadata:
   name: cart-service-pdb
   namespace: eshtry-mny
 spec:
-  minAvailable: 1
+  maxUnavailable: {{ .Values.pdb.maxUnavailable }}
   selector:
     matchLabels:
       app: cart-service
@@ -37,7 +37,7 @@ metadata:
   name: frontend-pdb
   namespace: eshtry-mny
 spec:
-  minAvailable: 1
+  maxUnavailable: {{ .Values.pdb.maxUnavailable }}
   selector:
     matchLabels:
       app: frontend

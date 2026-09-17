@@ -1,0 +1,5 @@
+NAME                      ADMISSION   BACKGROUND   READY   AGE     MESSAGE
+deny-latest-tag           true        true         True    8m58s   Ready
+require-non-root          true        true         True    10m     Ready
+require-readonly-rootfs   true        true         True    10m     Ready
+require-resource-limits   true        true         True    10m     Ready

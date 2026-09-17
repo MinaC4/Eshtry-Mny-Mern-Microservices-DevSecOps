@@ -6,9 +6,9 @@ COPY . .
 
 FROM node:20-alpine
 WORKDIR /app
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-COPY --from=build --chown=appuser:appgroup /app ./
-USER appuser
+RUN addgroup -g 1001 -S appgroup && adduser -S -u 1001 -G appgroup appuser
+COPY --from=build --chown=1001:1001 /app ./
+USER 1001
 ENV NODE_ENV=production
 EXPOSE 9001
 CMD ["node", "server.js"]

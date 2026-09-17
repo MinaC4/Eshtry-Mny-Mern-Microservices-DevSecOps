@@ -34,6 +34,36 @@ Created/modified (repo only):
 
 Remove: `pre-commit uninstall`; `git checkout main -- .gitleaks.toml` (only if deliberately reverting the fix — not recommended).
 
-## Cluster objects
+## Phase 3 — Baseline deployment
 
-None yet. Nothing created or modified on the cluster by this engagement.
+Repo changes:
+- `eshtry-mny/values.yaml` (Harbor images, traefik ingress, right-sized HPA/PDB, secrets/mongodb/registry/security blocks)
+- `eshtry-mny/templates/secret.yaml` (new), `registry-secret.yaml` (new), `mongodb.yaml` (new), `networkpolicy-mongodb.yaml` (new)
+- `eshtry-mny/templates/{user,product,cart,frontend}-deployment.yaml` (numeric uid, imagePullSecrets)
+- `eshtry-mny/templates/{user,product,cart,frontend}-hpa.yaml` (min 1 / max 3)
+- `eshtry-mny/templates/pdb.yaml` (maxUnavailable)
+- `eshtry-mny/templates/networkpolicy-*.yaml` (traefik ingress, Mongo podSelector egress)
+- `eshtry-mny/templates/kyverno-*.yaml` (namespace scoping, controller-only kinds, pattern-based deny-latest)
+- `eshtry-mny/templates/externalsecret.yaml`, `clustersecretstore.yaml` (gated off); `namespace.yaml` (removed)
+- `User|Product|Cart/Dockerfile` (uid 1001); `*/config/db_conn.js` (MONGO_URI); `*/server.js` (trust proxy); `User/controllers/usercontroller.js` (cookie secure); `Product/middleware/validateRequest.js` + `routes/filterRouter.js` (zod)
+- 4× `package-lock.json` (internal reg `package-firewall.replit.local` -> `registry.npmjs.org`); `front-end/package.json` (removed `fs` placeholder)
+
+Harbor: project `eshtry-mny`; robot `robot$eshtry-mny+eshtry-mny-puller` (pull-only).
+
+Cluster (namespace `eshtry-mny`, created by `--create-namespace`):
+- Deployments: `user-service`, `product-service`, `cart-service`, `frontend`
+- StatefulSet: `mongodb` (+ 2Gi PVC `data-mongodb-0` via `local-path`)
+- Services: `user-service:9001`, `product-service:9000`, `cart-service:9003`, `frontend:80`, headless `mongodb:27017`
+- Ingress `eshtry-mny-ingress` (class traefik)
+- NetworkPolicies: default-deny-all + 4 service allow + mongodb-allow
+- HPAs ×4, PDBs ×4, ConfigMap `app-config`, Secrets `app-secrets` + `harbor-creds`
+- ClusterPolicies (scoped to eshtry-mny): `deny-latest-tag`, `require-non-root`, `require-readonly-rootfs`, `require-resource-limits`
+
+Remove:
+```
+helm uninstall eshtry-mny -n eshtry-mny
+kubectl delete clusterpolicy deny-latest-tag require-non-root require-readonly-rootfs require-resource-limits
+kubectl delete namespace eshtry-mny
+```
+(Harbor project/robot removal is manual in the Harbor UI/API.)
+

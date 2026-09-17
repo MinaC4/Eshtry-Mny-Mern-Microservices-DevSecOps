@@ -6,6 +6,10 @@ const cookieParser = require('cookie-parser');
 const logger = require('./config/logger');
 const app = express();
 
+// Behind the Traefik ingress; trust exactly one proxy so rate limiting and
+// logs key on the real client IP rather than the ingress pod IP.
+app.set('trust proxy', 1);
+
 require('dotenv').config();
 require('./config/db_conn');
 const port = process.env.PORT || 9001;

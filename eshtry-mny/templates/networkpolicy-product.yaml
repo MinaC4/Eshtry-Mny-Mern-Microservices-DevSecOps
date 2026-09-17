@@ -14,7 +14,10 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: ingress-nginx
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: traefik
         - podSelector:
             matchLabels:
               app: frontend
@@ -37,8 +40,9 @@ spec:
         # MongoDB Atlas egress: intentionally broad (0.0.0.0/0) because Atlas
         # does not provide a fixed IP range. Accepted tradeoff per security review.
     - to:
-        - ipBlock:
-            cidr: 0.0.0.0/0
+        - podSelector:
+            matchLabels:
+              app: mongodb
       ports:
         - protocol: TCP
           port: 27017
