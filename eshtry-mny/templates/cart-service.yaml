@@ -4,6 +4,7 @@ metadata:
   name: cart-service
   namespace: eshtry-mny
   labels:
+    app: cart-service
     app.kubernetes.io/part-of: eshtry-mny
 spec:
   selector:

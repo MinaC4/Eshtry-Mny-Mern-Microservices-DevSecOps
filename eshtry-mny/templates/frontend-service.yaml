@@ -4,6 +4,7 @@ metadata:
   name: frontend
   namespace: eshtry-mny
   labels:
+    app: frontend
     app.kubernetes.io/part-of: eshtry-mny
 spec:
   selector:
