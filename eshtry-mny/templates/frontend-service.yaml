@@ -3,10 +3,13 @@ kind: Service
 metadata:
   name: frontend
   namespace: eshtry-mny
+  labels:
+    app.kubernetes.io/part-of: eshtry-mny
 spec:
   selector:
     app: frontend
   ports:
-  - port: 80
+  - name: http
+    port: 80
     targetPort: 8080
   type: ClusterIP

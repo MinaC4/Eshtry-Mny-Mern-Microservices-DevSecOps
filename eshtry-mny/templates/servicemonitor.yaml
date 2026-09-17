@@ -1,0 +1,27 @@
+{{- if .Values.monitoring.serviceMonitor.enabled }}
+# Scraped by kube-prometheus-stack (serviceMonitorSelector: release=prometheus).
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: eshtry-mny-backends
+  namespace: eshtry-mny
+  labels:
+    release: prometheus
+    app.kubernetes.io/part-of: eshtry-mny
+spec:
+  namespaceSelector:
+    matchNames:
+      - eshtry-mny
+  selector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - user-service
+          - product-service
+          - cart-service
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+{{- end }}

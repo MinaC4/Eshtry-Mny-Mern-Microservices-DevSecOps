@@ -4,6 +4,23 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const logger = require('./config/logger');
+const client = require('prom-client');
+
+const register = new client.Registry();
+client.collectDefaultMetrics({ register });
+const httpRequestDuration = new client.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'HTTP request duration in seconds',
+  labelNames: ['method', 'route', 'status'],
+  buckets: [0.01, 0.05, 0.1, 0.3, 0.5, 1, 2, 5],
+  registers: [register]
+});
+const httpRequestsTotal = new client.Counter({
+  name: 'http_requests_total',
+  help: 'Total number of HTTP requests',
+  labelNames: ['method', 'route', 'status'],
+  registers: [register]
+});
 const app = express();
 
 // Behind the Traefik ingress; trust exactly one proxy so rate limiting and
@@ -26,6 +43,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Prometheus request metrics (count + duration by route/status).
+app.use((req, res, next) => {
+  const endTimer = httpRequestDuration.startTimer();
+  res.on('finish', () => {
+    const route = (req.baseUrl || '') + (req.route ? req.route.path : (req.path || 'unknown'));
+    const labels = { method: req.method, route, status: String(res.statusCode) };
+    httpRequestsTotal.inc(labels);
+    endTimer(labels);
+  });
+  next();
+});
+
 // Health check — before rate limiter so probes are never throttled
 const startTime = Date.now();
 app.get('/health', (req, res) => {
@@ -43,6 +72,11 @@ app.get('/health', (req, res) => {
 app.get('/ready', (req, res) => {
   const ready = mongoose.connection.readyState === 1;
   res.status(ready ? 200 : 503).json({ status: ready ? 'ready' : 'not-ready' });
+});
+
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
 });
 
 // General rate limit

@@ -65,6 +65,13 @@ smokeTest:
   enabled: true
   image: "curlimages/curl:8.10.1"
   baseUrl: "http://eshtry-mny.192.168.1.8.nip.io"
+
+# Observability via the existing kube-prometheus-stack.
+monitoring:
+  serviceMonitor:
+    enabled: true
+  dashboard:
+    enabled: true
 # ====================== Ingress ======================
 ingress:
   enabled: true

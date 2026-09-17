@@ -3,9 +3,12 @@ kind: Service
 metadata:
   name: product-service
   namespace: eshtry-mny
+  labels:
+    app.kubernetes.io/part-of: eshtry-mny
 spec:
   selector:
     app: product-service
   ports:
-  - port: 9000
+  - name: http
+    port: 9000
     targetPort: 9000

@@ -1,0 +1,53 @@
+{{- if .Values.monitoring.dashboard.enabled }}
+# Picked up by the Grafana sidecar (label grafana_dashboard=1, NAMESPACE=ALL).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eshtry-mny-dashboard
+  namespace: eshtry-mny
+  labels:
+    grafana_dashboard: "1"
+    app.kubernetes.io/part-of: eshtry-mny
+data:
+  eshtry-mny.json: |-
+    {
+      "title": "Eshtry-Mny",
+      "uid": "eshtry-mny",
+      "schemaVersion": 39,
+      "refresh": "30s",
+      "time": { "from": "now-1h", "to": "now" },
+      "panels": [
+        {
+          "id": 1, "type": "stat", "title": "Pods Running",
+          "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [ { "expr": "count(kube_pod_status_phase{namespace=\"eshtry-mny\",phase=\"Running\"} == 1)", "refId": "A" } ],
+          "options": { "reduceOptions": { "calcs": [ "lastNotNull" ] } }
+        },
+        {
+          "id": 2, "type": "timeseries", "title": "Request rate (req/s) by job",
+          "gridPos": { "h": 8, "w": 9, "x": 6, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [ { "expr": "sum by (job) (rate(http_requests_total{namespace=\"eshtry-mny\"}[5m]))", "refId": "A" } ]
+        },
+        {
+          "id": 3, "type": "timeseries", "title": "Error rate (5xx)",
+          "gridPos": { "h": 8, "w": 9, "x": 15, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [ { "expr": "sum(rate(http_requests_total{namespace=\"eshtry-mny\",status=~\"5..\"}[5m]))", "refId": "A" } ]
+        },
+        {
+          "id": 4, "type": "timeseries", "title": "p95 latency (s)",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [ { "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{namespace=\"eshtry-mny\"}[5m])) by (le, job))", "refId": "A" } ]
+        },
+        {
+          "id": 5, "type": "timeseries", "title": "Pod restarts",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [ { "expr": "sum by (pod) (kube_pod_container_status_restarts_total{namespace=\"eshtry-mny\"})", "refId": "A" } ]
+        }
+      ]
+    }
+{{- end }}

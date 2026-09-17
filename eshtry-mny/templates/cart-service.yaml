@@ -3,9 +3,12 @@ kind: Service
 metadata:
   name: cart-service
   namespace: eshtry-mny
+  labels:
+    app.kubernetes.io/part-of: eshtry-mny
 spec:
   selector:
     app: cart-service
   ports:
-  - port: 9003
+  - name: http
+    port: 9003
     targetPort: 9003
