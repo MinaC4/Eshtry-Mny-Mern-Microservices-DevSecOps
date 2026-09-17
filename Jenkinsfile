@@ -162,7 +162,7 @@ pipeline {
                         set -e
                         while IFS='=' read -r svc ref; do
                           expr=$(printf '.images.%s = "%s"' "$svc" "$ref")
-                          docker run --rm -v "$PWD/eshtry-mny":/w -w /w mikefarah/yq:4 -i "$expr" values.yaml
+                          docker run --rm --user 0:0 -v "$PWD/eshtry-mny":/w -w /w mikefarah/yq:4 -i "$expr" values.yaml
                         done < digests.txt
                         git config user.email "jenkins@eshtry-mny.local"
                         git config user.name "Jenkins CI"
