@@ -1,0 +1,29 @@
+# Allow Prometheus (monitoring namespace) to scrape /metrics on the backends.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-prometheus
+  namespace: eshtry-mny
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - user-service
+          - product-service
+          - cart-service
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9001
+        - protocol: TCP
+          port: 9000
+        - protocol: TCP
+          port: 9003
