@@ -59,7 +59,7 @@ pdb:
 kyverno:
   verifyImages:
     enabled: true
-    action: Enforce
+    action: Audit
 # ====================== Ingress ======================
 ingress:
   enabled: true
