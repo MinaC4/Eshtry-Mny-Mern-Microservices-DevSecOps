@@ -7,9 +7,9 @@ replicaCount: 1
 imagePullPolicy: IfNotPresent
 # Images from the operator's Harbor registry (override with --set images.user=...)
 images:
-  user: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3
-  product: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product@sha256:c84bc2dc9c71275ba95fe20ed7f290b5b62b1d999a968af11b1ff547ec40460f
-  cart: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:cbd6d1eef157ace6283030d96e78266f6cf331b79fad78ca4cbdab7318b8b422
+  user: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:5f841b767b4a8f0a31924680bc448be6ad6962d5d539f74d05f776014cf261a6
+  product: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product@sha256:40f6644079d4e12ed0cc8fd5afc6f8953af4fafda2e4c6e52de0162194e1309a
+  cart: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:c2957607e51fb83ee6abf8211f81e66e68bca74226219fb79f8cab63566b886a
   frontend: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:5a35d626a8e76b3b6451259fadafbac9bd27181126a9d547b64849f26365ca0d
 # ConfigMap values
 mongoCluster: "" # unused when MONGO_URI is set (in-cluster MongoDB)
@@ -65,7 +65,6 @@ smokeTest:
   enabled: true
   image: "curlimages/curl:8.10.1"
   baseUrl: "http://eshtry-mny.192.168.1.8.nip.io"
-
 # Observability via the existing kube-prometheus-stack.
 monitoring:
   serviceMonitor:
