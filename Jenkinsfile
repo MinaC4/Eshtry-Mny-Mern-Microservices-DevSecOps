@@ -4,7 +4,7 @@ pipeline {
     parameters {
         booleanParam(name: 'SONAR_ENABLED', defaultValue: false, description: 'Run SonarQube analysis (requires the sonar-token credential and a reachable server)')
         booleanParam(name: 'PUSH_GITOPS', defaultValue: true, description: 'Push the digest-pinned values.yaml back to Git for Argo CD')
-        string(name: 'GIT_BRANCH', defaultValue: 'devsecops/homelab-engagement', description: 'Branch to push the GitOps commit to')
+        string(name: 'GITOPS_BRANCH', defaultValue: 'devsecops/homelab-engagement', description: 'Branch to push the GitOps digest commit to')
     }
 
     environment {
@@ -168,7 +168,7 @@ pipeline {
                         git config user.name "Jenkins CI"
                         git add eshtry-mny/values.yaml
                         git commit -m "ci: pin ${IMAGE_TAG} image digests [skip ci]" || echo "No changes to commit"
-                        git push "https://x-access-token:${GITHUB_TOKEN}@github.com/MinaC4/Eshtry-Mny-Mern-Microservices-DevSecOps.git" "HEAD:refs/heads/${GIT_BRANCH}"
+                        git push "https://x-access-token:${GITHUB_TOKEN}@github.com/MinaC4/Eshtry-Mny-Mern-Microservices-DevSecOps.git" "HEAD:refs/heads/${GITOPS_BRANCH}"
                     '''
                 }
             }
