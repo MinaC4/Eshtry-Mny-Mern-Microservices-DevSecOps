@@ -55,6 +55,12 @@ hpa:
 # PodDisruptionBudget: maxUnavailable keeps single-replica rollouts/drains possible.
 pdb:
   maxUnavailable: 1
+
+# Image signature admission (Phase 5/8). Roll out Audit first, then Enforce.
+kyverno:
+  verifyImages:
+    enabled: true
+    action: Audit
 # ====================== Ingress ======================
 ingress:
   enabled: true

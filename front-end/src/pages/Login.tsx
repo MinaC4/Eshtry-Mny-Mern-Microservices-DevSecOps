@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import "../Style/Login.css";
 import { API_BASE } from "../config/api";
 import axios from "axios";
@@ -6,6 +6,13 @@ import axios from "axios";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    // Already authenticated? Skip the login form.
+    axios.get(`${API_BASE}/users`)
+      .then(() => { window.location.href = "/"; })
+      .catch(() => {});
+  }, []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

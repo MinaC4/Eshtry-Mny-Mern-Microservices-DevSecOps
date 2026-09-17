@@ -1,6 +1,7 @@
 import "../Style/Register.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { API_BASE } from "../config/api";
+import axios from "axios";
 
 function Register() {
   const [firstName, setFirstName] = useState("");
@@ -11,6 +12,13 @@ function Register() {
   const [gender, setGender] = useState("");
   const [password, setPassword] = useState("");
   const [confpassword, setconfPassword] = useState("");
+
+  useEffect(() => {
+    // Already authenticated? Skip the registration form.
+    axios.get(`${API_BASE}/users`)
+      .then(() => { window.location.href = "/"; })
+      .catch(() => {});
+  }, []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
