@@ -41,9 +41,11 @@ Date: after merge to `main` (commit `43573f4`/`1a8501f`). Legend: ✅ done · �
 | ZAP findings triaged | ❌ ZAP not run |
 | README/SECURITY/EVIDENCE/COMPARISON/DEMO | ✅ |
 
-## Expected-tree gaps
-- Missing: `docs/06-secrets-management.md`, `docs/phases/PHASE-{6,7,8,9,10,11}-REPORT.md`, `tests/smoke/` (script lives in the chart template), `security/zap/`, `docs/ENGAGEMENT.md`, `docs/evidence/pre-engagement/`.
-- `security/sbom/*.cdx.json` were committed (acceptable; they are artifacts).
+## Expected-tree gaps — RESOLVED since first pass
+- Added: `docs/06-secrets-management.md`, `docs/phases/PHASE-{6,7,8,9,10,11}-REPORT.md`, `tests/smoke/smoke.sh`, `docs/ENGAGEMENT.md`, `docs/evidence/state-snapshot/` (post-engagement restore point; the rule-1.11 *pre*-engagement export was missed and is recorded).
+- Rollback via `git revert` **rehearsed**: reverted the digest-pin commit → Argo re-deployed the previous digests → revert-of-revert restored. Evidence recorded.
+- UI bugs fixed: Login/Register background asset paths (`src/assets/...` → `../assets/...`) and CSP (invalid `connect-src` removed; the project's Font Awesome/Google Fonts CDNs allowed). Deployed; `background1/2.jpg` and other assets return 200.
+- Still absent by design: `security/zap/` (ZAP not run).
 
 ## Remaining work (prioritised)
 1. **Branch protection** (CR-1, needs repo admin).
