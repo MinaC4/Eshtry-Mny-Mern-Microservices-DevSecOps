@@ -1,12 +1,26 @@
 # STATE — Eshtry-Mny Homelab DevSecOps Engagement
 
-Last updated: after Phases 4 + 5(signing). Branch `devsecops/homelab-engagement`. Jenkins build **#12 SUCCESS**.
+Last updated: Phases 9/10/11 + functional/UI work. Branch `devsecops/homelab-engagement`. Jenkins build #15 SUCCESS; smoke Job `SMOKE OK`.
 
 ## Current position
-- Phases **0–4 DONE**. Phase 5 **partial** (SBOM + cosign done; Kyverno `verify-images` pending). Phase 7 GitOps **DONE**.
-- Full tool-driven flow proven: **Jenkins** (build → tests → audit → Trivy → SBOM → Harbor push → cosign sign+verify → digest pin) → **Git commit `1f64f3a`** → **Argo CD** deploys digest-pinned, signed images.
-- App verified end-to-end (products 26, register 201, login 200, cart total 34.99, checkout).
-- `kubectl` context `default`, k3s `v1.36.2+k3s1`.
+- Phases **0–11 substantially DONE**. Remaining: **merge to `main`** (operator said at the end), and three documented gaps that need decisions (Kyverno Enforce, ZAP DAST, app `/metrics`).
+- Everything runs on its own tools: Jenkins (build→scan→SBOM→sign→pin) → Git → Argo CD (deploy + self-heal + PostSync smoke) → Harbor. 5/5 pods, Argo `Synced/Healthy`.
+- Secret rotation proven (old token 401, re-login 200); **rotate then roll all three backends** (the smoke test caught cross-service 401 from stale pods).
+- NetworkPolicy enforcement proven (allowed/denied matrix in `docs/09-network-security.md`).
+- UI/functional fixes: cart remove, checkout summary + receipt, full profile page, logout, auth redirects, add-to-cart errors, image fallback.
+
+## Docs
+`docs/00-*` analysis/threat/build, `01-*` infra/capacity/ADR, phase reports `docs/phases/`, `SECURITY.md`, `EVIDENCE.md`, `COMPARISON.md`, `DEMO.md`, `08-policy-as-code.md`, `09-network-security.md`, `10-dynamic-testing.md`, `FUNCTIONAL-REVIEW.md`, `CHANGE_LOG.md`, `ROLLBACK.md`, `ISSUES.md`.
+
+## Blocked / decisions
+1. Kyverno `verify-images` Enforce blocked by private-realm SSRF guard (Audit now). Options: Harbor hostname + node registries.yaml, or Kyverno upgrade.
+2. Branch protection (CR-1, needs repo admin).
+3. SonarQube server pod down (stage disabled by default).
+4. ZAP DAST not run (waiver); app has no `/metrics` (observability gap).
+
+## Merge plan
+Merge `devsecops/homelab-engagement` → `main`; retarget the Argo Application `targetRevision` to `main`; update the Jenkins job branch. Committed `argocd-application.yaml` already targets `main`.
+
 
 ## Cluster objects (namespace `eshtry-mny` + scoped ClusterPolicies)
 Deployments user/product/cart/frontend; StatefulSet `mongodb` (+2Gi local-path PVC); Services (5); Ingress (class `traefik`, host `eshtry-mny.192.168.1.8.nip.io`); NetworkPolicies (default-deny + 4 allow + mongodb-allow); HPAs ×4 (min1/max3); PDBs ×4; ConfigMap `app-config`; out-of-band Secrets `app-secrets`, `harbor-creds`; ClusterPolicies `deny-latest-tag`, `require-non-root`, `require-readonly-rootfs`, `require-resource-limits` (all `namespaces: [eshtry-mny]`).
