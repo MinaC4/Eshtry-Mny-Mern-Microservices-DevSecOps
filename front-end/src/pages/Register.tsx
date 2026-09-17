@@ -38,10 +38,13 @@ function Register() {
       if (response.ok) {
         window.location.href = "/login";
       } else {
-        alert("Registration failed");
+        const err = await response.json().catch(() => ({}));
+        const detail = err.details && Object.values(err.details).flat().join(", ");
+        alert(detail ? `Registration failed: ${detail}` : (err.message || "Registration failed"));
       }
     } catch (error) {
       console.error("Error:", error);
+      alert("Registration failed: could not reach the server");
     }
   }
   return (
@@ -175,12 +178,18 @@ function Register() {
               </div>
             </div>
             <div className="col">
-              <div className="row">
-                <div className="col inline">
-                  <label className="radio-inline">
-                    <input type="text" name="gender" onChange={(event) => setGender(event.target.value)}></input>
-                  </label>
-                </div>
+              <div className="field">
+                <select
+                  className="form-control"
+                  name="gender"
+                  value={gender}
+                  onChange={(event) => setGender(event.target.value)}
+                >
+                  <option value="">Prefer not to say</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
               </div>
             </div>
           </div>

@@ -5,20 +5,17 @@
 
 replicaCount: 1
 imagePullPolicy: IfNotPresent
-
 # Images from the operator's Harbor registry (override with --set images.user=...)
 images:
-  user: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user:0.1.0-homelab3
+  user: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user:0.1.2
   product: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product:0.1.0-homelab2
   cart: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart:0.1.0-homelab2
-  frontend: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend:0.1.0-homelab2
-
+  frontend: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend:0.1.1
 # ConfigMap values
-mongoCluster: ""            # unused when MONGO_URI is set (in-cluster MongoDB)
+mongoCluster: "" # unused when MONGO_URI is set (in-cluster MongoDB)
 mongoDbname: "eshtry_mny"
 frontendOrigin: "http://eshtry-mny.192.168.1.8.nip.io"
 nodeEnv: "production"
-
 # Local secrets backend (ADR D1). Values supplied out-of-band; never committed.
 secrets:
   mongoUsername: ""
@@ -27,11 +24,9 @@ secrets:
   accessToken: ""
   harborUsername: ""
   harborPassword: ""
-
 registry:
   host: "192.168.1.8:30082"
   pullSecretName: "harbor-creds"
-
 # In-cluster MongoDB (ADR D7). No cloud database.
 mongodb:
   enabled: true
@@ -45,28 +40,23 @@ mongodb:
     limits:
       cpu: "500m"
       memory: "512Mi"
-
 # External Secrets (AWS/Vault) are disabled for this homelab (ADR D1).
 externalSecrets:
   enabled: false
-
 # Right-sized for the homelab (docs/01-capacity-budget.md).
 hpa:
   minReplicas: 1
   maxReplicas: 3
   cpuUtilization: 70
   memoryUtilization: 80
-
 # PodDisruptionBudget: maxUnavailable keeps single-replica rollouts/drains possible.
 pdb:
   maxUnavailable: 1
-
 # ====================== Ingress ======================
 ingress:
   enabled: true
   className: traefik
   host: eshtry-mny.192.168.1.8.nip.io
-
 # Runtime UIDs matching the container images (ADR: numeric uid required for runAsNonRoot)
 security:
   backend:

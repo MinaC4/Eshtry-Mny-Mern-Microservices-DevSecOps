@@ -33,7 +33,7 @@ const userRegister = async (req, res, next) => {
             lastName: req.body.lastName,
             age: req.body.age,
             phone: req.body.phone,
-            gender: req.body.gender
+            gender: req.body.gender || undefined
         });
 
         logger.info({ userId: user._id, email }, 'User registered successfully');
