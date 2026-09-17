@@ -10,7 +10,7 @@ images:
   user: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:5f841b767b4a8f0a31924680bc448be6ad6962d5d539f74d05f776014cf261a6
   product: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product@sha256:40f6644079d4e12ed0cc8fd5afc6f8953af4fafda2e4c6e52de0162194e1309a
   cart: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:c2957607e51fb83ee6abf8211f81e66e68bca74226219fb79f8cab63566b886a
-  frontend: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:5a35d626a8e76b3b6451259fadafbac9bd27181126a9d547b64849f26365ca0d
+  frontend: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:31367080ff2d0c79434bb380f319fd2bb0482a2446fcc5cb76b43df2c60a6110
 # ConfigMap values
 mongoCluster: "" # unused when MONGO_URI is set (in-cluster MongoDB)
 mongoDbname: "eshtry_mny"
