@@ -64,6 +64,25 @@ Remove:
 helm uninstall eshtry-mny -n eshtry-mny
 kubectl delete clusterpolicy deny-latest-tag require-non-root require-readonly-rootfs require-resource-limits
 kubectl delete namespace eshtry-mny
+kubectl delete application eshtry-mny -n argocd
 ```
-(Harbor project/robot removal is manual in the Harbor UI/API.)
+(Harbor project/robots removal is manual in the Harbor UI/API.)
+
+## Phase 3+ — GitOps / supply chain
+
+Harbor:
+- project `eshtry-mny` (private)
+- robot `robot$eshtry-mny+eshtry-mny-puller` (pull-only, used by `harbor-creds`)
+- robot `robot$eshtry-mny+eshtry-mny-ci` (push+pull, for Jenkins)
+
+Argo CD:
+- Application `eshtry-mny` in `argocd` (auto-sync, prune, selfHeal). Cluster tracks the branch during development; committed manifest tracks `main`.
+
+Out-of-band secrets (not in Git, not Argo-managed):
+- `app-secrets`, `harbor-creds` in `eshtry-mny`, created by `ci/scripts/create-secrets.sh`.
+
+cosign:
+- keypair generated locally at `~/.config/eshtry-mny/cosign.key` (password in `cosign.key.pass`), public key committed at `security/cosign.pub`.
+- images signed by digest: user/product/cart `0.1.0`, user `0.1.2`, frontend `0.1.1`.
+
 

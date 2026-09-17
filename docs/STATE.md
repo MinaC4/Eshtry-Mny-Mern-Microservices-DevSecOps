@@ -1,12 +1,29 @@
 # STATE — Eshtry-Mny Homelab DevSecOps Engagement
 
-Last updated: end of Phase 3. Release `eshtry-mny` deployed in namespace `eshtry-mny` (revision 4).
+Last updated: mid-Phase 4/5. App deployed via Argo CD (`Synced/Healthy`). Branch `devsecops/homelab-engagement`.
 
 ## Current position
-- Phases 0, 1, 2, 3: **DONE**. Phase 2 has one BLOCKED item (branch protection, CR-1).
-- Phase 3: 5/5 workloads Running, full user journey verified. Images on Harbor `eshtry-mny` (tags `0.1.0-homelab*`).
-- Next: Phase 4 (Jenkins hardening + SBOM/sign in-pipeline), then Phase 5 (cosign + verify-images).
-- Resume: read this file, then `docs/03-baseline-deployment.md`, `docs/01-ADR-0001-homelab-adaptation.md`.
+- Phases 0–3 **DONE**. Phase 5 partially done (SBOM + cosign sign/verify proven; verify-images Kyverno policy NOT yet added).
+- Phase 7 GitOps **working**: Argo CD Application `eshtry-mny` auto-syncs, self-heal proven.
+- Phase 4 Jenkins: **BLOCKED on operator** (need Jenkins login/API token to create the additive job + credentials). Jenkins reachable at http://192.168.1.8:30081; GitHub+Harbor egress OK.
+- SonarQube: only `sonar-postgres` running; app pod down (operator to start it).
+
+## Deployer of record
+Argo CD (do NOT run `helm upgrade` anymore). Secrets are out-of-band via `ci/scripts/create-secrets.sh`.
+Cluster Application temporarily tracks the branch; committed `argocd-application.yaml` tracks `main`.
+
+## Ready for Jenkins (prepared)
+- `ci/scripts/{sbom.sh,sign.sh,verify.sh,create-secrets.sh}`
+- Harbor CI robot `robot$eshtry-mny+eshtry-mny-ci` (push+pull); secret in `/tmp/opencode/harbor-ci-robot.json`
+- cosign keypair at `~/.config/eshtry-mny/` (public key committed)
+- Jenkinsfile NOT yet extended (next step once access is available)
+
+## Next exact steps
+1. Operator provides Jenkins credentials/token -> create additive pipeline job + credentials.
+2. Extend Jenkinsfile: Harbor registry, optional SonarQube, SBOM/sign/verify, digest-pinned values bump.
+3. Add Kyverno `verify-images` (namespaced to eshtry-mny), Audit -> Enforce, prove unsigned rejection.
+4. Phases 8–11.
+
 
 ## Cluster objects now existing (all in `eshtry-mny` + 4 scoped ClusterPolicies)
 Deployments user/product/cart/frontend, StatefulSet mongodb (+2Gi PVC), 5 Services, Ingress (traefik), 6 NetworkPolicies, 4 HPAs (min1/max3), 4 PDBs, ConfigMap app-config, Secrets app-secrets + harbor-creds, ClusterPolicies deny-latest-tag/require-non-root/require-readonly-rootfs/require-resource-limits.
