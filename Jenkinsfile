@@ -50,15 +50,18 @@ pipeline {
         }
 
         stage('Build & Dependency Audit') {
+            // Audit production dependencies only: the image is built with
+            // `npm ci --omit=dev`, so dev-only tooling (nodemon/jest transitives)
+            // never ships. Full-tree advisories are still visible in the SBOM.
             parallel {
                 stage('Build: User')     { steps { sh "docker build -t ${REGISTRY}/eshtry-mny-user:${IMAGE_TAG} ./User" } }
                 stage('Build: Product')  { steps { sh "docker build -t ${REGISTRY}/eshtry-mny-product:${IMAGE_TAG} ./Product" } }
                 stage('Build: Cart')     { steps { sh "docker build -t ${REGISTRY}/eshtry-mny-cart:${IMAGE_TAG} ./Cart" } }
                 stage('Build: Frontend') { steps { sh "docker build -t ${REGISTRY}/eshtry-mny-frontend:${IMAGE_TAG} ./front-end" } }
-                stage('Audit: User')     { steps { sh 'docker run --rm -e HOME=/tmp -v "$PWD/User":/app:ro -w /app node:20-alpine npm audit --audit-level=high' } }
-                stage('Audit: Product')  { steps { sh 'docker run --rm -e HOME=/tmp -v "$PWD/Product":/app:ro -w /app node:20-alpine npm audit --audit-level=high' } }
-                stage('Audit: Cart')     { steps { sh 'docker run --rm -e HOME=/tmp -v "$PWD/Cart":/app:ro -w /app node:20-alpine npm audit --audit-level=high' } }
-                stage('Audit: Frontend') { steps { sh 'docker run --rm -e HOME=/tmp -v "$PWD/front-end":/app:ro -w /app node:20-alpine npm audit --audit-level=high' } }
+                stage('Audit: User')     { steps { sh 'docker run --rm -e HOME=/tmp -v "$PWD/User":/app:ro -w /app node:20-alpine npm audit --omit=dev --audit-level=high' } }
+                stage('Audit: Product')  { steps { sh 'docker run --rm -e HOME=/tmp -v "$PWD/Product":/app:ro -w /app node:20-alpine npm audit --omit=dev --audit-level=high' } }
+                stage('Audit: Cart')     { steps { sh 'docker run --rm -e HOME=/tmp -v "$PWD/Cart":/app:ro -w /app node:20-alpine npm audit --omit=dev --audit-level=high' } }
+                stage('Audit: Frontend') { steps { sh 'docker run --rm -e HOME=/tmp -v "$PWD/front-end":/app:ro -w /app node:20-alpine npm audit --omit=dev --audit-level=high' } }
             }
         }
 
