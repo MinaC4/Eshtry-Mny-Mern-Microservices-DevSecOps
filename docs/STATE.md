@@ -1,68 +1,35 @@
 # STATE — Eshtry-Mny Homelab DevSecOps Engagement
 
-Last updated: mid-Phase 4/5. App deployed via Argo CD (`Synced/Healthy`). Branch `devsecops/homelab-engagement`.
+Last updated: after Phases 4 + 5(signing). Branch `devsecops/homelab-engagement`. Jenkins build **#12 SUCCESS**.
 
 ## Current position
-- Phases 0–3 **DONE**. Phase 5 partially done (SBOM + cosign sign/verify proven; verify-images Kyverno policy NOT yet added).
-- Phase 7 GitOps **working**: Argo CD Application `eshtry-mny` auto-syncs, self-heal proven.
-- Phase 4 Jenkins: **BLOCKED on operator** (need Jenkins login/API token to create the additive job + credentials). Jenkins reachable at http://192.168.1.8:30081; GitHub+Harbor egress OK.
-- SonarQube: only `sonar-postgres` running; app pod down (operator to start it).
+- Phases **0–4 DONE**. Phase 5 **partial** (SBOM + cosign done; Kyverno `verify-images` pending). Phase 7 GitOps **DONE**.
+- Full tool-driven flow proven: **Jenkins** (build → tests → audit → Trivy → SBOM → Harbor push → cosign sign+verify → digest pin) → **Git commit `1f64f3a`** → **Argo CD** deploys digest-pinned, signed images.
+- App verified end-to-end (products 26, register 201, login 200, cart total 34.99, checkout).
+- `kubectl` context `default`, k3s `v1.36.2+k3s1`.
 
-## Deployer of record
-Argo CD (do NOT run `helm upgrade` anymore). Secrets are out-of-band via `ci/scripts/create-secrets.sh`.
-Cluster Application temporarily tracks the branch; committed `argocd-application.yaml` tracks `main`.
+## Cluster objects (namespace `eshtry-mny` + scoped ClusterPolicies)
+Deployments user/product/cart/frontend; StatefulSet `mongodb` (+2Gi local-path PVC); Services (5); Ingress (class `traefik`, host `eshtry-mny.192.168.1.8.nip.io`); NetworkPolicies (default-deny + 4 allow + mongodb-allow); HPAs ×4 (min1/max3); PDBs ×4; ConfigMap `app-config`; out-of-band Secrets `app-secrets`, `harbor-creds`; ClusterPolicies `deny-latest-tag`, `require-non-root`, `require-readonly-rootfs`, `require-resource-limits` (all `namespaces: [eshtry-mny]`).
+Argo CD Application `eshtry-mny` in `argocd` (auto-sync, prune, selfHeal; currently tracks the branch).
+Harbor project `eshtry-mny` + robots `…puller` (pull) and `…ci` (push+pull).
+Jenkins job `eshtry-mny`; credentials `harbor-ci`, `cosign-key`, `cosign-password`, `github-token`.
 
-## Ready for Jenkins (prepared)
-- `ci/scripts/{sbom.sh,sign.sh,verify.sh,create-secrets.sh}`
-- Harbor CI robot `robot$eshtry-mny+eshtry-mny-ci` (push+pull); secret in `/tmp/opencode/harbor-ci-robot.json`
-- cosign keypair at `~/.config/eshtry-mny/` (public key committed)
-- Jenkinsfile NOT yet extended (next step once access is available)
-
-## Next exact steps
-1. Operator provides Jenkins credentials/token -> create additive pipeline job + credentials.
-2. Extend Jenkinsfile: Harbor registry, optional SonarQube, SBOM/sign/verify, digest-pinned values bump.
-3. Add Kyverno `verify-images` (namespaced to eshtry-mny), Audit -> Enforce, prove unsigned rejection.
-4. Phases 8–11.
-
-
-## Cluster objects now existing (all in `eshtry-mny` + 4 scoped ClusterPolicies)
-Deployments user/product/cart/frontend, StatefulSet mongodb (+2Gi PVC), 5 Services, Ingress (traefik), 6 NetworkPolicies, 4 HPAs (min1/max3), 4 PDBs, ConfigMap app-config, Secrets app-secrets + harbor-creds, ClusterPolicies deny-latest-tag/require-non-root/require-readonly-rootfs/require-resource-limits.
-Harbor project `eshtry-mny` + robot `robot$eshtry-mny+eshtry-mny-puller`.
-Local untracked file `values-secret.yaml` holds the secrets.
-
-## Access
-- App: `http://eshtry-mny.192.168.1.8.nip.io`
-- Mongo creds live only in `values-secret.yaml` + Secret `app-secrets`.
+## Secrets / cosign (outside Git)
+- `values-secret.yaml` (git-ignored) + `ci/scripts/create-secrets.sh`.
+- cosign keypair `~/.config/eshtry-mny/cosign.{key,pub}` (private out of Git); public key committed `security/cosign.pub`.
 
 ## Locked decisions (operator)
-- Source control: **GitHub** (origin), Gitea excluded. Work on branches, merge when verified.
-- Database: **in-cluster MongoDB** (dedicated, inside `eshtry-mny`); Atlas rejected.
-- Secrets: **local Kubernetes Secret** (Vault/ESO broken + inmem; not touched).
-- Registry: **Harbor** project `eshtry-mny` @ `192.168.1.8:30082` (pending project creation).
-- Platform: use operator's installed tools (Jenkins, Harbor, Argo CD, Kyverno, Prometheus).
-- Everything runs for real; report per phase; no breaking other projects.
+GitHub source control (Gitea excluded) · in-cluster MongoDB (no Atlas) · local k8s Secrets (Vault/ESO broken, untouched) · Harbor registry · use operator's installed tools · merge to `main` at the end.
 
-## Preflight
-- context `default`, `v1.36.2+k3s1`; nodes mina(8c/14.8Gi), worker-1(4c/5.6Gi), worker-2(3c/3.7Gi); `mina` 80% mem.
+## Next exact steps
+1. Kyverno `verify-images` (Audit → Enforce) scoped to `eshtry-mny`; prove unsigned rejection; confirm the 4 existing policies unaffected.
+2. Phase 6 (secrets rotation evidence), Phase 8 (policy proofs), Phase 9 (network/runtime), Phase 10 (smoke/DAST/observability), Phase 11 (README/SECURITY/EVIDENCE/COMPARISON/DEMO).
+3. Merge branch → `main`; retarget Argo Application to `main`; update Jenkins job branch.
 
-## Key discovered facts
-- Ingress = Traefik (default) in `kube-system`; NO ingress-nginx.
-- Kyverno 1.18.2 (16 policies), ESO 2.9.0 (Vault store broken), Argo CD, Jenkins, Harbor, Prometheus present. No Falco/Loki.
-- `eshtry-mny` namespace does NOT exist. No MongoDB anywhere. No `eshtry-mny` Harbor project.
-- Chart gaps confirmed: AWS store, ingress-nginx x4, 12-pod min, no digest/sign/SBOM, host-Docker Jenkins, cluster-wide Kyverno policies.
-- Tools local: kubectl, helm v3.14, git, docker, cosign, grype, trivy, jq, yq, node. Missing: syft, gitleaks, hadolint, mongosh.
+## Open operator items
+- SonarQube server pod is down (start it; then run Jenkins with `SONAR_ENABLED=true`).
+- Branch protection (CR-1) needs repo admin.
+- Falco (not installed), ZAP permission, Kaniko/rootless BuildKit — pending decisions.
 
-## Names created so far
-- Git branch `devsecops/homelab-engagement`.
-- No cluster objects.
-
-## Phase 2 outcomes / carry-forward
-- `.gitleaks.toml` was a no-op (missing `[extend] useDefault = true`) — **fixed and proven** with a planted GitHub PAT.
-- pre-commit installed and green; branch protection BLOCKED (no repo admin) -> CR-1.
-- Phase 3 must address numeric uid: backends use `USER appuser` (non-numeric) + chart `runAsNonRoot: true` -> kubelet rejects ("cannot verify user is non-root"). Pin uid and set `runAsUser`.
-
-## Open decisions needed (for later phases)
-1. Falco in scope? 2. ZAP permitted? 3. BuildKit/Kaniko? 4. Harbor project creation approved? 5. Merge policy (per phase vs final).
-
-## Exit criteria for the engagement (unchanged)
-Real end-to-end: build -> scan -> SBOM -> sign -> push -> GitOps sync -> admission verify -> running app -> full user journey -> runtime/network proof -> docs/evidence.
+## Key findings so far
+- `.gitleaks.toml` was a no-op → fixed + proven. Non-numeric `USER` breaks `runAsNonRoot` → uid 1001. lockfiles pinned to a dead internal registry → fixed. Chart Kyverno policies were cluster-wide → scoped. JSON duplicate: MongoDB absent → deployed dedicated. Trivy HIGH/CRITICAL now 0 on all images.
