@@ -10,7 +10,7 @@ images:
   user: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3
   product: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product@sha256:c84bc2dc9c71275ba95fe20ed7f290b5b62b1d999a968af11b1ff547ec40460f
   cart: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:cbd6d1eef157ace6283030d96e78266f6cf331b79fad78ca4cbdab7318b8b422
-  frontend: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:df4517e08548894d08fa49e7d777e878bca3cb20db447127b537059047500528
+  frontend: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:5a35d626a8e76b3b6451259fadafbac9bd27181126a9d547b64849f26365ca0d
 # ConfigMap values
 mongoCluster: "" # unused when MONGO_URI is set (in-cluster MongoDB)
 mongoDbname: "eshtry_mny"
@@ -55,12 +55,11 @@ hpa:
 # PodDisruptionBudget: maxUnavailable keeps single-replica rollouts/drains possible.
 pdb:
   maxUnavailable: 1
- # Image signature admission (Phase 5/8). Roll out Audit first, then Enforce.
+  # Image signature admission (Phase 5/8). Roll out Audit first, then Enforce.
 kyverno:
   verifyImages:
     enabled: true
     action: Audit
-
 # PostSync smoke test (Phase 10). Runs in its own namespace via the Ingress.
 smokeTest:
   enabled: true
