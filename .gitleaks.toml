@@ -1,5 +1,10 @@
 title = "eshtry-mny gitleaks config"
 
+# Without `useDefault = true` this file REPLACES gitleaks' built-in rule set,
+# which would silently turn the secret scan into a no-op. Keep it true.
+[extend]
+useDefault = true
+
 # No allowlist entries — every finding should be reviewed.
 # If a false positive is confirmed after review, add a narrow regex here
 # with a comment explaining why it's safe to ignore.

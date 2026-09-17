@@ -1,10 +1,10 @@
 # STATE — Eshtry-Mny Homelab DevSecOps Engagement
 
-Last updated: end of Phase 1. No cluster writes performed. Working branch `devsecops/homelab-engagement`.
+Last updated: end of Phase 2. No cluster writes performed. Working branch `devsecops/homelab-engagement`.
 
 ## Current position
-- Phases 0 and 1: **DONE** (read-only). Reports in `docs/phases/`.
-- Next: Phase 2 (Git/branch protection + pre-commit) — then first write ops in Phase 3.
+- Phases 0, 1, 2: **DONE** (Phase 2 left one BLOCKED item: branch protection needs repo admin — CR-1).
+- Next: Phase 3 (first cluster writes) — prerequisite fixes identified (ingress class, netpol ns, secrets->local, in-cluster Mongo, HPA 1/3, Kyverno namespace scoping, numeric uid).
 - Resume: read this file, then `docs/01-ADR-0001-homelab-adaptation.md` and the phase reports.
 
 ## Locked decisions (operator)
@@ -28,6 +28,11 @@ Last updated: end of Phase 1. No cluster writes performed. Working branch `devse
 ## Names created so far
 - Git branch `devsecops/homelab-engagement`.
 - No cluster objects.
+
+## Phase 2 outcomes / carry-forward
+- `.gitleaks.toml` was a no-op (missing `[extend] useDefault = true`) — **fixed and proven** with a planted GitHub PAT.
+- pre-commit installed and green; branch protection BLOCKED (no repo admin) -> CR-1.
+- Phase 3 must address numeric uid: backends use `USER appuser` (non-numeric) + chart `runAsNonRoot: true` -> kubelet rejects ("cannot verify user is non-root"). Pin uid and set `runAsUser`.
 
 ## Open decisions needed (for later phases)
 1. Falco in scope? 2. ZAP permitted? 3. BuildKit/Kaniko? 4. Harbor project creation approved? 5. Merge policy (per phase vs final).
