@@ -8,13 +8,13 @@
 }
 
 .bg-img {
-  background: url('src/assets/background1.jpg');
+  background: url('../assets/background1.jpg');
   height: 100vh;
   background-size: cover;
   background-position: center;
 }
 .bg-img2 {
-  background: url('src/assets/background2.jpg');
+  background: url('../assets/background2.jpg');
   height: 100vh;
   background-size: cover;
   background-position: center;

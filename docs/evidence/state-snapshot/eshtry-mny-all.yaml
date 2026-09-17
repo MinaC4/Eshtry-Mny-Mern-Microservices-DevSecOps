@@ -1,0 +1,5980 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/restartedAt: "2026-09-18T00:45:48+03:00"
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:cbd6d1eef157ace6283030d96e78266f6cf331b79fad78ca4cbdab7318b8b422":"fail"}'
+    creationTimestamp: "2026-09-17T21:45:50Z"
+    generateName: cart-service-55f88b4c7b-
+    generation: 1
+    labels:
+      app: cart-service
+      pod-template-hash: 55f88b4c7b
+    name: cart-service-55f88b4c7b-2httr
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: cart-service-55f88b4c7b
+      uid: 0b9330d7-d0e7-4d14-a5b2-2b173e8a2978
+    resourceVersion: "3331787"
+    uid: d2b1f9f4-8962-4159-aa9e-c3f25f7b3c42
+  spec:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - cart-service
+            topologyKey: kubernetes.io/hostname
+          weight: 100
+    containers:
+    - envFrom:
+      - secretRef:
+          name: app-secrets
+      - configMapRef:
+          name: app-config
+      image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:cbd6d1eef157ace6283030d96e78266f6cf331b79fad78ca4cbdab7318b8b422
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /health
+          port: 9003
+          scheme: HTTP
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      name: cart-service
+      ports:
+      - containerPort: 9003
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /ready
+          port: 9003
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources:
+        limits:
+          cpu: 300m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-4dthk
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    imagePullSecrets:
+    - name: harbor-creds
+    nodeName: worker-1
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      fsGroup: 1001
+      runAsGroup: 1001
+      runAsNonRoot: true
+      runAsUser: 1001
+      seccompProfile:
+        type: RuntimeDefault
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: kube-api-access-4dthk
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    allocatedResources:
+      cpu: 100m
+      memory: 128Mi
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T21:45:51Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T21:45:50Z"
+      observedGeneration: 1
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T21:46:07Z"
+      observedGeneration: 1
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T21:46:07Z"
+      observedGeneration: 1
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T21:45:50Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - allocatedResources:
+        cpu: 100m
+        memory: 128Mi
+      containerID: containerd://7bd5e06919a81e0c599a0ac53b1e915fd16b910e1b057dc87e2d03ffff613981
+      image: sha256:c4c8d62528a1b5552d9f16a8005e2e1464ca360236a63339455688b812d965e8
+      imageID: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:cbd6d1eef157ace6283030d96e78266f6cf331b79fad78ca4cbdab7318b8b422
+      lastState: {}
+      name: cart-service
+      ready: true
+      resources:
+        limits:
+          cpu: 300m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2026-09-17T21:46:01Z"
+      user:
+        linux:
+          gid: 1001
+          supplementalGroups:
+          - 1001
+          uid: 1001
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-4dthk
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 10.1.211.122
+    hostIPs:
+    - ip: 10.1.211.122
+    - ip: fd42:4fcb:c48c:a23e:216:3eff:feb8:270c
+    observedGeneration: 1
+    phase: Running
+    podIP: 10.42.1.211
+    podIPs:
+    - ip: 10.42.1.211
+    qosClass: Burstable
+    resources:
+      limits:
+        cpu: 300m
+        memory: 256Mi
+      requests:
+        cpu: 79m
+        memory: 128Mi
+    startTime: "2026-09-17T21:45:50Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/restartedAt: "2026-09-17T22:44:15+03:00"
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:df4517e08548894d08fa49e7d777e878bca3cb20db447127b537059047500528":"fail"}'
+    creationTimestamp: "2026-09-17T20:50:20Z"
+    generateName: frontend-84cc78b6fb-
+    generation: 1
+    labels:
+      app: frontend
+      pod-template-hash: 84cc78b6fb
+    name: frontend-84cc78b6fb-jnhql
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: frontend-84cc78b6fb
+      uid: d0c8cc9e-443f-4e99-86cf-975e89d3b0f7
+    resourceVersion: "3317455"
+    uid: 628f667c-012e-4e0b-981a-5f460b42d207
+  spec:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - frontend
+            topologyKey: kubernetes.io/hostname
+          weight: 100
+    containers:
+    - envFrom:
+      - configMapRef:
+          name: app-config
+      image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:df4517e08548894d08fa49e7d777e878bca3cb20db447127b537059047500528
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      name: frontend
+      ports:
+      - containerPort: 8080
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources:
+        limits:
+          cpu: 300m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/cache/nginx
+        name: nginx-cache
+      - mountPath: /tmp
+        name: nginx-tmp
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-vq2zj
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    imagePullSecrets:
+    - name: harbor-creds
+    nodeName: worker-2
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      fsGroup: 101
+      runAsGroup: 101
+      runAsNonRoot: true
+      runAsUser: 101
+      seccompProfile:
+        type: RuntimeDefault
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - emptyDir: {}
+      name: nginx-cache
+    - emptyDir: {}
+      name: nginx-tmp
+    - name: kube-api-access-vq2zj
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    allocatedResources:
+      cpu: 100m
+      memory: 128Mi
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T20:50:21Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T20:50:21Z"
+      observedGeneration: 1
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T20:50:45Z"
+      observedGeneration: 1
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T20:50:45Z"
+      observedGeneration: 1
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T20:50:21Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - allocatedResources:
+        cpu: 100m
+        memory: 128Mi
+      containerID: containerd://d21768e4dee4eb18e85f173071e06e949e188519a0b482b1f7bfabfa08a02cd2
+      image: sha256:2e10ec528db042a869dc80f9461683f00b7869e26ff93820695d9768fe20abf5
+      imageID: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:df4517e08548894d08fa49e7d777e878bca3cb20db447127b537059047500528
+      lastState: {}
+      name: frontend
+      ready: true
+      resources:
+        limits:
+          cpu: 300m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2026-09-17T20:50:40Z"
+      user:
+        linux:
+          gid: 101
+          supplementalGroups:
+          - 101
+          uid: 101
+      volumeMounts:
+      - mountPath: /var/cache/nginx
+        name: nginx-cache
+      - mountPath: /tmp
+        name: nginx-tmp
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-vq2zj
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 10.1.211.202
+    hostIPs:
+    - ip: 10.1.211.202
+    - ip: fd42:4fcb:c48c:a23e:216:3eff:feef:71f
+    observedGeneration: 1
+    phase: Running
+    podIP: 10.42.2.159
+    podIPs:
+    - ip: 10.42.2.159
+    qosClass: Burstable
+    resources:
+      limits:
+        cpu: 300m
+        memory: 256Mi
+      requests:
+        cpu: 79m
+        memory: 128Mi
+    startTime: "2026-09-17T20:50:21Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2026-09-17T16:54:38Z"
+    generateName: mongodb-
+    generation: 1
+    labels:
+      app: mongodb
+      apps.kubernetes.io/pod-index: "0"
+      controller-revision-hash: mongodb-57df48859d
+      statefulset.kubernetes.io/pod-name: mongodb-0
+    name: mongodb-0
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: StatefulSet
+      name: mongodb
+      uid: c055b532-4176-4b52-8016-0d338ec33121
+    resourceVersion: "3253206"
+    uid: 87f34dda-ddf6-4486-b5e7-72dadf8c66b0
+  spec:
+    containers:
+    - args:
+      - --wiredTigerCacheSizeGB
+      - "0.25"
+      - --bind_ip_all
+      env:
+      - name: MONGO_INITDB_ROOT_USERNAME
+        valueFrom:
+          secretKeyRef:
+            key: MONGO_USERNAME
+            name: app-secrets
+      - name: MONGO_INITDB_ROOT_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: MONGO_PASSWORD
+            name: app-secrets
+      - name: MONGO_INITDB_DATABASE
+        value: eshtry_mny
+      image: mongo:7.0
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 3
+        initialDelaySeconds: 30
+        periodSeconds: 20
+        successThreshold: 1
+        tcpSocket:
+          port: 27017
+        timeoutSeconds: 1
+      name: mongodb
+      ports:
+      - containerPort: 27017
+        name: mongo
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        tcpSocket:
+          port: 27017
+        timeoutSeconds: 1
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /data/db
+        name: data
+      - mountPath: /data/configdb
+        name: configdb
+      - mountPath: /tmp
+        name: tmp
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-nwr5n
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    hostname: mongodb-0
+    imagePullSecrets:
+    - name: harbor-creds
+    nodeName: mina
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      fsGroup: 999
+      runAsGroup: 999
+      runAsNonRoot: true
+      runAsUser: 999
+    serviceAccount: default
+    serviceAccountName: default
+    subdomain: mongodb
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: data-mongodb-0
+    - emptyDir: {}
+      name: configdb
+    - emptyDir: {}
+      name: tmp
+    - name: kube-api-access-nwr5n
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    allocatedResources:
+      cpu: 100m
+      memory: 256Mi
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T16:54:43Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T16:54:43Z"
+      observedGeneration: 1
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T16:57:01Z"
+      observedGeneration: 1
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T16:57:01Z"
+      observedGeneration: 1
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T16:54:43Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - allocatedResources:
+        cpu: 100m
+        memory: 256Mi
+      containerID: containerd://189b6acf86865e367c245dbfc5c5ec312c691469d1775681e0e866064fca0350
+      image: docker.io/library/mongo:7.0
+      imageID: docker.io/library/mongo@sha256:9854f7139445d766a9523571d6f047530c45547460ffcf8259eb2bf4264632ca
+      lastState: {}
+      name: mongodb
+      ready: true
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2026-09-17T16:56:51Z"
+      user:
+        linux:
+          gid: 999
+          supplementalGroups:
+          - 999
+          uid: 999
+      volumeMounts:
+      - mountPath: /data/db
+        name: data
+      - mountPath: /data/configdb
+        name: configdb
+      - mountPath: /tmp
+        name: tmp
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-nwr5n
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 192.168.1.8
+    hostIPs:
+    - ip: 192.168.1.8
+    observedGeneration: 1
+    phase: Running
+    podIP: 10.42.0.117
+    podIPs:
+    - ip: 10.42.0.117
+    qosClass: Burstable
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 79m
+        memory: 256Mi
+    startTime: "2026-09-17T16:54:43Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/restartedAt: "2026-09-18T00:45:48+03:00"
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-product@sha256:c84bc2dc9c71275ba95fe20ed7f290b5b62b1d999a968af11b1ff547ec40460f":"fail"}'
+    creationTimestamp: "2026-09-17T21:45:50Z"
+    generateName: product-service-84479cb958-
+    generation: 1
+    labels:
+      app: product-service
+      pod-template-hash: 84479cb958
+    name: product-service-84479cb958-bfkvd
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: product-service-84479cb958
+      uid: 4ae7e328-3d45-4e3a-ac75-d34ed343b2b7
+    resourceVersion: "3331713"
+    uid: 343f3c82-8031-417f-ad9a-0c69e4b5e97d
+  spec:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - product-service
+            topologyKey: kubernetes.io/hostname
+          weight: 100
+    containers:
+    - envFrom:
+      - secretRef:
+          name: app-secrets
+      - configMapRef:
+          name: app-config
+      image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product@sha256:c84bc2dc9c71275ba95fe20ed7f290b5b62b1d999a968af11b1ff547ec40460f
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /health
+          port: 9000
+          scheme: HTTP
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      name: product-service
+      ports:
+      - containerPort: 9000
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /ready
+          port: 9000
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources:
+        limits:
+          cpu: 300m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-t67wq
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    imagePullSecrets:
+    - name: harbor-creds
+    nodeName: worker-2
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      fsGroup: 1001
+      runAsGroup: 1001
+      runAsNonRoot: true
+      runAsUser: 1001
+      seccompProfile:
+        type: RuntimeDefault
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: kube-api-access-t67wq
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    allocatedResources:
+      cpu: 100m
+      memory: 128Mi
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T21:45:50Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T21:45:50Z"
+      observedGeneration: 1
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T21:45:56Z"
+      observedGeneration: 1
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T21:45:56Z"
+      observedGeneration: 1
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T21:45:50Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - allocatedResources:
+        cpu: 100m
+        memory: 128Mi
+      containerID: containerd://a4b255f5a56e56b1b6004ce69d67f52550a8530a9451ea559660587a4e60b9be
+      image: sha256:d13790a51a88d00070637239fe781dc0d37f14722ed61fc8e283c4faf450ea55
+      imageID: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product@sha256:c84bc2dc9c71275ba95fe20ed7f290b5b62b1d999a968af11b1ff547ec40460f
+      lastState: {}
+      name: product-service
+      ready: true
+      resources:
+        limits:
+          cpu: 300m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2026-09-17T21:45:51Z"
+      user:
+        linux:
+          gid: 1001
+          supplementalGroups:
+          - 1001
+          uid: 1001
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-t67wq
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 10.1.211.202
+    hostIPs:
+    - ip: 10.1.211.202
+    - ip: fd42:4fcb:c48c:a23e:216:3eff:feef:71f
+    observedGeneration: 1
+    phase: Running
+    podIP: 10.42.2.161
+    podIPs:
+    - ip: 10.42.2.161
+    qosClass: Burstable
+    resources:
+      limits:
+        cpu: 300m
+        memory: 256Mi
+      requests:
+        cpu: 79m
+        memory: 128Mi
+    startTime: "2026-09-17T21:45:50Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/restartedAt: "2026-09-18T00:45:48+03:00"
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3":"fail"}'
+    creationTimestamp: "2026-09-17T21:45:48Z"
+    generateName: user-service-66dcb9c7ff-
+    generation: 1
+    labels:
+      app: user-service
+      pod-template-hash: 66dcb9c7ff
+    name: user-service-66dcb9c7ff-mjbsz
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: user-service-66dcb9c7ff
+      uid: ca8558e8-1318-4ff6-897e-cdd6e177a2a6
+    resourceVersion: "3331675"
+    uid: 76343113-7f03-40f5-9e2e-f2757ba36bc2
+  spec:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - user-service
+            topologyKey: kubernetes.io/hostname
+          weight: 100
+    containers:
+    - envFrom:
+      - secretRef:
+          name: app-secrets
+      - configMapRef:
+          name: app-config
+      image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /health
+          port: 9001
+          scheme: HTTP
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      name: user-service
+      ports:
+      - containerPort: 9001
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /ready
+          port: 9001
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources:
+        limits:
+          cpu: 300m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-lm84w
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    imagePullSecrets:
+    - name: harbor-creds
+    nodeName: worker-2
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      fsGroup: 1001
+      runAsGroup: 1001
+      runAsNonRoot: true
+      runAsUser: 1001
+      seccompProfile:
+        type: RuntimeDefault
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: kube-api-access-lm84w
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    allocatedResources:
+      cpu: 100m
+      memory: 128Mi
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T21:45:49Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T21:45:48Z"
+      observedGeneration: 1
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T21:45:54Z"
+      observedGeneration: 1
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T21:45:54Z"
+      observedGeneration: 1
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-09-17T21:45:48Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - allocatedResources:
+        cpu: 100m
+        memory: 128Mi
+      containerID: containerd://078a06914c2412fe8857280ebf9fa5f1111adfcc55c5cf13b290acaa485e9636
+      image: sha256:cfac99807ffa437302bab26154ffcddcba6a765c06983323f032a0db07312c54
+      imageID: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3
+      lastState: {}
+      name: user-service
+      ready: true
+      resources:
+        limits:
+          cpu: 300m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2026-09-17T21:45:49Z"
+      user:
+        linux:
+          gid: 1001
+          supplementalGroups:
+          - 1001
+          uid: 1001
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-lm84w
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 10.1.211.202
+    hostIPs:
+    - ip: 10.1.211.202
+    - ip: fd42:4fcb:c48c:a23e:216:3eff:feef:71f
+    observedGeneration: 1
+    phase: Running
+    podIP: 10.42.2.160
+    podIPs:
+    - ip: 10.42.2.160
+    qosClass: Burstable
+    resources:
+      limits:
+        cpu: 300m
+        memory: 256Mi
+      requests:
+        cpu: 79m
+        memory: 128Mi
+    startTime: "2026-09-17T21:45:48Z"
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:/Service:eshtry-mny/cart-service
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"eshtry-mny:/Service:eshtry-mny/cart-service"},"name":"cart-service","namespace":"eshtry-mny"},"spec":{"ports":[{"port":9003,"targetPort":9003}],"selector":{"app":"cart-service"}}}
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:37Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+    name: cart-service
+    namespace: eshtry-mny
+    resourceVersion: "3260324"
+    uid: 577a204b-30bf-4b69-9941-58eaa0b128e6
+  spec:
+    clusterIP: 10.43.196.248
+    clusterIPs:
+    - 10.43.196.248
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - port: 9003
+      protocol: TCP
+      targetPort: 9003
+    selector:
+      app: cart-service
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:/Service:eshtry-mny/frontend
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"eshtry-mny:/Service:eshtry-mny/frontend"},"name":"frontend","namespace":"eshtry-mny"},"spec":{"ports":[{"port":80,"targetPort":8080}],"selector":{"app":"frontend"},"type":"ClusterIP"}}
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:37Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+    name: frontend
+    namespace: eshtry-mny
+    resourceVersion: "3260322"
+    uid: d98382ed-b779-4197-83fb-e755c515e059
+  spec:
+    clusterIP: 10.43.145.59
+    clusterIPs:
+    - 10.43.145.59
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: frontend
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:/Service:eshtry-mny/mongodb
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"eshtry-mny:/Service:eshtry-mny/mongodb"},"labels":{"app":"mongodb","app.kubernetes.io/part-of":"eshtry-mny"},"name":"mongodb","namespace":"eshtry-mny"},"spec":{"clusterIP":"None","ports":[{"name":"mongo","port":27017,"targetPort":27017}],"selector":{"app":"mongodb"}}}
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:37Z"
+    labels:
+      app: mongodb
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: eshtry-mny
+    name: mongodb
+    namespace: eshtry-mny
+    resourceVersion: "3260321"
+    uid: 890079b5-675c-46d9-9608-42593b230db5
+  spec:
+    clusterIP: None
+    clusterIPs:
+    - None
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: mongo
+      port: 27017
+      protocol: TCP
+      targetPort: 27017
+    selector:
+      app: mongodb
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:/Service:eshtry-mny/product-service
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"eshtry-mny:/Service:eshtry-mny/product-service"},"name":"product-service","namespace":"eshtry-mny"},"spec":{"ports":[{"port":9000,"targetPort":9000}],"selector":{"app":"product-service"}}}
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:37Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+    name: product-service
+    namespace: eshtry-mny
+    resourceVersion: "3260323"
+    uid: 04c7088d-10f9-43d4-831c-dd861ae3e0c2
+  spec:
+    clusterIP: 10.43.134.129
+    clusterIPs:
+    - 10.43.134.129
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - port: 9000
+      protocol: TCP
+      targetPort: 9000
+    selector:
+      app: product-service
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:/Service:eshtry-mny/user-service
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"eshtry-mny:/Service:eshtry-mny/user-service"},"name":"user-service","namespace":"eshtry-mny"},"spec":{"ports":[{"port":9001,"targetPort":9001}],"selector":{"app":"user-service"}}}
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:37Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+    name: user-service
+    namespace: eshtry-mny
+    resourceVersion: "3260326"
+    uid: e2549bea-fabb-42e3-8ecb-de3246fcae03
+  spec:
+    clusterIP: 10.43.250.124
+    clusterIPs:
+    - 10.43.250.124
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - port: 9001
+      protocol: TCP
+      targetPort: 9001
+    selector:
+      app: user-service
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/cart-service
+      deployment.kubernetes.io/revision: "6"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"eshtry-mny:apps/Deployment:eshtry-mny/cart-service"},"name":"cart-service","namespace":"eshtry-mny"},"spec":{"selector":{"matchLabels":{"app":"cart-service"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":0},"type":"RollingUpdate"},"template":{"metadata":{"labels":{"app":"cart-service"}},"spec":{"affinity":{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchExpressions":[{"key":"app","operator":"In","values":["cart-service"]}]},"topologyKey":"kubernetes.io/hostname"},"weight":100}]}},"containers":[{"envFrom":[{"secretRef":{"name":"app-secrets"}},{"configMapRef":{"name":"app-config"}}],"image":"192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:cbd6d1eef157ace6283030d96e78266f6cf331b79fad78ca4cbdab7318b8b422","imagePullPolicy":"IfNotPresent","livenessProbe":{"httpGet":{"path":"/health","port":9003},"initialDelaySeconds":10,"periodSeconds":10},"name":"cart-service","ports":[{"containerPort":9003}],"readinessProbe":{"httpGet":{"path":"/ready","port":9003},"initialDelaySeconds":5,"periodSeconds":5},"resources":{"limits":{"cpu":"300m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"128Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true}}],"imagePullSecrets":[{"name":"harbor-creds"}],"securityContext":{"fsGroup":1001,"runAsGroup":1001,"runAsNonRoot":true,"runAsUser":1001,"seccompProfile":{"type":"RuntimeDefault"}}}}}}
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:cbd6d1eef157ace6283030d96e78266f6cf331b79fad78ca4cbdab7318b8b422":"pass"}'
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:37Z"
+    generation: 7
+    labels:
+      app.kubernetes.io/managed-by: Helm
+    name: cart-service
+    namespace: eshtry-mny
+    resourceVersion: "3332004"
+    uid: f3ac15de-53de-4385-a9cd-3f2966ac39ad
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: cart-service
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 0
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-09-18T00:45:48+03:00"
+        labels:
+          app: cart-service
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - cart-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:cbd6d1eef157ace6283030d96e78266f6cf331b79fad78ca4cbdab7318b8b422
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9003
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: cart-service
+          ports:
+          - containerPort: 9003
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9003
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-09-17T16:55:47Z"
+      lastUpdateTime: "2026-09-17T16:55:47Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-09-17T16:54:38Z"
+      lastUpdateTime: "2026-09-17T21:46:08Z"
+      message: ReplicaSet "cart-service-55f88b4c7b" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 7
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/frontend
+      deployment.kubernetes.io/revision: "10"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"eshtry-mny:apps/Deployment:eshtry-mny/frontend"},"name":"frontend","namespace":"eshtry-mny"},"spec":{"selector":{"matchLabels":{"app":"frontend"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":0},"type":"RollingUpdate"},"template":{"metadata":{"labels":{"app":"frontend"}},"spec":{"affinity":{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchExpressions":[{"key":"app","operator":"In","values":["frontend"]}]},"topologyKey":"kubernetes.io/hostname"},"weight":100}]}},"containers":[{"envFrom":[{"configMapRef":{"name":"app-config"}}],"image":"192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:df4517e08548894d08fa49e7d777e878bca3cb20db447127b537059047500528","imagePullPolicy":"IfNotPresent","livenessProbe":{"httpGet":{"path":"/","port":8080},"initialDelaySeconds":10,"periodSeconds":10},"name":"frontend","ports":[{"containerPort":8080}],"readinessProbe":{"httpGet":{"path":"/","port":8080},"initialDelaySeconds":5,"periodSeconds":5},"resources":{"limits":{"cpu":"300m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"128Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true},"volumeMounts":[{"mountPath":"/var/cache/nginx","name":"nginx-cache"},{"mountPath":"/tmp","name":"nginx-tmp"}]}],"imagePullSecrets":[{"name":"harbor-creds"}],"securityContext":{"fsGroup":101,"runAsGroup":101,"runAsNonRoot":true,"runAsUser":101,"seccompProfile":{"type":"RuntimeDefault"}},"volumes":[{"emptyDir":{},"name":"nginx-cache"},{"emptyDir":{},"name":"nginx-tmp"}]}}}}
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:df4517e08548894d08fa49e7d777e878bca3cb20db447127b537059047500528":"fail"}'
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:37Z"
+    generation: 10
+    labels:
+      app.kubernetes.io/managed-by: Helm
+    name: frontend
+    namespace: eshtry-mny
+    resourceVersion: "3317477"
+    uid: 40536daf-1221-43db-bb7c-9c286a35a909
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: frontend
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 0
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-09-17T22:44:15+03:00"
+        labels:
+          app: frontend
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - frontend
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:df4517e08548894d08fa49e7d777e878bca3cb20db447127b537059047500528
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: frontend
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/cache/nginx
+            name: nginx-cache
+          - mountPath: /tmp
+            name: nginx-tmp
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 101
+          runAsGroup: 101
+          runAsNonRoot: true
+          runAsUser: 101
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: nginx-cache
+        - emptyDir: {}
+          name: nginx-tmp
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-09-17T19:44:04Z"
+      lastUpdateTime: "2026-09-17T19:44:04Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-09-17T16:54:38Z"
+      lastUpdateTime: "2026-09-17T20:50:45Z"
+      message: ReplicaSet "frontend-84cc78b6fb" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 10
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/product-service
+      deployment.kubernetes.io/revision: "6"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"eshtry-mny:apps/Deployment:eshtry-mny/product-service"},"name":"product-service","namespace":"eshtry-mny"},"spec":{"selector":{"matchLabels":{"app":"product-service"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":0},"type":"RollingUpdate"},"template":{"metadata":{"labels":{"app":"product-service"}},"spec":{"affinity":{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchExpressions":[{"key":"app","operator":"In","values":["product-service"]}]},"topologyKey":"kubernetes.io/hostname"},"weight":100}]}},"containers":[{"envFrom":[{"secretRef":{"name":"app-secrets"}},{"configMapRef":{"name":"app-config"}}],"image":"192.168.1.8:30082/eshtry-mny/eshtry-mny-product@sha256:c84bc2dc9c71275ba95fe20ed7f290b5b62b1d999a968af11b1ff547ec40460f","imagePullPolicy":"IfNotPresent","livenessProbe":{"httpGet":{"path":"/health","port":9000},"initialDelaySeconds":10,"periodSeconds":10},"name":"product-service","ports":[{"containerPort":9000}],"readinessProbe":{"httpGet":{"path":"/ready","port":9000},"initialDelaySeconds":5,"periodSeconds":5},"resources":{"limits":{"cpu":"300m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"128Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true}}],"imagePullSecrets":[{"name":"harbor-creds"}],"securityContext":{"fsGroup":1001,"runAsGroup":1001,"runAsNonRoot":true,"runAsUser":1001,"seccompProfile":{"type":"RuntimeDefault"}}}}}}
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-product@sha256:c84bc2dc9c71275ba95fe20ed7f290b5b62b1d999a968af11b1ff547ec40460f":"pass"}'
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:37Z"
+    generation: 7
+    labels:
+      app.kubernetes.io/managed-by: Helm
+    name: product-service
+    namespace: eshtry-mny
+    resourceVersion: "3331935"
+    uid: f1f6df35-05fd-4265-86d1-62e832e99725
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: product-service
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 0
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-09-18T00:45:48+03:00"
+        labels:
+          app: product-service
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - product-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product@sha256:c84bc2dc9c71275ba95fe20ed7f290b5b62b1d999a968af11b1ff547ec40460f
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: product-service
+          ports:
+          - containerPort: 9000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-09-17T16:55:33Z"
+      lastUpdateTime: "2026-09-17T16:55:33Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-09-17T16:54:38Z"
+      lastUpdateTime: "2026-09-17T21:45:57Z"
+      message: ReplicaSet "product-service-84479cb958" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 7
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/user-service
+      deployment.kubernetes.io/revision: "14"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"eshtry-mny:apps/Deployment:eshtry-mny/user-service"},"name":"user-service","namespace":"eshtry-mny"},"spec":{"selector":{"matchLabels":{"app":"user-service"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":0},"type":"RollingUpdate"},"template":{"metadata":{"labels":{"app":"user-service"}},"spec":{"affinity":{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchExpressions":[{"key":"app","operator":"In","values":["user-service"]}]},"topologyKey":"kubernetes.io/hostname"},"weight":100}]}},"containers":[{"envFrom":[{"secretRef":{"name":"app-secrets"}},{"configMapRef":{"name":"app-config"}}],"image":"192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3","imagePullPolicy":"IfNotPresent","livenessProbe":{"httpGet":{"path":"/health","port":9001},"initialDelaySeconds":10,"periodSeconds":10},"name":"user-service","ports":[{"containerPort":9001}],"readinessProbe":{"httpGet":{"path":"/ready","port":9001},"initialDelaySeconds":5,"periodSeconds":5},"resources":{"limits":{"cpu":"300m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"128Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true}}],"imagePullSecrets":[{"name":"harbor-creds"}],"securityContext":{"fsGroup":1001,"runAsGroup":1001,"runAsNonRoot":true,"runAsUser":1001,"seccompProfile":{"type":"RuntimeDefault"}}}}}}
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3":"pass"}'
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:38Z"
+    generation: 16
+    labels:
+      app.kubernetes.io/managed-by: Helm
+    name: user-service
+    namespace: eshtry-mny
+    resourceVersion: "3331911"
+    uid: ab1ad0f1-8ffb-4a9d-ba6d-913a95d12ac4
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: user-service
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 0
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-09-18T00:45:48+03:00"
+        labels:
+          app: user-service
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - user-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: user-service
+          ports:
+          - containerPort: 9001
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-09-17T17:42:00Z"
+      lastUpdateTime: "2026-09-17T17:42:00Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-09-17T16:54:39Z"
+      lastUpdateTime: "2026-09-17T21:45:54Z"
+      message: ReplicaSet "user-service-66dcb9c7ff" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 16
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/cart-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "6"
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:cbd6d1eef157ace6283030d96e78266f6cf331b79fad78ca4cbdab7318b8b422":"pass"}'
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T21:45:49Z"
+    generation: 1
+    labels:
+      app: cart-service
+      pod-template-hash: 55f88b4c7b
+    name: cart-service-55f88b4c7b
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: cart-service
+      uid: f3ac15de-53de-4385-a9cd-3f2966ac39ad
+    resourceVersion: "3331785"
+    uid: 0b9330d7-d0e7-4d14-a5b2-2b173e8a2978
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: cart-service
+        pod-template-hash: 55f88b4c7b
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-09-18T00:45:48+03:00"
+        labels:
+          app: cart-service
+          pod-template-hash: 55f88b4c7b
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - cart-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:cbd6d1eef157ace6283030d96e78266f6cf331b79fad78ca4cbdab7318b8b422
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9003
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: cart-service
+          ports:
+          - containerPort: 9003
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9003
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/cart-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "5"
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:cbd6d1eef157ace6283030d96e78266f6cf331b79fad78ca4cbdab7318b8b422":"pass"}'
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T21:44:53Z"
+    generation: 2
+    labels:
+      app: cart-service
+      pod-template-hash: 69f76689c
+    name: cart-service-69f76689c
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: cart-service
+      uid: f3ac15de-53de-4385-a9cd-3f2966ac39ad
+    resourceVersion: "3332002"
+    uid: 6b202d13-2a83-4a72-be7d-49cbea6b7c30
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: cart-service
+        pod-template-hash: 69f76689c
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-09-18T00:44:53+03:00"
+        labels:
+          app: cart-service
+          pod-template-hash: 69f76689c
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - cart-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:cbd6d1eef157ace6283030d96e78266f6cf331b79fad78ca4cbdab7318b8b422
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9003
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: cart-service
+          ports:
+          - containerPort: 9003
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9003
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/cart-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "3"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T17:49:07Z"
+    generation: 2
+    labels:
+      app: cart-service
+      pod-template-hash: 6d7c99c7b9
+    name: cart-service-6d7c99c7b9
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: cart-service
+      uid: f3ac15de-53de-4385-a9cd-3f2966ac39ad
+    resourceVersion: "3287207"
+    uid: 922a11ac-b619-4c45-a4ac-65b7227a1533
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: cart-service
+        pod-template-hash: 6d7c99c7b9
+    template:
+      metadata:
+        labels:
+          app: cart-service
+          pod-template-hash: 6d7c99c7b9
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - cart-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart:0.1.3
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9003
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: cart-service
+          ports:
+          - containerPort: 9003
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9003
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/cart-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "4"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T18:54:46Z"
+    generation: 2
+    labels:
+      app: cart-service
+      pod-template-hash: 6ff7b9f4c8
+    name: cart-service-6ff7b9f4c8
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: cart-service
+      uid: f3ac15de-53de-4385-a9cd-3f2966ac39ad
+    resourceVersion: "3331664"
+    uid: d11833a6-61d2-4605-9193-517229c0c936
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: cart-service
+        pod-template-hash: 6ff7b9f4c8
+    template:
+      metadata:
+        labels:
+          app: cart-service
+          pod-template-hash: 6ff7b9f4c8
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - cart-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:cbd6d1eef157ace6283030d96e78266f6cf331b79fad78ca4cbdab7318b8b422
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9003
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: cart-service
+          ports:
+          - containerPort: 9003
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9003
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/cart-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "2"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T17:01:05Z"
+    generation: 2
+    labels:
+      app: cart-service
+      pod-template-hash: 756d9c64b8
+    name: cart-service-756d9c64b8
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: cart-service
+      uid: f3ac15de-53de-4385-a9cd-3f2966ac39ad
+    resourceVersion: "3267942"
+    uid: 344ad4e1-b349-4e42-9e6b-3bbcf114427a
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: cart-service
+        pod-template-hash: 756d9c64b8
+    template:
+      metadata:
+        labels:
+          app: cart-service
+          pod-template-hash: 756d9c64b8
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - cart-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart:0.1.0-homelab2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9003
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: cart-service
+          ports:
+          - containerPort: 9003
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9003
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:38Z"
+    generation: 2
+    labels:
+      app: cart-service
+      pod-template-hash: 787cfc5c78
+    name: cart-service-787cfc5c78
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: cart-service
+      uid: f3ac15de-53de-4385-a9cd-3f2966ac39ad
+    resourceVersion: "3254957"
+    uid: c8ff9fb1-fba2-4dc2-b35b-d9605fbafa9e
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: cart-service
+        pod-template-hash: 787cfc5c78
+    template:
+      metadata:
+        labels:
+          app: cart-service
+          pod-template-hash: 787cfc5c78
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - cart-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart:0.1.0-homelab
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9003
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: cart-service
+          ports:
+          - containerPort: 9003
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9003
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:38Z"
+    generation: 2
+    labels:
+      app: frontend
+      pod-template-hash: 5547ff94c7
+    name: frontend-5547ff94c7
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: frontend
+      uid: 40536daf-1221-43db-bb7c-9c286a35a909
+    resourceVersion: "3254781"
+    uid: 267f21f4-b90b-49bf-9ce4-ac860aa79e03
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: frontend
+        pod-template-hash: 5547ff94c7
+    template:
+      metadata:
+        labels:
+          app: frontend
+          pod-template-hash: 5547ff94c7
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - frontend
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend:0.1.0-homelab
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: frontend
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/cache/nginx
+            name: nginx-cache
+          - mountPath: /tmp
+            name: nginx-tmp
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 101
+          runAsGroup: 101
+          runAsNonRoot: true
+          runAsUser: 101
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: nginx-cache
+        - emptyDir: {}
+          name: nginx-tmp
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/frontend
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "6"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T18:54:47Z"
+    generation: 2
+    labels:
+      app: frontend
+      pod-template-hash: 658d8ff59f
+    name: frontend-658d8ff59f
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: frontend
+      uid: 40536daf-1221-43db-bb7c-9c286a35a909
+    resourceVersion: "3294875"
+    uid: 370d163e-f623-42b1-8813-2d3cbe6ab6b5
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: frontend
+        pod-template-hash: 658d8ff59f
+    template:
+      metadata:
+        labels:
+          app: frontend
+          pod-template-hash: 658d8ff59f
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - frontend
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:395174a216af59b7e50f692e70dcff4b288dd0fc7d7bdcf30dfc9467123cd5c3
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: frontend
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/cache/nginx
+            name: nginx-cache
+          - mountPath: /tmp
+            name: nginx-tmp
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 101
+          runAsGroup: 101
+          runAsNonRoot: true
+          runAsUser: 101
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: nginx-cache
+        - emptyDir: {}
+          name: nginx-tmp
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/frontend
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "4"
+      deployment.kubernetes.io/revision-history: "2"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T17:01:05Z"
+    generation: 4
+    labels:
+      app: frontend
+      pod-template-hash: 674ddd7c6c
+    name: frontend-674ddd7c6c
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: frontend
+      uid: 40536daf-1221-43db-bb7c-9c286a35a909
+    resourceVersion: "3262659"
+    uid: 7dc74d93-b172-411c-a585-76b2b096eee3
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: frontend
+        pod-template-hash: 674ddd7c6c
+    template:
+      metadata:
+        labels:
+          app: frontend
+          pod-template-hash: 674ddd7c6c
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - frontend
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend:0.1.0-homelab2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: frontend
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/cache/nginx
+            name: nginx-cache
+          - mountPath: /tmp
+            name: nginx-tmp
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 101
+          runAsGroup: 101
+          runAsNonRoot: true
+          runAsUser: 101
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: nginx-cache
+        - emptyDir: {}
+          name: nginx-tmp
+  status:
+    observedGeneration: 4
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/frontend
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "9"
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:a3a34a89c352d80a70bbfddd560fbe767481c5d75295020745617ec43b931c22":"fail"}'
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T20:02:50Z"
+    generation: 2
+    labels:
+      app: frontend
+      pod-template-hash: 795d6ccd7
+    name: frontend-795d6ccd7
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: frontend
+      uid: 40536daf-1221-43db-bb7c-9c286a35a909
+    resourceVersion: "3317475"
+    uid: 00c44b61-ab8b-4d20-ba63-1c83c74eb00d
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: frontend
+        pod-template-hash: 795d6ccd7
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-09-17T22:44:15+03:00"
+        labels:
+          app: frontend
+          pod-template-hash: 795d6ccd7
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - frontend
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:a3a34a89c352d80a70bbfddd560fbe767481c5d75295020745617ec43b931c22
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: frontend
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/cache/nginx
+            name: nginx-cache
+          - mountPath: /tmp
+            name: nginx-tmp
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 101
+          runAsGroup: 101
+          runAsNonRoot: true
+          runAsUser: 101
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: nginx-cache
+        - emptyDir: {}
+          name: nginx-tmp
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/frontend
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "5"
+      deployment.kubernetes.io/revision-history: "3"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T17:17:34Z"
+    generation: 4
+    labels:
+      app: frontend
+      pod-template-hash: 7fbdc478bf
+    name: frontend-7fbdc478bf
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: frontend
+      uid: 40536daf-1221-43db-bb7c-9c286a35a909
+    resourceVersion: "3287066"
+    uid: 1a64a734-7767-4786-b0df-4cf2f7624930
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: frontend
+        pod-template-hash: 7fbdc478bf
+    template:
+      metadata:
+        labels:
+          app: frontend
+          pod-template-hash: 7fbdc478bf
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - frontend
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend:0.1.1
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: frontend
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/cache/nginx
+            name: nginx-cache
+          - mountPath: /tmp
+            name: nginx-tmp
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 101
+          runAsGroup: 101
+          runAsNonRoot: true
+          runAsUser: 101
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: nginx-cache
+        - emptyDir: {}
+          name: nginx-tmp
+  status:
+    observedGeneration: 4
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/frontend
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "10"
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:df4517e08548894d08fa49e7d777e878bca3cb20db447127b537059047500528":"fail"}'
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T20:50:19Z"
+    generation: 1
+    labels:
+      app: frontend
+      pod-template-hash: 84cc78b6fb
+    name: frontend-84cc78b6fb
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: frontend
+      uid: 40536daf-1221-43db-bb7c-9c286a35a909
+    resourceVersion: "3317456"
+    uid: d0c8cc9e-443f-4e99-86cf-975e89d3b0f7
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: frontend
+        pod-template-hash: 84cc78b6fb
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-09-17T22:44:15+03:00"
+        labels:
+          app: frontend
+          pod-template-hash: 84cc78b6fb
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - frontend
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:df4517e08548894d08fa49e7d777e878bca3cb20db447127b537059047500528
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: frontend
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/cache/nginx
+            name: nginx-cache
+          - mountPath: /tmp
+            name: nginx-tmp
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 101
+          runAsGroup: 101
+          runAsNonRoot: true
+          runAsUser: 101
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: nginx-cache
+        - emptyDir: {}
+          name: nginx-tmp
+  status:
+    availableReplicas: 1
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/frontend
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "7"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T19:23:33Z"
+    generation: 2
+    labels:
+      app: frontend
+      pod-template-hash: 9d69b98c6
+    name: frontend-9d69b98c6
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: frontend
+      uid: 40536daf-1221-43db-bb7c-9c286a35a909
+    resourceVersion: "3301140"
+    uid: c495df09-61c5-4b7c-8e59-e3329e1af63d
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: frontend
+        pod-template-hash: 9d69b98c6
+    template:
+      metadata:
+        labels:
+          app: frontend
+          pod-template-hash: 9d69b98c6
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - frontend
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:9f806bc1a70966ea3547c323d3d9dcce8a8db36f2950ee8542af02c1b365e2b4
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: frontend
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/cache/nginx
+            name: nginx-cache
+          - mountPath: /tmp
+            name: nginx-tmp
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 101
+          runAsGroup: 101
+          runAsNonRoot: true
+          runAsUser: 101
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: nginx-cache
+        - emptyDir: {}
+          name: nginx-tmp
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/frontend
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "8"
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:9f806bc1a70966ea3547c323d3d9dcce8a8db36f2950ee8542af02c1b365e2b4":"pass"}'
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T19:44:15Z"
+    generation: 2
+    labels:
+      app: frontend
+      pod-template-hash: d5d8895d
+    name: frontend-d5d8895d
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: frontend
+      uid: 40536daf-1221-43db-bb7c-9c286a35a909
+    resourceVersion: "3305846"
+    uid: d6884281-f968-4294-ae2f-d7d51e39887b
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: frontend
+        pod-template-hash: d5d8895d
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-09-17T22:44:15+03:00"
+        labels:
+          app: frontend
+          pod-template-hash: d5d8895d
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - frontend
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:9f806bc1a70966ea3547c323d3d9dcce8a8db36f2950ee8542af02c1b365e2b4
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: frontend
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/cache/nginx
+            name: nginx-cache
+          - mountPath: /tmp
+            name: nginx-tmp
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 101
+          runAsGroup: 101
+          runAsNonRoot: true
+          runAsUser: 101
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: nginx-cache
+        - emptyDir: {}
+          name: nginx-tmp
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/product-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "3"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T17:49:07Z"
+    generation: 2
+    labels:
+      app: product-service
+      pod-template-hash: 58db448568
+    name: product-service-58db448568
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: product-service
+      uid: f1f6df35-05fd-4265-86d1-62e832e99725
+    resourceVersion: "3287186"
+    uid: fd9344be-501f-4947-b7e3-58ea32610277
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: product-service
+        pod-template-hash: 58db448568
+    template:
+      metadata:
+        labels:
+          app: product-service
+          pod-template-hash: 58db448568
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - product-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product:0.1.3
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: product-service
+          ports:
+          - containerPort: 9000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/product-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "2"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T17:01:06Z"
+    generation: 2
+    labels:
+      app: product-service
+      pod-template-hash: 5ccdbc6d7f
+    name: product-service-5ccdbc6d7f
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: product-service
+      uid: f1f6df35-05fd-4265-86d1-62e832e99725
+    resourceVersion: "3267934"
+    uid: b3e48ac8-6a08-4107-ac54-717d0d088b79
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: product-service
+        pod-template-hash: 5ccdbc6d7f
+    template:
+      metadata:
+        labels:
+          app: product-service
+          pod-template-hash: 5ccdbc6d7f
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - product-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product:0.1.0-homelab2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: product-service
+          ports:
+          - containerPort: 9000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/product-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "5"
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-product@sha256:c84bc2dc9c71275ba95fe20ed7f290b5b62b1d999a968af11b1ff547ec40460f":"pass"}'
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T21:44:53Z"
+    generation: 2
+    labels:
+      app: product-service
+      pod-template-hash: 7d785c84d9
+    name: product-service-7d785c84d9
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: product-service
+      uid: f1f6df35-05fd-4265-86d1-62e832e99725
+    resourceVersion: "3331934"
+    uid: cd9dde24-bcb5-4ea9-a68c-dba083e1ec55
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: product-service
+        pod-template-hash: 7d785c84d9
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-09-18T00:44:53+03:00"
+        labels:
+          app: product-service
+          pod-template-hash: 7d785c84d9
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - product-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product@sha256:c84bc2dc9c71275ba95fe20ed7f290b5b62b1d999a968af11b1ff547ec40460f
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: product-service
+          ports:
+          - containerPort: 9000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:38Z"
+    generation: 2
+    labels:
+      app: product-service
+      pod-template-hash: 7db594988c
+    name: product-service-7db594988c
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: product-service
+      uid: f1f6df35-05fd-4265-86d1-62e832e99725
+    resourceVersion: "3254899"
+    uid: 9ce979bb-b3d4-4840-913c-9f9a7be59212
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: product-service
+        pod-template-hash: 7db594988c
+    template:
+      metadata:
+        labels:
+          app: product-service
+          pod-template-hash: 7db594988c
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - product-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product:0.1.0-homelab
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: product-service
+          ports:
+          - containerPort: 9000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/product-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "6"
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-product@sha256:c84bc2dc9c71275ba95fe20ed7f290b5b62b1d999a968af11b1ff547ec40460f":"pass"}'
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T21:45:48Z"
+    generation: 1
+    labels:
+      app: product-service
+      pod-template-hash: 84479cb958
+    name: product-service-84479cb958
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: product-service
+      uid: f1f6df35-05fd-4265-86d1-62e832e99725
+    resourceVersion: "3331717"
+    uid: 4ae7e328-3d45-4e3a-ac75-d34ed343b2b7
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: product-service
+        pod-template-hash: 84479cb958
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-09-18T00:45:48+03:00"
+        labels:
+          app: product-service
+          pod-template-hash: 84479cb958
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - product-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product@sha256:c84bc2dc9c71275ba95fe20ed7f290b5b62b1d999a968af11b1ff547ec40460f
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: product-service
+          ports:
+          - containerPort: 9000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/product-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "4"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T18:54:47Z"
+    generation: 2
+    labels:
+      app: product-service
+      pod-template-hash: 865fbb7886
+    name: product-service-865fbb7886
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: product-service
+      uid: f1f6df35-05fd-4265-86d1-62e832e99725
+    resourceVersion: "3331615"
+    uid: 10a0a554-322c-44aa-92fd-645893425ea4
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: product-service
+        pod-template-hash: 865fbb7886
+    template:
+      metadata:
+        labels:
+          app: product-service
+          pod-template-hash: 865fbb7886
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - product-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product@sha256:c84bc2dc9c71275ba95fe20ed7f290b5b62b1d999a968af11b1ff547ec40460f
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: product-service
+          ports:
+          - containerPort: 9000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/user-service
+      deployment.kubernetes.io/desired-replicas: "2"
+      deployment.kubernetes.io/max-replicas: "3"
+      deployment.kubernetes.io/revision: "6"
+      deployment.kubernetes.io/revision-history: "3"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T17:03:36Z"
+    generation: 6
+    labels:
+      app: user-service
+      pod-template-hash: 55cd586757
+    name: user-service-55cd586757
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: user-service
+      uid: ab1ad0f1-8ffb-4a9d-ba6d-913a95d12ac4
+    resourceVersion: "3263057"
+    uid: 38ae75e4-e0ac-443f-8f16-c617d5e66a10
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: user-service
+        pod-template-hash: 55cd586757
+    template:
+      metadata:
+        labels:
+          app: user-service
+          pod-template-hash: 55cd586757
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - user-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user:0.1.0-homelab3
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: user-service
+          ports:
+          - containerPort: 9001
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 6
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/user-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "10"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T19:23:32Z"
+    generation: 2
+    labels:
+      app: user-service
+      pod-template-hash: 5966899f55
+    name: user-service-5966899f55
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: user-service
+      uid: ab1ad0f1-8ffb-4a9d-ba6d-913a95d12ac4
+    resourceVersion: "3325143"
+    uid: 0dfbb42a-acbe-4e16-90e1-f13be1a22524
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: user-service
+        pod-template-hash: 5966899f55
+    template:
+      metadata:
+        labels:
+          app: user-service
+          pod-template-hash: 5966899f55
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - user-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: user-service
+          ports:
+          - containerPort: 9001
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "4"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T17:17:35Z"
+    generation: 2
+    labels:
+      app: user-service
+      pod-template-hash: 5bfbf59494
+    name: user-service-5bfbf59494
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: user-service
+      uid: ab1ad0f1-8ffb-4a9d-ba6d-913a95d12ac4
+    resourceVersion: "3259866"
+    uid: aa54b1c6-f286-45fa-af0a-6819b1b9ca26
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: user-service
+        pod-template-hash: 5bfbf59494
+    template:
+      metadata:
+        labels:
+          app: user-service
+          pod-template-hash: 5bfbf59494
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - user-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user:0.1.1
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: user-service
+          ports:
+          - containerPort: 9001
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/user-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "12"
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3":"pass"}'
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T21:21:09Z"
+    generation: 3
+    labels:
+      app: user-service
+      pod-template-hash: 65f57769f4
+    name: user-service-65f57769f4
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: user-service
+      uid: ab1ad0f1-8ffb-4a9d-ba6d-913a95d12ac4
+    resourceVersion: "3325267"
+    uid: 8d6bc458-234e-47de-a3d5-8d9f0df966b4
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: user-service
+        pod-template-hash: 65f57769f4
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-09-18T00:21:09+03:00"
+        labels:
+          app: user-service
+          pod-template-hash: 65f57769f4
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - user-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: user-service
+          ports:
+          - containerPort: 9001
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 3
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/user-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "14"
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3":"pass"}'
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T21:45:48Z"
+    generation: 1
+    labels:
+      app: user-service
+      pod-template-hash: 66dcb9c7ff
+    name: user-service-66dcb9c7ff
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: user-service
+      uid: ab1ad0f1-8ffb-4a9d-ba6d-913a95d12ac4
+    resourceVersion: "3331679"
+    uid: ca8558e8-1318-4ff6-897e-cdd6e177a2a6
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: user-service
+        pod-template-hash: 66dcb9c7ff
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-09-18T00:45:48+03:00"
+        labels:
+          app: user-service
+          pod-template-hash: 66dcb9c7ff
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - user-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: user-service
+          ports:
+          - containerPort: 9001
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/user-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "7"
+      deployment.kubernetes.io/revision-history: "5"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T17:20:45Z"
+    generation: 6
+    labels:
+      app: user-service
+      pod-template-hash: 6b85ff947f
+    name: user-service-6b85ff947f
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: user-service
+      uid: ab1ad0f1-8ffb-4a9d-ba6d-913a95d12ac4
+    resourceVersion: "3267905"
+    uid: 86ae1f8b-7997-402f-ac92-af51d561dc89
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: user-service
+        pod-template-hash: 6b85ff947f
+    template:
+      metadata:
+        labels:
+          app: user-service
+          pod-template-hash: 6b85ff947f
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - user-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user:0.1.2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: user-service
+          ports:
+          - containerPort: 9001
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 6
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/user-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "8"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T17:49:07Z"
+    generation: 2
+    labels:
+      app: user-service
+      pod-template-hash: 6cbddf746c
+    name: user-service-6cbddf746c
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: user-service
+      uid: ab1ad0f1-8ffb-4a9d-ba6d-913a95d12ac4
+    resourceVersion: "3287224"
+    uid: 6d879389-b565-4b4e-937f-ecbff9f67be1
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: user-service
+        pod-template-hash: 6cbddf746c
+    template:
+      metadata:
+        labels:
+          app: user-service
+          pod-template-hash: 6cbddf746c
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - user-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user:0.1.3
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: user-service
+          ports:
+          - containerPort: 9001
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/user-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "13"
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3":"pass"}'
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T21:21:48Z"
+    generation: 2
+    labels:
+      app: user-service
+      pod-template-hash: 8658d86465
+    name: user-service-8658d86465
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: user-service
+      uid: ab1ad0f1-8ffb-4a9d-ba6d-913a95d12ac4
+    resourceVersion: "3331909"
+    uid: 0668f299-ba7d-43fd-b8b7-97519684c508
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: user-service
+        pod-template-hash: 8658d86465
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-09-18T00:21:48+03:00"
+        labels:
+          app: user-service
+          pod-template-hash: 8658d86465
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - user-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: user-service
+          ports:
+          - containerPort: 9001
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/user-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "11"
+      kyverno.io/verify-images: '{"192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3":"pass"}'
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T21:20:57Z"
+    generation: 2
+    labels:
+      app: user-service
+      pod-template-hash: 86d55dffd8
+    name: user-service-86d55dffd8
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: user-service
+      uid: ab1ad0f1-8ffb-4a9d-ba6d-913a95d12ac4
+    resourceVersion: "3325017"
+    uid: 31c15409-1959-4af7-b944-4578dd104941
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: user-service
+        pod-template-hash: 86d55dffd8
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-09-18T00:20:57+03:00"
+        labels:
+          app: user-service
+          pod-template-hash: 86d55dffd8
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - user-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:85f51280b95cf548b3b1052d2f1714269900420e3c412e65bbf9a8ee419981c3
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: user-service
+          ports:
+          - containerPort: 9001
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "2"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T17:01:06Z"
+    generation: 2
+    labels:
+      app: user-service
+      pod-template-hash: b6fd458bb
+    name: user-service-b6fd458bb
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: user-service
+      uid: ab1ad0f1-8ffb-4a9d-ba6d-913a95d12ac4
+    resourceVersion: "3255584"
+    uid: 6781b074-a084-4893-93fa-036a5de8fa26
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: user-service
+        pod-template-hash: b6fd458bb
+    template:
+      metadata:
+        labels:
+          app: user-service
+          pod-template-hash: b6fd458bb
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - user-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user:0.1.0-homelab2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: user-service
+          ports:
+          - containerPort: 9001
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/Deployment:eshtry-mny/user-service
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "9"
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T18:54:46Z"
+    generation: 2
+    labels:
+      app: user-service
+      pod-template-hash: bc8fcc6fd
+    name: user-service-bc8fcc6fd
+    namespace: eshtry-mny
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: user-service
+      uid: ab1ad0f1-8ffb-4a9d-ba6d-913a95d12ac4
+    resourceVersion: "3295035"
+    uid: 340bf396-9b52-416c-ab2a-b8303a3308f2
+  spec:
+    replicas: 0
+    selector:
+      matchLabels:
+        app: user-service
+        pod-template-hash: bc8fcc6fd
+    template:
+      metadata:
+        labels:
+          app: user-service
+          pod-template-hash: bc8fcc6fd
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - user-service
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - envFrom:
+          - secretRef:
+              name: app-secrets
+          - configMapRef:
+              name: app-config
+          image: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:c1d943fba19f887ca2a9432217d2d44f51474a5594f97ab872047270a70f2e94
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: user-service
+          ports:
+          - containerPort: 9001
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    observedGeneration: 2
+    replicas: 0
+    terminatingReplicas: 0
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:apps/StatefulSet:eshtry-mny/mongodb
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"StatefulSet","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"eshtry-mny:apps/StatefulSet:eshtry-mny/mongodb"},"labels":{"app":"mongodb","app.kubernetes.io/part-of":"eshtry-mny"},"name":"mongodb","namespace":"eshtry-mny"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"mongodb"}},"serviceName":"mongodb","template":{"metadata":{"labels":{"app":"mongodb"}},"spec":{"containers":[{"args":["--wiredTigerCacheSizeGB","0.25","--bind_ip_all"],"env":[{"name":"MONGO_INITDB_ROOT_USERNAME","valueFrom":{"secretKeyRef":{"key":"MONGO_USERNAME","name":"app-secrets"}}},{"name":"MONGO_INITDB_ROOT_PASSWORD","valueFrom":{"secretKeyRef":{"key":"MONGO_PASSWORD","name":"app-secrets"}}},{"name":"MONGO_INITDB_DATABASE","value":"eshtry_mny"}],"image":"mongo:7.0","imagePullPolicy":"IfNotPresent","livenessProbe":{"initialDelaySeconds":30,"periodSeconds":20,"tcpSocket":{"port":27017}},"name":"mongodb","ports":[{"containerPort":27017,"name":"mongo"}],"readinessProbe":{"initialDelaySeconds":10,"periodSeconds":10,"tcpSocket":{"port":27017}},"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true},"volumeMounts":[{"mountPath":"/data/db","name":"data"},{"mountPath":"/data/configdb","name":"configdb"},{"mountPath":"/tmp","name":"tmp"}]}],"imagePullSecrets":[{"name":"harbor-creds"}],"securityContext":{"fsGroup":999,"runAsGroup":999,"runAsNonRoot":true,"runAsUser":999},"volumes":[{"emptyDir":{},"name":"configdb"},{"emptyDir":{},"name":"tmp"}]}},"volumeClaimTemplates":[{"metadata":{"name":"data"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"2Gi"}},"storageClassName":"local-path"}}]}}
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:38Z"
+    generation: 1
+    labels:
+      app: mongodb
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: eshtry-mny
+    name: mongodb
+    namespace: eshtry-mny
+    resourceVersion: "3260386"
+    uid: c055b532-4176-4b52-8016-0d338ec33121
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: mongodb
+    serviceName: mongodb
+    template:
+      metadata:
+        labels:
+          app: mongodb
+      spec:
+        containers:
+        - args:
+          - --wiredTigerCacheSizeGB
+          - "0.25"
+          - --bind_ip_all
+          env:
+          - name: MONGO_INITDB_ROOT_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: MONGO_USERNAME
+                name: app-secrets
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: MONGO_PASSWORD
+                name: app-secrets
+          - name: MONGO_INITDB_DATABASE
+            value: eshtry_mny
+          image: mongo:7.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            successThreshold: 1
+            tcpSocket:
+              port: 27017
+            timeoutSeconds: 1
+          name: mongodb
+          ports:
+          - containerPort: 27017
+            name: mongo
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 27017
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data/db
+            name: data
+          - mountPath: /data/configdb
+            name: configdb
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: harbor-creds
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 999
+          runAsGroup: 999
+          runAsNonRoot: true
+          runAsUser: 999
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: configdb
+        - emptyDir: {}
+          name: tmp
+    updateStrategy:
+      rollingUpdate:
+        partition: 0
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi
+        storageClassName: local-path
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+  status:
+    availableReplicas: 1
+    collisionCount: 0
+    currentReplicas: 1
+    currentRevision: mongodb-57df48859d
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updateRevision: mongodb-57df48859d
+    updatedReplicas: 1
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:autoscaling/HorizontalPodAutoscaler:eshtry-mny/cart-service-hpa
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"eshtry-mny:autoscaling/HorizontalPodAutoscaler:eshtry-mny/cart-service-hpa"},"name":"cart-service-hpa","namespace":"eshtry-mny"},"spec":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":60,"type":"Percent","value":10}],"stabilizationWindowSeconds":300},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Percent","value":100},{"periodSeconds":15,"type":"Pods","value":4}],"selectPolicy":"Max","stabilizationWindowSeconds":0}},"maxReplicas":3,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":70,"type":"Utilization"}},"type":"Resource"},{"resource":{"name":"memory","target":{"averageUtilization":80,"type":"Utilization"}},"type":"Resource"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"cart-service"}}}
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:38Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+    name: cart-service-hpa
+    namespace: eshtry-mny
+    resourceVersion: "3337797"
+    uid: f56ac394-efb0-40f4-996e-8a41f4f45304
+  spec:
+    behavior:
+      scaleDown:
+        policies:
+        - periodSeconds: 60
+          type: Percent
+          value: 10
+        selectPolicy: Max
+        stabilizationWindowSeconds: 300
+      scaleUp:
+        policies:
+        - periodSeconds: 15
+          type: Percent
+          value: 100
+        - periodSeconds: 15
+          type: Pods
+          value: 4
+        selectPolicy: Max
+        stabilizationWindowSeconds: 0
+    maxReplicas: 3
+    metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 70
+          type: Utilization
+      type: Resource
+    - resource:
+        name: memory
+        target:
+          averageUtilization: 80
+          type: Utilization
+      type: Resource
+    minReplicas: 1
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: cart-service
+  status:
+    conditions:
+    - lastTransitionTime: "2026-09-17T16:54:53Z"
+      message: recommended size matches current size
+      reason: ReadyForNewScale
+      status: "True"
+      type: AbleToScale
+    - lastTransitionTime: "2026-09-17T21:46:25Z"
+      message: the HPA was able to successfully calculate a replica count from cpu
+        resource utilization (percentage of request)
+      reason: ValidMetricFound
+      status: "True"
+      type: ScalingActive
+    - lastTransitionTime: "2026-09-17T16:56:08Z"
+      message: the desired count is within the acceptable range
+      reason: DesiredWithinRange
+      status: "False"
+      type: ScalingLimited
+    currentMetrics:
+    - resource:
+        current:
+          averageUtilization: 1
+          averageValue: 1m
+        name: cpu
+      type: Resource
+    - resource:
+        current:
+          averageUtilization: 31
+          averageValue: 41252Ki
+        name: memory
+      type: Resource
+    currentReplicas: 1
+    desiredReplicas: 1
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:autoscaling/HorizontalPodAutoscaler:eshtry-mny/frontend-hpa
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"eshtry-mny:autoscaling/HorizontalPodAutoscaler:eshtry-mny/frontend-hpa"},"name":"frontend-hpa","namespace":"eshtry-mny"},"spec":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":60,"type":"Percent","value":10}],"stabilizationWindowSeconds":300},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Percent","value":100},{"periodSeconds":15,"type":"Pods","value":4}],"selectPolicy":"Max","stabilizationWindowSeconds":0}},"maxReplicas":3,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":70,"type":"Utilization"}},"type":"Resource"},{"resource":{"name":"memory","target":{"averageUtilization":80,"type":"Utilization"}},"type":"Resource"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"frontend"}}}
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:38Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+    name: frontend-hpa
+    namespace: eshtry-mny
+    resourceVersion: "3337557"
+    uid: 8bf6f729-3019-473a-8e30-b6917c8f8d97
+  spec:
+    behavior:
+      scaleDown:
+        policies:
+        - periodSeconds: 60
+          type: Percent
+          value: 10
+        selectPolicy: Max
+        stabilizationWindowSeconds: 300
+      scaleUp:
+        policies:
+        - periodSeconds: 15
+          type: Percent
+          value: 100
+        - periodSeconds: 15
+          type: Pods
+          value: 4
+        selectPolicy: Max
+        stabilizationWindowSeconds: 0
+    maxReplicas: 3
+    metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 70
+          type: Utilization
+      type: Resource
+    - resource:
+        name: memory
+        target:
+          averageUtilization: 80
+          type: Utilization
+      type: Resource
+    minReplicas: 1
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: frontend
+  status:
+    conditions:
+    - lastTransitionTime: "2026-09-17T16:54:53Z"
+      message: recommended size matches current size
+      reason: ReadyForNewScale
+      status: "True"
+      type: AbleToScale
+    - lastTransitionTime: "2026-09-17T20:51:03Z"
+      message: the HPA was able to successfully calculate a replica count from cpu
+        resource utilization (percentage of request)
+      reason: ValidMetricFound
+      status: "True"
+      type: ScalingActive
+    - lastTransitionTime: "2026-09-17T16:56:08Z"
+      message: the desired count is within the acceptable range
+      reason: DesiredWithinRange
+      status: "False"
+      type: ScalingLimited
+    currentMetrics:
+    - resource:
+        current:
+          averageUtilization: 1
+          averageValue: 1m
+        name: cpu
+      type: Resource
+    - resource:
+        current:
+          averageUtilization: 3
+          averageValue: 4292Ki
+        name: memory
+      type: Resource
+    currentReplicas: 1
+    desiredReplicas: 1
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:autoscaling/HorizontalPodAutoscaler:eshtry-mny/product-service-hpa
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"eshtry-mny:autoscaling/HorizontalPodAutoscaler:eshtry-mny/product-service-hpa"},"name":"product-service-hpa","namespace":"eshtry-mny"},"spec":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":60,"type":"Percent","value":10}],"stabilizationWindowSeconds":300},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Percent","value":100},{"periodSeconds":15,"type":"Pods","value":4}],"selectPolicy":"Max","stabilizationWindowSeconds":0}},"maxReplicas":3,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":70,"type":"Utilization"}},"type":"Resource"},{"resource":{"name":"memory","target":{"averageUtilization":80,"type":"Utilization"}},"type":"Resource"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"product-service"}}}
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:38Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+    name: product-service-hpa
+    namespace: eshtry-mny
+    resourceVersion: "3337849"
+    uid: ee208849-cc6b-41ec-be0a-17b4f5ee48b0
+  spec:
+    behavior:
+      scaleDown:
+        policies:
+        - periodSeconds: 60
+          type: Percent
+          value: 10
+        selectPolicy: Max
+        stabilizationWindowSeconds: 300
+      scaleUp:
+        policies:
+        - periodSeconds: 15
+          type: Percent
+          value: 100
+        - periodSeconds: 15
+          type: Pods
+          value: 4
+        selectPolicy: Max
+        stabilizationWindowSeconds: 0
+    maxReplicas: 3
+    metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 70
+          type: Utilization
+      type: Resource
+    - resource:
+        name: memory
+        target:
+          averageUtilization: 80
+          type: Utilization
+      type: Resource
+    minReplicas: 1
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: product-service
+  status:
+    conditions:
+    - lastTransitionTime: "2026-09-17T16:54:53Z"
+      message: recommended size matches current size
+      reason: ReadyForNewScale
+      status: "True"
+      type: AbleToScale
+    - lastTransitionTime: "2026-09-17T21:46:25Z"
+      message: the HPA was able to successfully calculate a replica count from cpu
+        resource utilization (percentage of request)
+      reason: ValidMetricFound
+      status: "True"
+      type: ScalingActive
+    - lastTransitionTime: "2026-09-17T16:55:53Z"
+      message: the desired count is within the acceptable range
+      reason: DesiredWithinRange
+      status: "False"
+      type: ScalingLimited
+    currentMetrics:
+    - resource:
+        current:
+          averageUtilization: 2
+          averageValue: 2m
+        name: cpu
+      type: Resource
+    - resource:
+        current:
+          averageUtilization: 28
+          averageValue: 37900Ki
+        name: memory
+      type: Resource
+    currentReplicas: 1
+    desiredReplicas: 1
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: eshtry-mny:autoscaling/HorizontalPodAutoscaler:eshtry-mny/user-service-hpa
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"eshtry-mny:autoscaling/HorizontalPodAutoscaler:eshtry-mny/user-service-hpa"},"name":"user-service-hpa","namespace":"eshtry-mny"},"spec":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":60,"type":"Percent","value":10}],"stabilizationWindowSeconds":300},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Percent","value":100},{"periodSeconds":15,"type":"Pods","value":4}],"selectPolicy":"Max","stabilizationWindowSeconds":0}},"maxReplicas":3,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":70,"type":"Utilization"}},"type":"Resource"},{"resource":{"name":"memory","target":{"averageUtilization":80,"type":"Utilization"}},"type":"Resource"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"user-service"}}}
+      meta.helm.sh/release-name: eshtry-mny
+      meta.helm.sh/release-namespace: eshtry-mny
+    creationTimestamp: "2026-09-17T16:54:38Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+    name: user-service-hpa
+    namespace: eshtry-mny
+    resourceVersion: "3337845"
+    uid: b0e94788-220b-4490-a8e5-4f74a90cc030
+  spec:
+    behavior:
+      scaleDown:
+        policies:
+        - periodSeconds: 60
+          type: Percent
+          value: 10
+        selectPolicy: Max
+        stabilizationWindowSeconds: 300
+      scaleUp:
+        policies:
+        - periodSeconds: 15
+          type: Percent
+          value: 100
+        - periodSeconds: 15
+          type: Pods
+          value: 4
+        selectPolicy: Max
+        stabilizationWindowSeconds: 0
+    maxReplicas: 3
+    metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 70
+          type: Utilization
+      type: Resource
+    - resource:
+        name: memory
+        target:
+          averageUtilization: 80
+          type: Utilization
+      type: Resource
+    minReplicas: 1
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: user-service
+  status:
+    conditions:
+    - lastTransitionTime: "2026-09-17T16:54:53Z"
+      message: recommended size matches current size
+      reason: ReadyForNewScale
+      status: "True"
+      type: AbleToScale
+    - lastTransitionTime: "2026-09-17T21:46:10Z"
+      message: the HPA was able to successfully calculate a replica count from cpu
+        resource utilization (percentage of request)
+      reason: ValidMetricFound
+      status: "True"
+      type: ScalingActive
+    - lastTransitionTime: "2026-09-17T16:56:08Z"
+      message: the desired count is within the acceptable range
+      reason: DesiredWithinRange
+      status: "False"
+      type: ScalingLimited
+    currentMetrics:
+    - resource:
+        current:
+          averageUtilization: 1
+          averageValue: 1m
+        name: cpu
+      type: Resource
+    - resource:
+        current:
+          averageUtilization: 33
+          averageValue: 44188Ki
+        name: memory
+      type: Resource
+    currentReplicas: 1
+    desiredReplicas: 1
+    lastScaleTime: "2026-09-17T17:36:18Z"
+kind: List
+metadata:
+  resourceVersion: ""
