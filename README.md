@@ -4,7 +4,6 @@ An e-commerce demo built as **MERN microservices** (Node.js/Express + MongoDB + 
 self-hosted **k3s** homelab with a full **DevSecOps supply chain**: Jenkins CI → Harbor (signed,
 digest-pinned images) → Git → Argo CD → Kyverno admission, plus Prometheus/Grafana monitoring.
 
-**Live app:** http://eshtry-mny.192.168.1.8.nip.io
 
 ![Eshtry-Mny architecture diagram](docs/Architecture-diagram.png)
 
@@ -28,7 +27,7 @@ centralized error handling, Zod validation, pino logging, `/health` (liveness) a
 (readiness gated on MongoDB), and Prometheus `/metrics`.
 
 ## What runs on the homelab
-
+**Live app:** http://eshtry-mny.192.168.1.8.nip.io
 - **Ingress:** Traefik (class `traefik`, `kube-system`) — not ingress-nginx.
 - **Database:** in-cluster MongoDB StatefulSet in `eshtry-mny` (no Atlas); NetworkPolicy egress is
   restricted to the Mongo pods only.
