@@ -1,7 +1,7 @@
 # 00 — Application Analysis (verified against current code)
 
 Repo: `Eshtry-Mny-Mern-Microservices-DevSecOps` @ branch `devsecops/homelab-engagement`
-Verified by direct file reads; every claim has a path. Section 2 of the engagement prompt was checked and corrected where noted.
+Verified by direct file reads; every claim has a path. The engagement brief's application section was checked and corrected where noted.
 
 ## 1. Service inventory
 
