@@ -148,19 +148,7 @@ Images are pulled from Harbor; `values.yaml` references them **by digest**.
 - [`docs/STATE.md`](docs/STATE.md) — current state and resume point
 - `docs/0x-*.md` + `docs/phases/` — per-phase analysis and reports
 
-## Screenshots (tooling)
 
-### Jenkins pipeline
-
-![Jenkins pipeline stages](docs/screenshots/screenshot-03.png)
-
-### Argo CD application (synced/healthy)
-
-![Argo CD application tree](docs/screenshots/screenshot-07.png)
-
-### Kubernetes workloads
-
-![Kubernetes Dashboard workloads](docs/screenshots/screenshot-08.png)
 
 ## Honest limitations
 
