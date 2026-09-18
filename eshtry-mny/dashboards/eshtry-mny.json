@@ -1,0 +1,152 @@
+{
+  "title": "Eshtry-Mny",
+  "uid": "eshtry-mny",
+  "tags": ["eshtry-mny", "homelab", "mern"],
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-3h", "to": "now" },
+  "timezone": "browser",
+  "editable": true,
+  "panels": [
+    { "id": 100, "type": "row", "title": "Overview", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }, "collapsed": false },
+
+    { "id": 1, "type": "stat", "title": "Pods Running", "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "count(kube_pod_status_phase{namespace=\"eshtry-mny\",phase=\"Running\"} == 1)", "refId": "A" } ],
+      "options": { "reduceOptions": { "calcs": [ "lastNotNull" ] }, "colorMode": "value" } },
+
+    { "id": 2, "type": "stat", "title": "Requests / sec (5m)", "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "sum(rate(http_requests_total{namespace=\"eshtry-mny\"}[5m]))", "refId": "A" } ],
+      "options": { "reduceOptions": { "calcs": [ "lastNotNull" ] }, "colorMode": "value" } },
+
+    { "id": 3, "type": "stat", "title": "5xx Error rate %", "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "100 * sum(rate(http_requests_total{namespace=\"eshtry-mny\",status=~\"5..\"}[5m])) / clamp_min(sum(rate(http_requests_total{namespace=\"eshtry-mny\"}[5m])), 0.001)", "refId": "A" } ],
+      "fieldConfig": { "defaults": { "unit": "percent", "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 1 }, { "color": "red", "value": 5 } ] } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": [ "lastNotNull" ] }, "colorMode": "background" } },
+
+    { "id": 4, "type": "stat", "title": "p95 latency", "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{namespace=\"eshtry-mny\"}[5m])) by (le))", "refId": "A" } ],
+      "fieldConfig": { "defaults": { "unit": "s", "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 0.5 }, { "color": "red", "value": 1 } ] } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": [ "lastNotNull" ] }, "colorMode": "value" } },
+
+    { "id": 5, "type": "stat", "title": "Pod restarts (1h)", "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"eshtry-mny\"}[1h]))", "refId": "A" } ],
+      "options": { "reduceOptions": { "calcs": [ "lastNotNull" ] }, "colorMode": "value" } },
+
+    { "id": 6, "type": "stat", "title": "Scrape targets up", "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "sum(up{namespace=\"eshtry-mny\"})", "refId": "A" } ],
+      "options": { "reduceOptions": { "calcs": [ "lastNotNull" ] }, "colorMode": "value" } },
+
+    { "id": 101, "type": "row", "title": "Traffic & Errors", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 }, "collapsed": false },
+
+    { "id": 7, "type": "timeseries", "title": "Request rate by service (req/s)", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "sum by (job) (rate(http_requests_total{namespace=\"eshtry-mny\"}[5m]))", "refId": "A", "legendFormat": "__auto" } ] },
+
+    { "id": 8, "type": "timeseries", "title": "Requests by HTTP status", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "sum by (status) (rate(http_requests_total{namespace=\"eshtry-mny\"}[5m]))", "refId": "A", "legendFormat": "__auto" } ] },
+
+    { "id": 9, "type": "timeseries", "title": "5xx errors by service (req/s)", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "sum by (job) (rate(http_requests_total{namespace=\"eshtry-mny\",status=~\"5..\"}[5m]))", "refId": "A", "legendFormat": "__auto" } ] },
+
+    { "id": 10, "type": "timeseries", "title": "Top routes (req/s)", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "topk(10, sum by (route) (rate(http_requests_total{namespace=\"eshtry-mny\"}[5m])))", "refId": "A", "legendFormat": "__auto" } ] },
+
+    { "id": 102, "type": "row", "title": "Latency", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 }, "collapsed": false },
+
+    { "id": 11, "type": "timeseries", "title": "Latency percentiles by service (s)", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 23 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{namespace=\"eshtry-mny\"}[5m])) by (le, job))", "refId": "p50" },
+        { "expr": "histogram_quantile(0.90, sum(rate(http_request_duration_seconds_bucket{namespace=\"eshtry-mny\"}[5m])) by (le, job))", "refId": "p90" },
+        { "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{namespace=\"eshtry-mny\"}[5m])) by (le, job))", "refId": "p95" },
+        { "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{namespace=\"eshtry-mny\"}[5m])) by (le, job))", "refId": "p99" }
+      ] },
+
+    { "id": 12, "type": "timeseries", "title": "Average latency by route (s)", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 23 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "sum by (route) (rate(http_request_duration_seconds_sum{namespace=\"eshtry-mny\"}[5m])) / sum by (route) (rate(http_request_duration_seconds_count{namespace=\"eshtry-mny\"}[5m]))", "refId": "A", "legendFormat": "__auto" } ] },
+
+    { "id": 103, "type": "row", "title": "Workloads & Scaling", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 31 }, "collapsed": false },
+
+    { "id": 13, "type": "timeseries", "title": "Deployment replicas (ready vs desired)", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "kube_deployment_status_replicas_ready{namespace=\"eshtry-mny\"}", "refId": "ready", "legendFormat": "ready" },
+        { "expr": "kube_deployment_spec_replicas{namespace=\"eshtry-mny\"}", "refId": "desired", "legendFormat": "desired" }
+      ] },
+
+    { "id": 14, "type": "timeseries", "title": "HPA current vs max replicas", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "kube_horizontalpodautoscaler_status_current_replicas{namespace=\"eshtry-mny\"}", "refId": "current", "legendFormat": "current" },
+        { "expr": "kube_horizontalpodautoscaler_spec_max_replicas{namespace=\"eshtry-mny\"}", "refId": "max", "legendFormat": "max" }
+      ] },
+
+    { "id": 15, "type": "timeseries", "title": "Pod restarts by pod (increase 1h)", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 40 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "sum by (pod) (increase(kube_pod_container_status_restarts_total{namespace=\"eshtry-mny\"}[1h]))", "refId": "A", "legendFormat": "__auto" } ] },
+
+    { "id": 16, "type": "timeseries", "title": "Pods ready by pod", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 40 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "sum by (pod) (kube_pod_container_status_ready{namespace=\"eshtry-mny\"})", "refId": "A", "legendFormat": "__auto" } ] },
+
+    { "id": 104, "type": "row", "title": "Resources (pods)", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 48 }, "collapsed": false },
+
+    { "id": 17, "type": "timeseries", "title": "CPU usage by pod (cores)", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 49 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"eshtry-mny\",container!=\"\"}[5m]))", "refId": "A", "legendFormat": "__auto" } ] },
+
+    { "id": 18, "type": "timeseries", "title": "Memory working set by pod", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 49 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "sum by (pod) (container_memory_working_set_bytes{namespace=\"eshtry-mny\",container!=\"\"})", "refId": "A", "legendFormat": "__auto" } ],
+      "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] } },
+
+    { "id": 19, "type": "timeseries", "title": "Network RX by pod (bytes/s)", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 57 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "sum by (pod) (rate(container_network_receive_bytes_total{namespace=\"eshtry-mny\"}[5m]))", "refId": "A", "legendFormat": "__auto" } ],
+      "fieldConfig": { "defaults": { "unit": "Bps" }, "overrides": [] } },
+
+    { "id": 20, "type": "timeseries", "title": "Network TX by pod (bytes/s)", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 57 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "sum by (pod) (rate(container_network_transmit_bytes_total{namespace=\"eshtry-mny\"}[5m]))", "refId": "A", "legendFormat": "__auto" } ],
+      "fieldConfig": { "defaults": { "unit": "Bps" }, "overrides": [] } },
+
+    { "id": 105, "type": "row", "title": "Nodes & Health", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 65 }, "collapsed": false },
+
+    { "id": 21, "type": "timeseries", "title": "Node CPU utilisation %", "gridPos": { "h": 8, "w": 8, "x": 0, "y": 66 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])))", "refId": "A", "legendFormat": "__auto" } ],
+      "fieldConfig": { "defaults": { "unit": "percent" }, "overrides": [] } },
+
+    { "id": 22, "type": "timeseries", "title": "Node memory available", "gridPos": { "h": 8, "w": 8, "x": 8, "y": 66 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "node_memory_MemAvailable_bytes", "refId": "A", "legendFormat": "__auto" } ],
+      "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] } },
+
+    { "id": 23, "type": "timeseries", "title": "Node filesystem available (/)", "gridPos": { "h": 8, "w": 8, "x": 16, "y": 66 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "node_filesystem_avail_bytes{mountpoint=\"/\"}", "refId": "A", "legendFormat": "__auto" } ],
+      "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] } },
+
+    { "id": 24, "type": "timeseries", "title": "Prometheus scrape health (up by job)", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 74 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "up{namespace=\"eshtry-mny\"}", "refId": "A", "legendFormat": "__auto" } ] },
+
+    { "id": 25, "type": "timeseries", "title": "MongoDB pod resources", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 74 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"eshtry-mny\",pod=~\"mongodb-.*\",container!=\"\"}[5m]))", "refId": "cpu", "legendFormat": "cpu cores" },
+        { "expr": "sum(container_memory_working_set_bytes{namespace=\"eshtry-mny\",pod=~\"mongodb-.*\",container!=\"\"})", "refId": "mem", "legendFormat": "memory bytes" }
+      ] }
+  ]
+}
