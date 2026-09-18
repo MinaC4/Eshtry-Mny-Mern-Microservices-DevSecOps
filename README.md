@@ -1,223 +1,171 @@
-# Eshtry-Mny — MERN Microservices + DevSecOps + GitOps (Jenkins, Trivy, Helm, Argo CD)
+# Eshtry-Mny — MERN Microservices on k3s (DevSecOps + GitOps)
 
-## Architecture diagram
+An e-commerce demo built as **MERN microservices** (Node.js/Express + MongoDB + React) and run on a
+self-hosted **k3s** homelab with a full **DevSecOps supply chain**: Jenkins CI → Harbor (signed,
+digest-pinned images) → Git → Argo CD → Kyverno admission, plus Prometheus/Grafana monitoring.
+
+**Live app:** http://eshtry-mny.192.168.1.8.nip.io
 
 ![Eshtry-Mny architecture diagram](docs/Architecture-diagram.png)
 
-An e-commerce demo built as **MERN microservices** (Node.js/Express + MongoDB + React) and deployed to **Kubernetes** using **Helm**, with a **DevSecOps CI/CD pipeline** in **Jenkins** and **GitOps[...] 
+> This repository started from a cloud reference design (Docker Hub, AWS Secrets Manager, ingress-nginx,
+> MongoDB Atlas). It has been adapted to the operator's real homelab; see
+> [`docs/COMPARISON.md`](docs/COMPARISON.md) for the full received-vs-delivered diff and
+> [`docs/01-ADR-0001-homelab-adaptation.md`](docs/01-ADR-0001-homelab-adaptation.md) for the decisions.
 
+## Services
 
-## What's in this repo
+| Service | Path | Runtime | Port | Notes |
+|---|---|---|---|---|
+| frontend | `front-end/` | React 18 + Vite, served by `nginx-unprivileged` | 8080 (container) / 80 (Service) | proxies `/api/v1/*`, SPA fallback |
+| user-service | `User/` | Node 20 / Express | 9001 | bcrypt, JWT httpOnly cookie, register/login/logout/profile |
+| product-service | `Product/` | Node 20 / Express | 9000 | public reads, admin-only writes, filters |
+| cart-service | `Cart/` | Node 20 / Express | 9003 | JWT required; calls product-service |
+| mongodb | in-cluster StatefulSet | MongoDB 7 | 27017 | dedicated, `local-path` PVC, not exposed |
 
-### Application services
+All three backends share: `helmet`, CORS locked to `FRONTEND_ORIGIN`, two-tier rate limiting,
+centralized error handling, Zod validation, pino logging, `/health` (liveness) and `/ready`
+(readiness gated on MongoDB), and Prometheus `/metrics`.
 
-- **Frontend**: React (Vite) in `front-end/`, built into a static bundle and served by nginx (uses `nginxinc/nginx-unprivileged:1.27-alpine` running on container port `8080` with `emptyDir` volume[...]
-- **User service**: Node.js/Express in `User/` (API on `9001`)
-- **Product service**: Node.js/Express in `Product/` (API on `9000`)
-- **Cart service**: Node.js/Express in `Cart/` (API on `9003`)
-- **Service communication**: Cart stores cart entries in MongoDB and fetches product details from Product over HTTP via `PRODUCT_SERVICE_URL`
-- **Database**: MongoDB (Atlas in this setup)
+## What runs on the homelab
 
+- **Ingress:** Traefik (class `traefik`, `kube-system`) — not ingress-nginx.
+- **Database:** in-cluster MongoDB StatefulSet in `eshtry-mny` (no Atlas); NetworkPolicy egress is
+  restricted to the Mongo pods only.
+- **Secrets:** a local Kubernetes Secret created out-of-band by
+  [`ci/scripts/create-secrets.sh`](ci/scripts/create-secrets.sh) and never committed. The chart does
+  not render it, so Argo CD never reverts/prunes it. (The cluster's ESO↔Vault wiring is non-functional,
+  so ESO is gated off.)
+- **Registry:** the operator's **Harbor** at `192.168.1.8:30082/eshtry-mny` (project-scoped robots;
+  pull-only for the cluster, push for CI).
+- **Delivery:** **Argo CD** is the deployer of record (auto-sync, `prune`, `selfHeal`); manual
+  `helm upgrade` is retired.
+- **Scale:** HPA min 1 / max 3; PDB `maxUnavailable: 1`.
 
-### DevSecOps & GitOps
+## CI/CD pipeline (Jenkins)
 
-- **CI/CD**: `Jenkinsfile`
-  - Secret scanning with **gitleaks**
-  - Dependency checks with **npm audit**
-  - Container image scanning with **Trivy**, including a HIGH/CRITICAL-severity gate using `--exit-code 1`
-  - Build + push images to **Docker Hub**
-  - Update Helm image tags in `eshtry-mny/values.yaml` using `yq`, commit the build tag, and push `HEAD:main` for Argo CD to apply
-- **Kubernetes**:
-  - Raw manifests for reference in `k8s/base/`
-  - Helm chart in `eshtry-mny/`
-- **Argo CD**: GitOps application definition in `argocd-application.yaml`
+[`Jenkinsfile`](Jenkinsfile) — job `eshtry-mny`, triggered by the Jenkins API (no webhook; Jenkins is
+LAN-only). Stages:
 
-## Repository structure 
+1. **Checkout Code**
+2. **Quality & Tests** — gitleaks (blocking secret scan) + `npm test` for the three backends
+3. **SonarQube Analysis** — optional (`SONAR_ENABLED`), containerised scanner
+4. **Build & Dependency Audit** — build 4 images + `npm audit --omit=dev --audit-level=high`
+5. **Security: Docker Scan (Trivy)** — HIGH/CRITICAL blocking, shared offline DB cache
+6. **Supply Chain: SBOM (Syft)** — CycloneDX JSON per image, archived
+7. **Registry Login & Push** — Harbor robot
+8. **Supply Chain: Sign & Verify (cosign)** — key-based, **by digest**
+9. **Helm Lint & Template**
+10. **Update GitOps Manifest** — pins image **digests** into `eshtry-mny/values.yaml` and pushes
+
+## GitOps (Argo CD)
+
+[`argocd-application.yaml`](argocd-application.yaml) defines `Application eshtry-mny` pointing at this
+repo (`main`, path `eshtry-mny`) with automated sync + self-heal + prune. A **PostSync smoke Job**
+walks `/ → register → login → add-to-cart → checkout` through the Ingress after each sync.
+
+## Security controls
+
+- **App:** bcrypt, JWT (HS256, explicit algorithm) in httpOnly/SameSite=Strict cookies, Zod validation
+  (including catalog filters), RBAC (`requireRole('admin')`), rate limiting, fail-fast DB access.
+- **Container/K8s:** non-root numeric UID, `readOnlyRootFilesystem`, `capabilities.drop: [ALL]`,
+  `seccompProfile: RuntimeDefault`, `allowPrivilegeEscalation: false`, probes, resources, anti-affinity.
+- **Supply chain:** private Harbor, SBOM, cosign signing/verification, digest pinning, Trivy = 0
+  HIGH/CRITICAL, gitleaks.
+- **Network:** default-deny NetworkPolicies; each service reaches only DNS, MongoDB, and its peers
+  (enforcement proven — see [`docs/09-network-security.md`](docs/09-network-security.md)).
+- **Admission (Kyverno, scoped to `eshtry-mny`):** `deny-latest-tag`, `require-non-root`,
+  `require-readonly-rootfs`, `require-resource-limits` (Enforce) and `verify-images` (**Audit** — see
+  [`docs/08-policy-as-code.md`](docs/08-policy-as-code.md) for why Enforce is blocked on this cluster).
+
+Full list: [`docs/SECURITY.md`](docs/SECURITY.md).
+
+## Observability
+
+Backends expose `/metrics` (prom-client). A `ServiceMonitor` is scraped by the existing
+kube-prometheus-stack; the **Grafana dashboard `Eshtry-Mny`** (30 panels: overview stats, golden
+signals, latency percentiles, HPA/replicas, pod resources, network, nodes, health) is provisioned from
+[`eshtry-mny/dashboards/eshtry-mny.json`](eshtry-mny/dashboards/eshtry-mny.json).
+
+Grafana: `http://192.168.1.8:30084` (credentials in secret `prometheus-grafana`, namespace `monitoring`).
+
+## Repository structure
 
 ```text
 .
-├─ Jenkinsfile
-├─ docker-compose.yml
-├─ argocd-application.yaml
-├─ eshtry-mny/                 # Helm chart (templates + values)
-├─ k8s/base/                  
-├─ front-end/
-├─ User/
-├─ Product/
-└─ Cart/
+├─ Jenkinsfile                 # extended CI pipeline (Harbor, SBOM, cosign, digest pin)
+├─ argocd-application.yaml     # Argo CD Application
+├─ docker-compose.yml          # local dev
+├─ eshtry-mny/                 # Helm chart (templates + values + dashboards/)
+├─ ci/                         # services.yaml + scripts (sbom/sign/verify/create-secrets)
+├─ tests/smoke/                # smoke-test script (run by the Argo PostSync Job)
+├─ security/cosign.pub         # public key used for image verification
+├─ docs/                       # analysis, threat model, ADR, phase reports, SECURITY/EVIDENCE/DEMO
+├─ front-end/                  # React + Vite (nginx-unprivileged)
+├─ User/  Product/  Cart/      # Express microservices
+├─ k8s/base/                   # non-canonical reference manifests (not deployed from)
+└─ products.json               # Product-collection seed data (26 docs)
 ```
 
-## CI/CD pipeline (DevSecOps)
-
-The Jenkins pipeline in `Jenkinsfile` implements these stages:
-
-- **Checkout Code**: fetch repository source
-- **Security: Secret Scan (gitleaks)**: scans for leaked secrets with `--exit-code=1` (fails on any finding)
-- **Build Docker Images**: builds images for `User`, `Product`, `Cart`, and `front-end`
-- **Security: Dependency Audit**: runs `npm audit --audit-level=high` for each Node project (fails on HIGH/CRITICAL)
-- **Security: Docker Scan (Trivy)**: scans each built image for **HIGH/CRITICAL** vulnerabilities with `--exit-code 1` (fails on findings)
-- **Push Images to Docker Hub**: authenticates using Jenkins credentials and pushes versioned images (tag = Jenkins `BUILD_NUMBER`)
-- **Update GitOps Manifest**: updates the `images.user`, `images.product`, `images.cart`, and `images.frontend` entries in `eshtry-mny/values.yaml` using `yq`, commits the build tag, and pushes `H[...]
-
-Jenkins builds, scans, and publishes the images, then records the new image tags in git. It does not run `helm upgrade --install` against the live cluster.
-
-## GitOps delivery with Argo CD
-
-`argocd-application.yaml` defines an Argo CD `Application` named `eshtry-mny` that:
-
-- Pulls the Helm chart from `https://github.com/MinaC4/Eshtry-Mny-Mern-Microservices-DevSecOps.git` at the repo path `eshtry-mny/`
-- Deploys into the `eshtry-mny` namespace
-- Uses **automated sync** with:
-  - **prune**: removes deleted manifests
-  - **selfHeal**: reconciles drift automatically
-- Jenkins builds images, tags `eshtry-mny/values.yaml` with `yq`, and pushes the commit. Argo CD detects the committed Helm values change and syncs it automatically — there are **no Argo CD Imag[...]
-
-Argo CD is the only component that applies Kubernetes changes to the cluster. After Jenkins pushes updated image tags, Argo CD detects the committed Helm values change and syncs it automatically.
-
-## Kubernetes + Helm deployment
-
-### Helm chart
-
-The Helm chart in `eshtry-mny/` templates:
-
-- Deployments + Services for **user**, **product**, **cart**, and **frontend`
-- A shared `ConfigMap` (`app-config`) for non-secret settings
-- A shared `Secret` (`app-secrets`) for sensitive settings (populated via **External Secrets Operator** from AWS Secrets Manager — see `eshtry-mny/templates/externalsecret.yaml` for the key mapp[...]
-- A dedicated `eshtry-mny` namespace
-- Health probes and resource requests/limits on all backend deployments
-- Container `securityContext` settings with `runAsNonRoot: true`, `readOnlyRootFilesystem: true`, and `allowPrivilegeEscalation: false`
-- **Pod Anti-Affinity** (soft) to spread pods across nodes
-- **RollingUpdate** strategy with `maxUnavailable: 0` for zero-downtime deployments
-- **HorizontalPodAutoscaler** (CPU 70%, Memory 80%, min 3 / max 10 replicas)
-- **PodDisruptionBudget** (`minAvailable: 1`) for high availability during maintenance
-- **NetworkPolicies**: default deny-all, with explicit allow rules per service (Ingress from nginx, service-to-service, egress to MongoDB)
-- An `Ingress` that routes:
-  - `/` → frontend
-  - `/api/v1/users` → user service
-  - `/api/v1/products` → product service
-  - `/api/v1/cart` → cart service
-- **TLS**: not currently configured. The Ingress serves HTTP only. To add TLS, install cert-manager, create a ClusterIssuer, and add the appropriate annotation to the Ingress.
-
-`k8s/base/configmap.yaml` and `eshtry-mny/values.yaml` ship with `CHANGE_ME` placeholders only. Secrets (`app-secrets`) are managed by **External Secrets Operator** from AWS Secrets Manager — s[...]
-
-Backends restrict CORS to `FRONTEND_ORIGIN` from the environment, which defaults to `http://localhost:5173` as shown in `.env.example`.
-
-### Admission Control (Kyverno)
-
-Cluster policies in `eshtry-mny/templates/kyverno-policies.yaml` enforce:
-
-- `runAsNonRoot: true` on all containers
-- `readOnlyRootFilesystem: true` on all containers
-- CPU/memory requests and limits required
-- Image tag `:latest` rejected
-
-### Example install/upgrade
-
-From the repo folder:
+## Run locally (docker-compose)
 
 ```bash
-cd eshtry-mny
-helm upgrade --install eshtry-mny . -n eshtry-mny --create-namespace
+cp .env.example .env            # fill MongoDB credentials
+docker compose up --build       # frontend :5173, user :9001, product :9000, cart :9003
 ```
 
-## Cluster Prerequisites
+## Deploy / verify on the homelab
 
-Before deploying with Helm/ArgoCD, ensure the following are in place:
+Deployment is GitOps-only: change the chart or the Jenkins digest pin and push; Argo CD syncs.
 
-1. **External Secrets Operator (ESO)**: Must be pre-installed cluster-wide. An IRSA-authorized ServiceAccount named `external-secrets-sa` must exist in the target namespace. The chart's `External[...]
-2. **Ingress Controller**: The NetworkPolicies expect the ingress controller to run in a namespace named exactly `ingress-nginx` (the default for the ingress-nginx Helm chart). If your ingress co[...]
-3. **MongoDB Atlas**: Backends connect to MongoDB Atlas. The NetworkPolicy egress rule allows `0.0.0.0/0:27017` because Atlas does not provide a fixed IP range — this is an accepted tradeoff.
-
-## Quickstart (one command)
-
-Clone the repo and run the setup script for your platform:
-
-**macOS / Linux:**
 ```bash
-./scripts/setup-mac.sh
+kubectl get application eshtry-mny -n argocd     # Synced / Healthy
+kubectl get pods -n eshtry-mny                   # 5/5 Running
+kubectl logs -n eshtry-mny-tests job/smoke-test  # SMOKE OK
 ```
 
-**Windows (PowerShell):**
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\\setup-windows.ps1
-```
+Images are pulled from Harbor; `values.yaml` references them **by digest**.
 
-The script will:
+## API (through the Ingress)
 
-1. Check Docker is installed and running
-2. Prompt for MongoDB Atlas credentials (if `.env` doesn't exist)
-3. Build and start all services
-4. Wait for backends to pass health checks
-5. Print URLs for frontend and APIs
+| Method | Path | Auth |
+|---|---|---|
+| POST | `/api/v1/users` | public (register) |
+| POST | `/api/v1/users/login` / `/logout` | public |
+| GET | `/api/v1/users` | JWT (profile) |
+| GET | `/api/v1/products` · `/api/v1/products/:idOrName` | public |
+| POST | `/api/v1/products` | JWT + admin |
+| GET | `/api/v1/filter/category/:c` · `/price/:p` · `/categoryprice/:c&&:p` | public |
+| GET/POST/DELETE | `/api/v1/cart` · `/api/v1/cart/:productid` · `/api/v1/cart/checkout` | JWT |
 
-After setup, access the app at http://localhost:5173
+## Documentation
 
-To stop: `docker compose down`
+- [`docs/SECURITY.md`](docs/SECURITY.md) — controls → threat → verification
+- [`docs/EVIDENCE.md`](docs/EVIDENCE.md) — indexed evidence bundle
+- [`docs/COMPARISON.md`](docs/COMPARISON.md) — received vs delivered
+- [`docs/DEMO.md`](docs/DEMO.md) — end-to-end walkthrough
+- [`docs/GAP-ANALYSIS.md`](docs/GAP-ANALYSIS.md) — what is done vs remaining
+- [`docs/STATE.md`](docs/STATE.md) — current state and resume point
+- `docs/0x-*.md` + `docs/phases/` — per-phase analysis and reports
 
-## Manual setup (advanced)
+## Screenshots (tooling)
 
-If you prefer manual control:
-
-1. Copy `.env.example` to `.env` and fill in your MongoDB Atlas credentials.
-2. Run `docker compose up --build`
-
-Ports:
-
-- `5173` → frontend
-- `9001` → user service
-- `9000` → product service
-- `9003` → cart service
-
-All four services build from multi-stage Dockerfiles. The backend images run in production mode as non-root users with `node server.js`; the frontend image also runs as a non-root user and serves[...]
-
-## Tooling screenshots
-
-### MongoDB Atlas (documents)
-
-![MongoDB Atlas users collection](docs/screenshots/screenshot-01.png)
-
-### MongoDB Atlas (data model diagram)
-
-![MongoDB Atlas data model](docs/screenshots/screenshot-02.png)
-
-### Jenkins pipeline run (stages)
+### Jenkins pipeline
 
 ![Jenkins pipeline stages](docs/screenshots/screenshot-03.png)
 
-
-### Argo CD application tree (synced/healthy)
+### Argo CD application (synced/healthy)
 
 ![Argo CD application tree](docs/screenshots/screenshot-07.png)
 
-### Kubernetes Dashboard (workloads overview)
+### Kubernetes workloads
 
 ![Kubernetes Dashboard workloads](docs/screenshots/screenshot-08.png)
 
-### Kubernetes Dashboard (replica sets/services)
+## Honest limitations
 
-![Kubernetes Dashboard replica sets](docs/screenshots/screenshot-09.png)
-
----
-
-## Homelab deployment (this cluster) — what actually runs here
-
-The sections above describe the original cloud-reference design. This deployment was adapted to the operator's real k3s homelab; see `docs/COMPARISON.md` for the full list. Key differences:
-
-- **Ingress:** Traefik (class `traefik`, `kube-system`) at `http://eshtry-mny.192.168.1.8.nip.io` — not ingress-nginx.
-- **Database:** dedicated in-cluster MongoDB StatefulSet in `eshtry-mny` (no Atlas); NetworkPolicy egress restricted to the Mongo pods only.
-- **Secrets:** local Kubernetes Secret created out-of-band (`ci/scripts/create-secrets.sh`), never committed; AWS/Vault ESO gated off (the cluster's ESO↔Vault wiring is non-functional).
-- **Registry:** the operator's Harbor (`192.168.1.8:30082/eshtry-mny`), not Docker Hub.
-- **Pipeline:** Jenkins builds → tests → audits → Trivy → SBOM (Syft) → push → **cosign sign by digest** → verify → **pin digests** into `values.yaml`.
-- **Delivery:** Argo CD auto-syncs the digest-pinned chart (manual `helm upgrade` retired); a PostSync smoke Job runs the full user journey.
-- **Admission:** Kyverno policies scoped to `eshtry-mny` (no `:latest`, non-root, read-only rootfs, limits). `verify-images` is in **Audit** (see `docs/08-policy-as-code.md`).
-- **Scale:** HPA min 1 / max 3 for the homelab.
-
-Docs: `docs/` (analysis, threat model, ADR, phase reports, `SECURITY.md`, `EVIDENCE.md`, `COMPARISON.md`, `DEMO.md`), state in `docs/STATE.md`.
-
-### Local run / verification
-```
-kubectl get application eshtry-mny -n argocd          # Synced / Healthy
-kubectl get pods -n eshtry-mny                        # 5/5 Running
-kubectl logs -n eshtry-mny-tests job/smoke-test       # SMOKE OK
-```
-
+- **HTTP only** on the LAN (no TLS); auth cookie `secure` is therefore disabled for the HTTP origin.
+- **Kyverno `verify-images` is in Audit**, not Enforce: Kyverno 1.18.2 rejects a bearer realm served by
+  a private IP (Harbor here). CI `cosign verify` is the enforced signature gate.
+- **Local Kubernetes Secret** instead of Vault/ESO (the cluster's ESO↔Vault wiring is broken).
+- No Falco runtime detection; ZAP DAST not yet run; branch protection on `main` not enabled.
