@@ -19,4 +19,11 @@ ZAP baseline was attempted as a pod in `eshtry-mny-tests` against the Ingress. T
 - Backends expose Prometheus metrics via `prom-client` (`/metrics`): default process/node metrics plus `http_requests_total{method,route,status}` and `http_request_duration_seconds` histogram.
 - `ServiceMonitor eshtry-mny-backends` (label `release: prometheus`) scrapes user/product/cart every 30s; a `allow-prometheus` NetworkPolicy admits the `monitoring` namespace.
 - **Verified**: Prometheus `up{namespace="eshtry-mny"}` = **1** for all three; `sum(http_requests_total{namespace="eshtry-mny"})` = 899; p95 latency ≈ 0.0095s.
-- **Grafana dashboard `Eshtry-Mny`** (uid `eshtry-mny`, 5 panels: pods running, request rate, 5xx error rate, p95 latency, pod restarts) loaded by the Grafana sidecar (verified via the Grafana API).
+- **Grafana dashboard `Eshtry-Mny`** (uid `eshtry-mny`) — detailed, **31 panels** across 5 rows, loaded by the Grafana sidecar (verified via the Grafana API):
+  1. **Overview** (stats): pods running, requests/sec, 5xx error rate %, p95 latency, pod restarts (1h), scrape targets up.
+  2. **Traffic & Errors**: request rate by service, requests by HTTP status, 5xx by service, top routes.
+  3. **Latency**: p50/p90/p95/p99 by service, average latency by route.
+  4. **Workloads & Scaling**: deployment ready vs desired replicas, HPA current vs max, pod restarts, pods ready.
+  5. **Resources (pods)**: CPU, memory working set, network RX/TX per pod.
+  6. **Nodes & Health**: node CPU %, memory available, filesystem available, scrape health, MongoDB pod resources.
+  Source JSON: `eshtry-mny/dashboards/eshtry-mny.json` (embedded by Helm).
