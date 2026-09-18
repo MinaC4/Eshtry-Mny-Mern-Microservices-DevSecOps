@@ -1,10 +1,10 @@
-# Architecture diagram — prompt (matches the current project state)
+# Architecture diagram (matches the current project state)
 
-Use this to regenerate the architecture diagram so it reflects what actually runs on the homelab.
-Two options: an **image-generation prompt** (for DALL·E/Midjourney/etc.) and a **Mermaid** version
+Reference for regenerating the architecture diagram so it reflects what actually runs on the homelab.
+Two formats: a **textual description** of the diagram and a **Mermaid** source
 (exact, no text distortion — best for draw.io / mermaid.live / `mermaid-cli`).
 
-## Option A — Image-generation prompt
+## Diagram description
 
 ```
 Create a clean, modern, flat-style technical architecture diagram for a MERN microservices
@@ -79,7 +79,7 @@ STYLE RULES:
  - Do NOT invent components (no cloud services, no AWS, no Atlas, no ingress-nginx, no Kafka).
 ```
 
-## Option B — Mermaid (exact)
+## Mermaid source
 
 ```mermaid
 flowchart LR
@@ -140,5 +140,5 @@ flowchart LR
   class K1,K2 sec;
 ```
 
-> Image generators distort long/technical labels; for exact output prefer the Mermaid version
-> rendered with `mermaid-cli` (`mmdc -i docs/architecture-diagram-prompt.md ...`) or draw.io.
+> For an exact render use the Mermaid source with `mermaid-cli`
+> (`mmdc -i docs/architecture-diagram.md -o docs/Architecture-diagram.png`) or draw.io.
