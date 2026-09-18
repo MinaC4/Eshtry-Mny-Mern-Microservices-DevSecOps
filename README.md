@@ -6,7 +6,7 @@ digest-pinned images) → Git → Argo CD → Kyverno admission, plus Prometheus
 
 **Live app:** http://eshtry-mny.192.168.1.8.nip.io
 
-![Eshtry-Mny architecture diagram](docs/Architecture-diagram.png)
+![Eshtry-Mny architecture diagram](docs/fb2bd2eb-1ce5-405b-a71f-918b18903754.png)
 
 > This repository started from a cloud reference design (Docker Hub, AWS Secrets Manager, ingress-nginx,
 > MongoDB Atlas). It has been adapted to the operator's real homelab; see
