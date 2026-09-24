@@ -14,7 +14,11 @@ const validateToken = asyncHandler(async (req, res, next) => {
         }
     }
     if (token) {
-        jwt.verify(token, process.env.ACCESS_TOKEN, { algorithms: ['HS256'] }, (err, decoded) => {
+        const publicKey = process.env.JWT_PUBLIC_KEY && process.env.JWT_PUBLIC_KEY.replace(/\\n/g, '\n');
+        const verify = publicKey
+            ? (cb) => jwt.verify(token, publicKey, { algorithms: ['RS256'] }, cb)
+            : (cb) => jwt.verify(token, process.env.ACCESS_TOKEN, { algorithms: ['HS256'] }, cb);
+        verify((err, decoded) => {
             if (err) {
                 logger.warn({ err: err.message }, 'JWT verification failed');
                 return res.status(401).json({ error: 'Unauthorized', message: "User is not authorized" });

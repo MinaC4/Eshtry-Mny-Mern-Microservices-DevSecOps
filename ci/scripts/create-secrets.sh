@@ -42,6 +42,18 @@ kubectl create secret generic app-secrets -n "$NS" \
   --from-literal=INTERNAL_TOKEN="$it" \
   --dry-run=client -o yaml | kubectl apply -f -
 
+# JWT signing keys (RS256): private key only reaches user-service, public key
+# reaches product/cart. Kept in a separate Secret so envFrom(app-secrets) never
+# leaks the private key to every service.
+JWT_PRIV_FILE="${JWT_PRIV_FILE:-$HOME/.config/eshtry-mny/jwt.key}"
+JWT_PUB_FILE="${JWT_PUB_FILE:-$HOME/.config/eshtry-mny/jwt.pub}"
+if [ -f "$JWT_PRIV_FILE" ] && [ -f "$JWT_PUB_FILE" ]; then
+  kubectl create secret generic jwt-keys -n "$NS" \
+    --from-file=JWT_PRIVATE_KEY="$JWT_PRIV_FILE" \
+    --from-file=JWT_PUBLIC_KEY="$JWT_PUB_FILE" \
+    --dry-run=client -o yaml | kubectl apply -f -
+fi
+
 kubectl create secret docker-registry harbor-creds -n "$NS" \
   --docker-server="$reg" \
   --docker-username="$hu" \

@@ -83,3 +83,8 @@ spec:
                 secretKeyRef:
                   name: app-secrets
                   key: MONGO_URI_PRODUCT
+            - name: JWT_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-keys
+                  key: JWT_PUBLIC_KEY

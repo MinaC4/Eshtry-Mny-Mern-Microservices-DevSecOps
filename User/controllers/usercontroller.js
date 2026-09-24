@@ -52,11 +52,12 @@ const loginUser = async (req, res, next) => {
         const user = await userModel.findOne({ email });
 
         if (user && (await bcrypt.compare(password, user.password))) {
-            const accessToken = jwt.sign(
-                { user: { id: user._id, role: user.role } },
-                process.env.ACCESS_TOKEN,
-                { expiresIn: "1h" }
-            );
+            // Sign RS256 with the private key when available (product/cart verify
+            // with the public key only); fall back to HS256 for local/dev/test.
+            const privateKey = process.env.JWT_PRIVATE_KEY && process.env.JWT_PRIVATE_KEY.replace(/\\n/g, '\n');
+            const accessToken = privateKey
+                ? jwt.sign({ user: { id: user._id, role: user.role } }, privateKey, { algorithm: 'RS256', expiresIn: '1h' })
+                : jwt.sign({ user: { id: user._id, role: user.role } }, process.env.ACCESS_TOKEN, { expiresIn: '1h' });
 
             logger.info({ userId: user._id, email }, 'User logged in successfully');
             // Secure cookies require HTTPS. Only mark secure when the public
