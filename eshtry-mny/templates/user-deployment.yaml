@@ -77,3 +77,9 @@ spec:
                 name: app-secrets
             - configMapRef:
                 name: app-config
+          env:
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: MONGO_URI_USER

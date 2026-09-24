@@ -21,10 +21,23 @@ if [ -z "$reg" ] || [ "$reg" = "null" ]; then
 fi
 reg="${reg:-192.168.1.8:30082}"
 
+# Per-service MongoDB least-privilege credentials (E-02). Each service gets its own
+# account (see ci/scripts/create-mongo-users.sh for the roles).
+dbn=$(yq -r '.mongoDbname' eshtry-mny/values.yaml)
+uu=$(yq -r '.secrets.mongoSvcUser.username' "$VALUES");    up=$(yq -r '.secrets.mongoSvcUser.password' "$VALUES")
+pu=$(yq -r '.secrets.mongoSvcProduct.username' "$VALUES"); pp=$(yq -r '.secrets.mongoSvcProduct.password' "$VALUES")
+cu=$(yq -r '.secrets.mongoSvcCart.username' "$VALUES");    cp=$(yq -r '.secrets.mongoSvcCart.password' "$VALUES")
+uri_user="mongodb://$uu:$up@mongodb:27017/$dbn?authSource=eshtry_mny"
+uri_product="mongodb://$pu:$pp@mongodb:27017/$dbn?authSource=eshtry_mny"
+uri_cart="mongodb://$cu:$cp@mongodb:27017/$dbn?authSource=eshtry_mny"
+
 kubectl create secret generic app-secrets -n "$NS" \
   --from-literal=MONGO_USERNAME="$u" \
   --from-literal=MONGO_PASSWORD="$p" \
   --from-literal=MONGO_URI="$uri" \
+  --from-literal=MONGO_URI_USER="$uri_user" \
+  --from-literal=MONGO_URI_PRODUCT="$uri_product" \
+  --from-literal=MONGO_URI_CART="$uri_cart" \
   --from-literal=ACCESS_TOKEN="$tok" \
   --from-literal=INTERNAL_TOKEN="$it" \
   --dry-run=client -o yaml | kubectl apply -f -

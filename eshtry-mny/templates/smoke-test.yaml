@@ -44,7 +44,7 @@ spec:
                 -d "{\"email\":\"$EMAIL\",\"password\":\"Password123\"}"
               PID=$($CURL "$BASE/api/v1/products" | tr ',' '\n' | grep -m1 '_id' | sed 's/.*"\([a-f0-9]\{24\}\)".*/\1/')
               $CURL -b /tmp/cj -o /dev/null -X POST "$BASE/api/v1/cart/$PID"
-              $CURL -b /tmp/cj -X DELETE "$BASE/api/v1/cart/checkout" | grep -q "Checkout completed"
+              $CURL -b /tmp/cj -X DELETE "$BASE/api/v1/cart/checkout" | grep -q "orderId"
               echo "SMOKE OK"
           volumeMounts:
             - name: tmp

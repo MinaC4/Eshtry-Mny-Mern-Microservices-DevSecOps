@@ -36,21 +36,18 @@ function CheckOut() {
   }, []);
 
   function submitHandler() {
-    const items = products;
-    const orderTotal = total;
     axios.delete(`${API_BASE}/cart/checkout`)
       .then((response) => {
-        if (response.status === 200) {
-          setReceipt({
-            orderId: `ORD-${Date.now().toString(36).toUpperCase()}`,
-            date: new Date().toLocaleString(),
-            email: email || "—",
-            items,
-            total: orderTotal
-          });
-          setProducts([]);
-          setTotal(0);
-        }
+        const d = response.data || {};
+        setReceipt({
+          orderId: d.orderId || "—",
+          date: d.createdAt ? new Date(d.createdAt).toLocaleString() : new Date().toLocaleString(),
+          email: email || "—",
+          items: d.items || [],
+          total: typeof d.total === "number" ? d.total : 0
+        });
+        setProducts([]);
+        setTotal(0);
       })
       .catch((error) => {
         if (error.response?.status === 401) { window.location.href = "/login"; }

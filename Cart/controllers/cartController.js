@@ -1,13 +1,14 @@
 const CartModel = require('../models/cartModel');
+const OrderModel = require('../models/orderModel');
 const axios = require('axios');
 const axiosRetry = require('axios-retry').default;
 const logger = require('../config/logger');
 
 const PRODUCT_SERVICE_URL = process.env.PRODUCT_SERVICE_URL || 'http://product-service:9000';
 
-// Configure axios-retry: 2 retries with exponential backoff, 3 s timeout per request
-// Internal token lets these service-to-service calls bypass the product-service rate
-// limiter (which is keyed per source IP and would otherwise be shared by all users).
+// Configure axios-retry: 2 retries with exponential backoff, 3 s timeout per request.
+// The internal token lets these service-to-service calls bypass the product-service
+// rate limiter (keyed per source IP, otherwise shared by every user).
 const axiosInstance = axios.create({
     timeout: 3000,
     headers: process.env.INTERNAL_TOKEN ? { 'x-internal-token': process.env.INTERNAL_TOKEN } : {}
@@ -20,42 +21,51 @@ axiosRetry(axiosInstance, {
         (err.response && err.response.status >= 500),
 });
 
+// Load the products referenced by a user's cart. Returns how many lookups failed
+// so callers can surface an explicit upstream error instead of a silent partial cart.
+const loadCartProducts = async (userId) => {
+    const cartProducts = await CartModel.find({ UserId: userId });
+    const ids = cartProducts.map((cartProduct) => cartProduct.ProductId);
+
+    let products = [];
+    let total = 0;
+    let failures = 0;
+
+    if (ids.length > 0) {
+        const results = await Promise.all(
+            ids.map((id) =>
+                axiosInstance.get(`${PRODUCT_SERVICE_URL}/api/v1/products/${id}`)
+                    .then((r) => ({ ok: true, data: r.data }))
+                    .catch((err) => {
+                        logger.error({ err, productId: id }, 'Failed to fetch product from Product service');
+                        return { ok: false, id };
+                    })
+            )
+        );
+        failures = results.filter((r) => !r.ok).length;
+        products = results.filter((r) => r.ok).map((r) => r.data);
+        products.forEach((product) => { total += product.price; });
+    }
+
+    return { products, total, failures };
+};
+
+const upstreamError = (res, failures) =>
+    res.status(502).json({
+        error: 'UpstreamError',
+        message: 'Could not load some cart items from the product service',
+        failedItems: failures
+    });
+
 const getCartProducts = async (req, res, next) => {
     try {
-        const cartProducts = await CartModel.find({ UserId: req.user.id });
-        const cartProductIds = cartProducts.map(cartProduct => cartProduct.ProductId);
-
-        let Products = [];
-        let total = 0;
-
-        if (cartProductIds.length > 0) {
-            const results = await Promise.all(
-                cartProductIds.map(id =>
-                    axiosInstance.get(`${PRODUCT_SERVICE_URL}/api/v1/products/${id}`)
-                        .then(r => ({ ok: true, data: r.data }))
-                        .catch((err) => {
-                            logger.error({ err, productId: id }, 'Failed to fetch product from Product service');
-                            return { ok: false, id };
-                        })
-                )
-            );
-            const failures = results.filter(r => !r.ok).length;
-            Products = results.filter(r => r.ok).map(r => r.data);
-            Products.forEach(product => {
-                total += product.price;
-            });
-            if (failures > 0) {
-                logger.warn({ userId: req.user.id, failures }, 'Cart response incomplete (product-service errors)');
-                return res.status(502).json({
-                    error: 'UpstreamError',
-                    message: 'Could not load some cart items from the product service',
-                    failedItems: failures
-                });
-            }
+        const { products, total, failures } = await loadCartProducts(req.user.id);
+        if (failures > 0) {
+            logger.warn({ userId: req.user.id, failures }, 'Cart response incomplete (product-service errors)');
+            return upstreamError(res, failures);
         }
-
-        logger.info({ userId: req.user.id, count: Products.length }, 'User fetched cart');
-        res.json({ Products, total });
+        logger.info({ userId: req.user.id, count: products.length }, 'User fetched cart');
+        res.json({ Products: products, total });
     } catch (err) {
         next(err);
     }
@@ -108,11 +118,32 @@ const deleteCartProduct = async (req, res, next) => {
     }
 };
 
+// Checkout persists a real Order (server-generated id) then clears the cart.
+// No payment is processed; this is the demo order record.
 const checkout = async (req, res, next) => {
     try {
-        const cartProducts = await CartModel.deleteMany({ UserId: req.user.id });
-        logger.info({ userId: req.user.id, deleted: cartProducts.deletedCount }, 'Cart checkout completed');
-        res.json({ message: 'Checkout completed', deletedCount: cartProducts.deletedCount });
+        const { products, total, failures } = await loadCartProducts(req.user.id);
+        if (failures > 0) {
+            return upstreamError(res, failures);
+        }
+        if (products.length === 0) {
+            return res.status(400).json({ error: 'EmptyCart', message: 'Cart is empty' });
+        }
+
+        const order = await OrderModel.create({
+            UserId: req.user.id,
+            items: products.map((p) => ({ ProductId: p._id, name: p.name, price: p.price })),
+            total
+        });
+        await CartModel.deleteMany({ UserId: req.user.id });
+
+        logger.info({ userId: req.user.id, orderId: order._id, total }, 'Order placed');
+        res.status(201).json({
+            orderId: order._id,
+            items: products.map((p) => ({ _id: p._id, name: p.name, category: p.category, price: p.price })),
+            total,
+            createdAt: order.createdAt
+        });
     } catch (err) {
         next(err);
     }

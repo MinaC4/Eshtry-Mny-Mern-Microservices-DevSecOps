@@ -1,12 +1,12 @@
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
-  name: deny-latest-tag
+  name: require-image-digest
 spec:
   validationFailureAction: Enforce
   background: true
   rules:
-    - name: deny-latest-image-tag
+    - name: require-digest
       match:
         any:
         - resources:
@@ -18,17 +18,17 @@ spec:
               - DaemonSet
               - Job
       validate:
-        message: "Image tag 'latest' is not allowed. Use a specific tag or digest."
+        message: "Images must be pinned by digest (image@sha256:...). Tags are mutable and not allowed."
         anyPattern:
           - spec:
               template:
                 spec:
                   containers:
-                    - image: "!*latest"
+                    - image: "*@sha256:*"
                   initContainers:
-                    - image: "!*latest"
+                    - image: "*@sha256:*"
           - spec:
               template:
                 spec:
                   containers:
-                    - image: "!*latest"
+                    - image: "*@sha256:*"

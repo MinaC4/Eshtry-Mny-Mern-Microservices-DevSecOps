@@ -26,6 +26,8 @@ const userRegister = async (req, res, next) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // role is intentionally NOT read from the request body: public registration
+        // always creates a 'customer' (any client-supplied role is ignored).
         const user = await userModel.create({
             email,
             password: hashedPassword,

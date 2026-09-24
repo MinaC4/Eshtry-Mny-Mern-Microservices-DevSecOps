@@ -33,7 +33,7 @@ registry:
 # In-cluster MongoDB (ADR D7). No cloud database.
 mongodb:
   enabled: true
-  image: "mongo:7.0"
+  image: "mongo:7.0@sha256:609d76574151bee8b148caee83cd9fec8b5f695e5a6db9f1e0f9dced0673574e"
   storageClass: "local-path"
   storageSize: "2Gi"
   resources:
