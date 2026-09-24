@@ -32,20 +32,28 @@ spec:
             - |
               set -e
               BASE="{{ .Values.smokeTest.baseUrl }}"
-              CURL="curl -fsS --retry 5 --retry-delay 5 --retry-all-errors"
-              echo "GET / -> $($CURL -o /dev/null -w '%{http_code}' "$BASE/")"
-              test "$($CURL -o /dev/null -w '%{http_code}' "$BASE/api/v1/products")" = "200"
-              test "$($CURL "$BASE/api/v1/products" | grep -o '"name"' | wc -l)" -ge 1
+              # Internal token lets the smoke test bypass the app rate limiters so
+              # repeated syncs and other traffic cannot make it flaky.
+              c() { curl -fsS --retry 5 --retry-delay 5 --retry-all-errors -H "x-internal-token: ${INTERNAL_TOKEN}" "$@"; }
+              echo "GET / -> $(c -o /dev/null -w '%{http_code}' "$BASE/")"
+              test "$(c -o /dev/null -w '%{http_code}' "$BASE/api/v1/products")" = "200"
+              test "$(c "$BASE/api/v1/products" | grep -o '"name"' | wc -l)" -ge 1
               EMAIL="smoke-test@eshtry.local"
               # fixed test account; register may 400 if it already exists -> ignore
-              $CURL -o /dev/null -X POST "$BASE/api/v1/users" -H 'Content-Type: application/json' \
+              c -o /dev/null -X POST "$BASE/api/v1/users" -H 'Content-Type: application/json' \
                 -d "{\"email\":\"$EMAIL\",\"password\":\"Password123\",\"firstName\":\"Smoke\",\"lastName\":\"Test\",\"age\":25,\"phone\":\"01000000001\",\"gender\":\"\"}" || true
-              $CURL -c /tmp/cj -o /dev/null -X POST "$BASE/api/v1/users/login" -H 'Content-Type: application/json' \
+              c -c /tmp/cj -o /dev/null -X POST "$BASE/api/v1/users/login" -H 'Content-Type: application/json' \
                 -d "{\"email\":\"$EMAIL\",\"password\":\"Password123\"}"
-              PID=$($CURL "$BASE/api/v1/products" | tr ',' '\n' | grep -m1 '_id' | sed 's/.*"\([a-f0-9]\{24\}\)".*/\1/')
-              $CURL -b /tmp/cj -o /dev/null -X POST "$BASE/api/v1/cart/$PID"
-              $CURL -b /tmp/cj -X DELETE "$BASE/api/v1/cart/checkout" | grep -q "orderId"
+              PID=$(c "$BASE/api/v1/products" | tr ',' '\n' | grep -m1 '_id' | sed 's/.*"\([a-f0-9]\{24\}\)".*/\1/')
+              c -b /tmp/cj -o /dev/null -X POST "$BASE/api/v1/cart/$PID"
+              c -b /tmp/cj -X DELETE "$BASE/api/v1/cart/checkout" | grep -q "orderId"
               echo "SMOKE OK"
+          env:
+            - name: INTERNAL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: internal-token
+                  key: INTERNAL_TOKEN
           volumeMounts:
             - name: tmp
               mountPath: /tmp

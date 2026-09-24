@@ -48,4 +48,12 @@ kubectl create secret docker-registry harbor-creds -n "$NS" \
   --docker-password="$hp" \
   --dry-run=client -o yaml | kubectl apply -f -
 
+# The PostSync smoke test runs in its own namespace and authenticates with the
+# internal token so it is not throttled by the app rate limiters.
+if kubectl get ns eshtry-mny-tests >/dev/null 2>&1; then
+  kubectl create secret generic internal-token -n eshtry-mny-tests \
+    --from-literal=INTERNAL_TOKEN="$it" \
+    --dry-run=client -o yaml | kubectl apply -f -
+fi
+
 echo "secrets app-secrets + harbor-creds applied in $NS"

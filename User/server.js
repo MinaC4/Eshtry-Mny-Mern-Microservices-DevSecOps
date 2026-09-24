@@ -83,6 +83,7 @@ app.get('/metrics', async (req, res) => {
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
+  skip: (req) => !!process.env.INTERNAL_TOKEN && req.headers['x-internal-token'] === process.env.INTERNAL_TOKEN,
   message: { error: 'TooManyRequests', message: 'Too many requests, please try again later' },
   standardHeaders: true,
   legacyHeaders: false
