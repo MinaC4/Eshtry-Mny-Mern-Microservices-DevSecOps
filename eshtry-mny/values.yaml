@@ -62,7 +62,7 @@ kyverno:
     action: Audit
 # PostSync smoke test (Phase 10). Runs in its own namespace via the Ingress.
 smokeTest:
-  enabled: true
+  enabled: false
   image: "curlimages/curl:8.10.1"
   baseUrl: "http://eshtry-mny.192.168.1.8.nip.io"
 # Observability via the existing kube-prometheus-stack.
