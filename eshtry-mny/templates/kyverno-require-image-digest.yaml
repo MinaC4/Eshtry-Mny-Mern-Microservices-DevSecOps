@@ -6,7 +6,7 @@ spec:
   validationFailureAction: Enforce
   background: true
   rules:
-    - name: require-digest
+    - name: require-digest-workloads
       match:
         any:
         - resources:
@@ -32,3 +32,23 @@ spec:
                 spec:
                   containers:
                     - image: "*@sha256:*"
+
+    - name: require-digest-pods
+      match:
+        any:
+        - resources:
+            namespaces:
+              - eshtry-mny
+            kinds:
+              - Pod
+      validate:
+        message: "Images must be pinned by digest (image@sha256:...). Tags are mutable and not allowed."
+        anyPattern:
+          - spec:
+              containers:
+                - image: "*@sha256:*"
+              initContainers:
+                - image: "*@sha256:*"
+          - spec:
+              containers:
+                - image: "*@sha256:*"
