@@ -79,10 +79,12 @@ app.get('/metrics', async (req, res) => {
   res.end(await register.metrics());
 });
 
-// Rate limiting
+// Rate limiting. Internal service-to-service calls (cart -> product) carry a shared
+// token and are exempt, so they never consume a user's per-IP budget.
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
+  skip: (req) => !!process.env.INTERNAL_TOKEN && req.headers['x-internal-token'] === process.env.INTERNAL_TOKEN,
   message: { error: 'TooManyRequests', message: 'Too many requests, please try again later' },
   standardHeaders: true,
   legacyHeaders: false

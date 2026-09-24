@@ -23,6 +23,7 @@ spec:
         app: smoke-test
     spec:
       restartPolicy: Never
+      automountServiceAccountToken: false
       containers:
         - name: smoke
           image: {{ .Values.smokeTest.image }}
@@ -35,9 +36,10 @@ spec:
               echo "GET / -> $($CURL -o /dev/null -w '%{http_code}' "$BASE/")"
               test "$($CURL -o /dev/null -w '%{http_code}' "$BASE/api/v1/products")" = "200"
               test "$($CURL "$BASE/api/v1/products" | grep -o '"name"' | wc -l)" -ge 1
-              EMAIL="smoke-$(date +%s)@example.com"
+              EMAIL="smoke-test@eshtry.local"
+              # fixed test account; register may 400 if it already exists -> ignore
               $CURL -o /dev/null -X POST "$BASE/api/v1/users" -H 'Content-Type: application/json' \
-                -d "{\"email\":\"$EMAIL\",\"password\":\"Password123\",\"firstName\":\"Smoke\",\"lastName\":\"Test\",\"age\":25,\"phone\":\"01000000001\",\"gender\":\"\"}"
+                -d "{\"email\":\"$EMAIL\",\"password\":\"Password123\",\"firstName\":\"Smoke\",\"lastName\":\"Test\",\"age\":25,\"phone\":\"01000000001\",\"gender\":\"\"}" || true
               $CURL -c /tmp/cj -o /dev/null -X POST "$BASE/api/v1/users/login" -H 'Content-Type: application/json' \
                 -d "{\"email\":\"$EMAIL\",\"password\":\"Password123\"}"
               PID=$($CURL "$BASE/api/v1/products" | tr ',' '\n' | grep -m1 '_id' | sed 's/.*"\([a-f0-9]\{24\}\)".*/\1/')
@@ -52,6 +54,8 @@ spec:
             runAsUser: 65534
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
             capabilities:
               drop:
                 - ALL

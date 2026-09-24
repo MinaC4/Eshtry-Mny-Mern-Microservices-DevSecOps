@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
+    }
+
     parameters {
         booleanParam(name: 'SONAR_ENABLED', defaultValue: false, description: 'Run SonarQube analysis (requires the sonar-token credential and a reachable server)')
         booleanParam(name: 'PUSH_GITOPS', defaultValue: true, description: 'Push the digest-pinned values.yaml back to Git for Argo CD')

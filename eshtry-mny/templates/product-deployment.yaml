@@ -27,6 +27,7 @@ spec:
           type: RuntimeDefault
       imagePullSecrets:
         - name: {{ .Values.registry.pullSecretName }}
+      automountServiceAccountToken: false
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

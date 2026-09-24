@@ -34,4 +34,4 @@ All claims below are backed by real command output captured during the engagemen
 - No TLS (HTTP-only LAN) — cookie `secure` disabled accordingly.
 - Falco runtime detection not installed (not approved).
 - ZAP DAST not run (documented waiver).
-- App-level Prometheus metrics absent.
+- App-level metrics **are** collected (prom-client `/metrics` + ServiceMonitor + Grafana dashboard "Eshtry-Mny" + PrometheusRule alerts).

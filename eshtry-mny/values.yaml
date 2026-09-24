@@ -71,6 +71,8 @@ monitoring:
     enabled: true
   dashboard:
     enabled: true
+  alerts:
+    enabled: true
 # ====================== Ingress ======================
 ingress:
   enabled: true

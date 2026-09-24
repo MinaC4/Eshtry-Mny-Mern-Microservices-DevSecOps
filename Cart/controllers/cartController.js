@@ -6,7 +6,12 @@ const logger = require('../config/logger');
 const PRODUCT_SERVICE_URL = process.env.PRODUCT_SERVICE_URL || 'http://product-service:9000';
 
 // Configure axios-retry: 2 retries with exponential backoff, 3 s timeout per request
-const axiosInstance = axios.create({ timeout: 3000 });
+// Internal token lets these service-to-service calls bypass the product-service rate
+// limiter (which is keyed per source IP and would otherwise be shared by all users).
+const axiosInstance = axios.create({
+    timeout: 3000,
+    headers: process.env.INTERNAL_TOKEN ? { 'x-internal-token': process.env.INTERNAL_TOKEN } : {}
+});
 axiosRetry(axiosInstance, {
     retries: 2,
     retryDelay: axiosRetry.exponentialDelay,
@@ -27,17 +32,26 @@ const getCartProducts = async (req, res, next) => {
             const results = await Promise.all(
                 cartProductIds.map(id =>
                     axiosInstance.get(`${PRODUCT_SERVICE_URL}/api/v1/products/${id}`)
-                        .then(r => r.data)
+                        .then(r => ({ ok: true, data: r.data }))
                         .catch((err) => {
                             logger.error({ err, productId: id }, 'Failed to fetch product from Product service');
-                            return null;
+                            return { ok: false, id };
                         })
                 )
             );
-            Products = results.filter(p => p !== null);
+            const failures = results.filter(r => !r.ok).length;
+            Products = results.filter(r => r.ok).map(r => r.data);
             Products.forEach(product => {
                 total += product.price;
             });
+            if (failures > 0) {
+                logger.warn({ userId: req.user.id, failures }, 'Cart response incomplete (product-service errors)');
+                return res.status(502).json({
+                    error: 'UpstreamError',
+                    message: 'Could not load some cart items from the product service',
+                    failedItems: failures
+                });
+            }
         }
 
         logger.info({ userId: req.user.id, count: Products.length }, 'User fetched cart');

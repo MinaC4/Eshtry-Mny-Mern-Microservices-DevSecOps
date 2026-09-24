@@ -1,0 +1,40 @@
+{{- if .Values.monitoring.alerts.enabled }}
+# Basic alerting for eshtry-mny. Selected by Prometheus (ruleSelector release=prometheus).
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: eshtry-mny-alerts
+  namespace: eshtry-mny
+  labels:
+    release: prometheus
+    app.kubernetes.io/part-of: eshtry-mny
+spec:
+  groups:
+    - name: eshtry-mny.rules
+      rules:
+        - alert: EshtryMnyHighErrorRate
+          expr: sum(rate(http_requests_total{namespace="eshtry-mny",status=~"5.."}[5m])) / clamp_min(sum(rate(http_requests_total{namespace="eshtry-mny"}[5m])), 0.001) > 0.05
+          for: 10m
+          labels: { severity: warning }
+          annotations: { summary: "Eshtry-Mny 5xx error rate above 5%" }
+        - alert: EshtryMnyHighLatency
+          expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{namespace="eshtry-mny"}[5m])) by (le)) > 0.5
+          for: 10m
+          labels: { severity: warning }
+          annotations: { summary: "Eshtry-Mny p95 latency above 0.5s" }
+        - alert: EshtryMnyRateLimited
+          expr: sum(rate(http_requests_total{namespace="eshtry-mny",status="429"}[5m])) > 0.2
+          for: 10m
+          labels: { severity: info }
+          annotations: { summary: "Eshtry-Mny is returning 429s" }
+        - alert: EshtryMnyScrapeDown
+          expr: up{namespace="eshtry-mny"} == 0
+          for: 5m
+          labels: { severity: critical }
+          annotations: { summary: "Prometheus cannot scrape an eshtry-mny backend" }
+        - alert: EshtryMnyPodRestarting
+          expr: increase(kube_pod_container_status_restarts_total{namespace="eshtry-mny"}[15m]) > 3
+          for: 5m
+          labels: { severity: warning }
+          annotations: { summary: "Eshtry-Mny pod restarting frequently" }
+{{- end }}

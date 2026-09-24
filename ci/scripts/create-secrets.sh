@@ -12,6 +12,7 @@ u=$(yq -r '.secrets.mongoUsername' "$VALUES")
 p=$(yq -r '.secrets.mongoPassword' "$VALUES")
 uri=$(yq -r '.secrets.mongoUri' "$VALUES")
 tok=$(yq -r '.secrets.accessToken' "$VALUES")
+it=$(yq -r '.secrets.internalToken' "$VALUES")
 hu=$(yq -r '.secrets.harborUsername' "$VALUES")
 hp=$(yq -r '.secrets.harborPassword' "$VALUES")
 reg=$(yq -r '.registry.host // ""' "$VALUES")
@@ -25,6 +26,7 @@ kubectl create secret generic app-secrets -n "$NS" \
   --from-literal=MONGO_PASSWORD="$p" \
   --from-literal=MONGO_URI="$uri" \
   --from-literal=ACCESS_TOKEN="$tok" \
+  --from-literal=INTERNAL_TOKEN="$it" \
   --dry-run=client -o yaml | kubectl apply -f -
 
 kubectl create secret docker-registry harbor-creds -n "$NS" \
