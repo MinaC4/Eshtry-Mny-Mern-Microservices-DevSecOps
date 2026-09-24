@@ -32,3 +32,23 @@ spec:
                 spec:
                   containers:
                     - image: "!*latest"
+
+    - name: deny-latest-image-tag-pods
+      match:
+        any:
+        - resources:
+            namespaces:
+              - eshtry-mny
+            kinds:
+              - Pod
+      validate:
+        message: "Image tag 'latest' is not allowed. Use a specific tag or digest."
+        anyPattern:
+          - spec:
+              containers:
+                - image: "!*latest"
+              initContainers:
+                - image: "!*latest"
+          - spec:
+              containers:
+                - image: "!*latest"
