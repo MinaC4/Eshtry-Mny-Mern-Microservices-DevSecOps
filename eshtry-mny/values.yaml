@@ -7,10 +7,10 @@ replicaCount: 1
 imagePullPolicy: IfNotPresent
 # Images from the operator's Harbor registry (override with --set images.user=...)
 images:
-  user: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:5f841b767b4a8f0a31924680bc448be6ad6962d5d539f74d05f776014cf261a6
+  user: 192.168.1.8:30082/eshtry-mny/eshtry-mny-user@sha256:53fb4de3288dbd141ae2aa3c4dec78ea49161d8852cc8bab8d94145c50fafba1
   product: 192.168.1.8:30082/eshtry-mny/eshtry-mny-product@sha256:12daddeeb0df12cab327c0e49b12d6e617378ee026d094f2b073f961201b6ec8
-  cart: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:103548c0e2cb9925ba67a29fde82e2c894329c35356eccfd0e3f3d48a3e6bf63
-  frontend: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:31367080ff2d0c79434bb380f319fd2bb0482a2446fcc5cb76b43df2c60a6110
+  cart: 192.168.1.8:30082/eshtry-mny/eshtry-mny-cart@sha256:1c90111cbd23ad4829dda283897c92535bfcf7ff327eced2d229357cf9a3bf28
+  frontend: 192.168.1.8:30082/eshtry-mny/eshtry-mny-frontend@sha256:8b74d091cb758bd494ec5586f4edc7a566cbf21b6d71c664f9b2fb38643730dc
 # ConfigMap values
 mongoCluster: "" # unused when MONGO_URI is set (in-cluster MongoDB)
 mongoDbname: "eshtry_mny"
